@@ -5,14 +5,14 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 1: synthetic data** (next). Phase 0 is complete.
+**Phase 2: core system and rules (Java)** (next). Phases 0 and 1 are complete.
 
 ## Phase status
 
 | Phase | Scope | Status | Release |
 |---|---|---|---|
 | 0 | Foundations: repo, tooling, compose stack, CI, first ADRs | done | v0.1.0 |
-| 1 | Synthetic data generator | pending | |
+| 1 | Synthetic data generator | done | v0.2.0 |
 | 2 | Core system and rules (Java) | pending | |
 | 3 | Document reading | pending | |
 | 4 | Policy search | pending | |
@@ -39,6 +39,22 @@ resuming work, read this file first.
 - CI on every push: secret scan, Python lint/types/tests, Java build/tests, compose smoke test.
   Failing steps publish their last output lines as annotations.
 - ADRs 0001 to 0006.
+
+## Phase 1: done
+
+- Product catalog (`data/policies/catalog.yaml`) as the single source of truth for limits,
+  deductibles, waiting periods, exclusions, required documents and fraud weights.
+- Seven Spanish policy condition documents rendered from the catalog with stable clause ids, plus
+  a structured clause index (`data/policies/clauses.json`). A test fails on drift.
+- Seeded generator (`make data`): 200 policyholders, 232 policies, 150 claims, about 230 documents
+  (PDF invoices, estimates, police reports, accident reports; a quarter as scanned JPEGs).
+- Expected resolution per claim derived from the facts (ADR 0007): decision, payable amount,
+  routing, reasons, clause citations, missing documents, fraud signals and score.
+- Coverage of the brief: planted fraud (18, four patterns), decoys (6), out of cover (10 not
+  included + 14 exclusions + 6 waiting periods), late notice (10), incomplete documentation (14),
+  amount adjustments (12) and hidden prompt injections (10).
+- 24 generator tests: determinism to the byte, label invariants, identifier check digits, policy
+  text consistency.
 
 ## Open issues and notes
 

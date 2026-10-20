@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 0 (foundations)** of 12. See [PROGRESS.md](PROGRESS.md) for what is done and
+> Status: **Phase 1 (synthetic data)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is done and
 > what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -98,6 +98,13 @@ Local endpoints after `make up`:
 | OpenSearch | http://localhost:9200 |
 | S3 API / console | http://localhost:9000 / http://localhost:9001 |
 | Temporal / UI | `localhost:7233` / http://localhost:8233 |
+
+## Data
+
+Everything is synthetic and reproducible from a seed (`make data`): seven products with Spanish
+policy conditions rendered from one catalog, 200 policyholders, 150 claims with PDF and scanned
+documents, and an expected resolution for each claim derived from the generated facts. See
+[data/README.md](data/README.md) and [ADR 0007](docs/decisions/0007-synthetic-dataset-and-ground-truth.md).
 
 ## Contributing
 
