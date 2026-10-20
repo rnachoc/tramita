@@ -1,9 +1,35 @@
 spring:
   application:
     name: tramita-core
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:tramita}
+    username: ${POSTGRES_USER:tramita}
+    password: ${POSTGRES_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.default_schema: core
+  flyway:
+    schemas: core
+    create-schemas: true
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: true
 
 server:
   port: ${CORE_PORT:8080}
+
+tramita:
+  catalog:
+    location: classpath:catalog/catalog.yaml
+    clauses: classpath:catalog/clauses.json
+  security:
+    # name:ROLE:key;name:ROLE:key - see .env.example. No default: an unset value rejects every call.
+    api-keys: ${TRAMITA_API_KEYS:}
 
 management:
   endpoints:
