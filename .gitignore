@@ -1,0 +1,48 @@
+# --- Secrets and local configuration -------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Personal interview notes (kept local on purpose, never published) ---
+notes/
+
+# --- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# --- Java -----------------------------------------------------------------
+target/
+*.class
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# --- Node / Angular -------------------------------------------------------
+node_modules/
+.angular/
+web/console/dist/
+
+# --- Generated data and eval outputs --------------------------------------
+data/generated/
+evals/reports/*
+!evals/reports/.gitkeep
+models-cache/
+
+# --- Editors and OS -------------------------------------------------------
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+.DS_Store
+Thumbs.db
