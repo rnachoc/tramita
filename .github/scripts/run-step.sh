@@ -2,7 +2,8 @@
 # Usage: run-step.sh "<title>" <command...>
 # Runs a CI command, streams its output, and on failure publishes the last lines
 # as an error annotation so the cause is visible in the checks summary and API
-# without opening the raw job log.
+# without opening the raw job log. GitHub truncates annotation messages at
+# about 4 KB, so only the end of the output (where errors usually are) is kept.
 set -uo pipefail
 title="$1"; shift
 log="$(mktemp)"
@@ -11,7 +12,7 @@ status=${PIPESTATUS[0]}
 if [[ $status -ne 0 ]]; then
   tail -n "${ANNOTATION_LINES:-120}" "$log" \
     | sed -E 's/\x1b\[[0-9;]*[A-Za-z]//g' \
-    | python3 -c 'import sys; t=sys.stdin.read()[-60000:]; print(t.replace("%","%25").replace("\r","").replace("\n","%0A"), end="")' \
+    | python3 -c 'import sys; t=sys.stdin.read()[-3800:]; print(t.replace("%","%25").replace("\r","").replace("\n","%0A"), end="")' \
     > "$log.tail"
   echo "::error title=${title}::$(cat "$log.tail")"
 fi
