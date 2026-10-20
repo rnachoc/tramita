@@ -51,6 +51,11 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
+      # The rules engine is cross-checked against the dataset generator's reference resolver.
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
       - run: .github/scripts/run-step.sh "java build" make core-test
 
   compose:

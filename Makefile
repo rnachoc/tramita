@@ -43,16 +43,19 @@ py-test: py-sync ## Run Python tests
 	uv run pytest services/agents data/generator
 
 # --- Data ---------------------------------------------------------------------------
-.PHONY: data
+.PHONY: data data-json
 data: py-sync ## Render policy conditions and generate the synthetic dataset (seeded)
 	uv run tramita-datagen
+
+data-json: py-sync ## Generate the dataset records only, without rendering documents (fast)
+	uv run tramita-datagen --no-documents
 
 # --- Java (core service) --------------------------------------------------------
 .PHONY: core-lint core-test
 core-lint: ## Check Java formatting
 	cd services/core && mvn -B -q spotless:check
 
-core-test: ## Run Java unit and integration tests
+core-test: data-json ## Run Java unit and integration tests (integration tests need Docker)
 	cd services/core && mvn -B verify
 
 # --- Aggregates -----------------------------------------------------------------
