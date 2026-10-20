@@ -1,0 +1,27 @@
+[project]
+name = "tramita-datagen"
+version = "0.1.0"
+description = "Reproducible synthetic data for Tramita: policy conditions, policyholders, claims, documents and expected resolutions."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "faker>=37.0",      # realistic Spanish names and addresses, seeded
+    "numpy>=2.2",       # seeded noise for scanned-looking images
+    "pillow>=11.0",     # image post-processing for scans
+    "pydantic>=2.12",
+    "pypdfium2>=4.30",  # rasterises generated PDFs into scan images
+    "pyyaml>=6.0",
+    "reportlab>=4.4",   # deterministic PDF rendering
+]
+
+[project.scripts]
+tramita-datagen = "tramita_datagen.cli:main"
+
+[dependency-groups]
+dev = ["types-pyyaml>=6.0", "types-reportlab>=4.4"]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tramita_datagen"]

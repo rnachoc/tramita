@@ -1,0 +1,186 @@
+# Product catalog of the fictional insurer "Aseguradora Brisa".
+#
+# Single source of truth for every number the system reasons about: which
+# guarantees each product includes, limits, deductibles, waiting periods,
+# exclusions, notice periods and required documents. The policy conditions in
+# data/policies/*.md are rendered from this file, and the core rules engine
+# loads the same values, so the text an agent cites and the rule the code
+# enforces cannot drift apart.
+#
+# Amounts are in euros. "limit: insured_value" means the per-policy insured
+# value of the vehicle.
+
+insurer:
+  name: Aseguradora Brisa
+  legal_notice: >-
+    Aseguradora Brisa es una compañía ficticia creada para el proyecto Tramita.
+    Este documento es sintético y no tiene validez contractual.
+
+# Internal operating rules. They are not part of the policy text.
+operations:
+  # Proposals above this payable amount always require a human claims handler.
+  review_threshold_eur: 3000
+  # Claims reported after this many days are flagged for human review. Under
+  # article 16 of Ley 50/1980 late notice does not void cover by itself, so it
+  # changes the routing, never the outcome.
+  notice_days: 7
+  # Fraud scoring (see docs/decisions): score = 1 - prod(1 - weight * confidence).
+  fraud:
+    review_threshold: 0.4
+    investigation_threshold: 0.7
+    weights:
+      DUPLICATE_INVOICE: 0.8
+      DATE_INCONSISTENCY: 0.5
+      DESCRIPTION_MISMATCH: 0.5
+      EARLY_CLAIM: 0.35
+      FREQUENT_CLAIMS: 0.35
+      ROUND_AMOUNTS: 0.15
+    early_claim_days: 60
+    frequent_claims_window_days: 180
+    frequent_claims_min: 3
+
+coverages:
+  HOME_WATER:
+    line: HOME
+    title: Daños por agua
+    description: >-
+      Daños materiales causados al continente y al contenido de la vivienda por
+      escapes accidentales de agua procedentes de las conducciones, depósitos o
+      aparatos fijos de la vivienda asegurada o de viviendas colindantes, así como
+      los gastos de localización y reparación de la avería.
+    exclusions:
+      - code: WATER_MAINTENANCE
+        text: >-
+          Daños debidos a la falta de mantenimiento o de reparación de las
+          instalaciones, así como humedades por condensación o filtraciones lentas
+          y continuadas.
+      - code: WATER_EXTERIOR
+        text: >-
+          Daños causados por agua de lluvia, nieve o inundación que penetre por
+          puertas, ventanas u otras aberturas que hayan quedado sin cerrar.
+    required_documents: [REPAIR_INVOICE_OR_ESTIMATE]
+  HOME_THEFT:
+    line: HOME
+    title: Robo y daños por robo
+    description: >-
+      Sustracción de los bienes del contenido de la vivienda asegurada cometida
+      con fuerza en las cosas o con violencia o intimidación en las personas, y
+      los daños materiales causados en la vivienda para cometer el robo o su
+      tentativa.
+    exclusions:
+      - code: THEFT_WITHOUT_FORCE
+        text: >-
+          El hurto, entendido como la sustracción de bienes sin fuerza en las cosas
+          ni violencia o intimidación en las personas, y las simples pérdidas o
+          extravíos.
+      - code: THEFT_UNOCCUPIED
+        text: >-
+          Los robos ocurridos cuando la vivienda haya permanecido deshabitada más
+          de 30 días consecutivos.
+    required_documents: [POLICE_REPORT, REPAIR_INVOICE_OR_ESTIMATE]
+  HOME_GLASS:
+    line: HOME
+    title: Rotura de cristales
+    description: >-
+      Rotura accidental de los cristales, lunas y espejos fijos de la vivienda,
+      incluidas las vitrocerámicas, con los gastos de colocación.
+    exclusions:
+      - code: GLASS_SCRATCHES
+        text: >-
+          Los arañazos, raspaduras, desconchados u otros deterioros de la
+          superficie que no constituyan rotura.
+    required_documents: [REPAIR_INVOICE_OR_ESTIMATE]
+  AUTO_COLLISION:
+    line: AUTO
+    title: Daños propios por colisión
+    description: >-
+      Daños sufridos por el vehículo asegurado como consecuencia de colisión con
+      otro vehículo, con un objeto fijo o móvil, o por vuelco, con independencia
+      de la culpa del conductor.
+    exclusions:
+      - code: AUTO_ALCOHOL
+        text: >-
+          Los siniestros ocurridos cuando el conductor supere las tasas de alcohol
+          o haya consumido drogas tóxicas, estupefacientes o psicotrópicos, según
+          la normativa de tráfico vigente.
+      - code: AUTO_COMPETITION
+        text: >-
+          Los daños sufridos durante la participación en carreras, competiciones o
+          pruebas de velocidad, o en circuitos cerrados.
+    required_documents: [ACCIDENT_REPORT, REPAIR_INVOICE_OR_ESTIMATE]
+  AUTO_GLASS:
+    line: AUTO
+    title: Rotura de lunas
+    description: >-
+      Rotura del parabrisas, la luneta trasera, las lunas laterales y el techo
+      acristalado del vehículo asegurado, incluida su colocación.
+    exclusions:
+      - code: AUTO_GLASS_MIRRORS
+        text: >-
+          Los espejos retrovisores, faros, pilotos e intermitentes, y los
+          arañazos o desperfectos que no constituyan rotura.
+    required_documents: [REPAIR_INVOICE_OR_ESTIMATE]
+  AUTO_THEFT:
+    line: AUTO
+    title: Robo de accesorios y daños por robo
+    description: >-
+      Sustracción de piezas o accesorios fijos del vehículo asegurado y daños
+      materiales causados al vehículo durante el robo o su tentativa.
+    exclusions:
+      - code: AUTO_THEFT_KEYS
+        text: >-
+          Los robos cometidos utilizando las llaves originales del vehículo, o
+          cuando el vehículo se hubiera dejado abierto o con las llaves en su
+          interior.
+    required_documents: [POLICE_REPORT, REPAIR_INVOICE_OR_ESTIMATE]
+
+documents:
+  REPAIR_INVOICE_OR_ESTIMATE: Factura o presupuesto detallado de la reparación o reposición
+  POLICE_REPORT: Copia de la denuncia presentada ante la autoridad competente
+  ACCIDENT_REPORT: Declaración amistosa de accidente o atestado
+
+products:
+  HB:
+    name: Hogar Básico
+    line: HOME
+    guarantees:
+      HOME_WATER: {limit: 6000, deductible: 150, waiting_days: 0}
+      HOME_THEFT: {limit: 3000, deductible: 0, waiting_days: 30}
+  HP:
+    name: Hogar Plus
+    line: HOME
+    guarantees:
+      HOME_WATER: {limit: 15000, deductible: 100, waiting_days: 0}
+      HOME_THEFT: {limit: 8000, deductible: 0, waiting_days: 15}
+      HOME_GLASS: {limit: 1500, deductible: 0, waiting_days: 0}
+  HT:
+    name: Hogar Total
+    line: HOME
+    guarantees:
+      HOME_WATER: {limit: 40000, deductible: 0, waiting_days: 0}
+      HOME_THEFT: {limit: 20000, deductible: 0, waiting_days: 0}
+      HOME_GLASS: {limit: 3000, deductible: 0, waiting_days: 0}
+  AT:
+    name: Auto Terceros
+    line: AUTO
+    guarantees: {}
+  AA:
+    name: Auto Terceros Ampliado
+    line: AUTO
+    guarantees:
+      AUTO_GLASS: {limit: 1200, deductible: 0, waiting_days: 0}
+      AUTO_THEFT: {limit: 3000, deductible: 0, waiting_days: 0}
+  AF:
+    name: Auto Todo Riesgo con Franquicia
+    line: AUTO
+    guarantees:
+      AUTO_COLLISION: {limit: insured_value, deductible: 300, waiting_days: 0}
+      AUTO_GLASS: {limit: 1500, deductible: 0, waiting_days: 0}
+      AUTO_THEFT: {limit: 6000, deductible: 0, waiting_days: 0}
+  AR:
+    name: Auto Todo Riesgo
+    line: AUTO
+    guarantees:
+      AUTO_COLLISION: {limit: insured_value, deductible: 0, waiting_days: 0}
+      AUTO_GLASS: {limit: 2000, deductible: 0, waiting_days: 0}
+      AUTO_THEFT: {limit: 10000, deductible: 0, waiting_days: 0}

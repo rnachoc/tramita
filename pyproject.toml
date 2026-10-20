@@ -10,7 +10,7 @@ requires-python = ">=3.12,<3.13"
 package = false
 
 [tool.uv.workspace]
-members = ["services/agents"]
+members = ["services/agents", "data/generator"]
 
 [dependency-groups]
 dev = [
@@ -27,20 +27,29 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "S", "PL", "ASYNC"]
 ignore = [
+    "E501",    # line length is enforced by `ruff format`; long string literals are allowed
     "PLR0913", # agent tools legitimately take many keyword arguments
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["tramita_agents"]
+known-first-party = ["tramita_agents", "tramita_datagen"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101", "PLR2004"]
+# Seeded pseudo-randomness is the point of the data generator, not a security control.
+"data/generator/**" = ["S311"]
 
 [tool.mypy]
 strict = true
 python_version = "3.12"
 plugins = ["pydantic.mypy"]
 
+[[tool.mypy.overrides]]
+# pypdfium2 ships no type information.
+module = ["pypdfium2", "pypdfium2.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
