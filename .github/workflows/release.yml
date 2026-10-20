@@ -1,0 +1,37 @@
+name: release
+
+# Release notes as code: adding docs/releases/vX.Y.Z.md on main creates the
+# annotated tag vX.Y.Z on that commit and a GitHub release whose body is the file.
+on:
+  push:
+    branches: [main]
+    paths: ["docs/releases/*.md"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Create missing tags and releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for notes in docs/releases/v*.md; do
+            tag="$(basename "$notes" .md)"
+            if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+              echo "$tag already exists, skipping"
+              continue
+            fi
+            title="$(head -n 1 "$notes" | sed -E 's/^#+ *//')"
+            git tag -a "$tag" -m "$title" "$GITHUB_SHA"
+            git push origin "refs/tags/$tag"
+            tail -n +2 "$notes" > /tmp/body.md
+            gh release create "$tag" --title "$title" --notes-file /tmp/body.md --verify-tag
+          done
