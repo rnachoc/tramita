@@ -1,0 +1,1834 @@
+[
+  {
+    "clause_id": "HB-1.1",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Objeto del seguro",
+    "text": "Aseguradora Brisa (en adelante, la Aseguradora) se obliga, mediante el cobro de la prima y dentro de los límites pactados, a indemnizar los daños sufridos por la vivienda asegurada como consecuencia de los riesgos expresamente cubiertos en el artículo 2, conforme a la Ley 50/1980, de 8 de octubre, de Contrato de Seguro.",
+    "keys": [
+      "object"
+    ]
+  },
+  {
+    "clause_id": "HB-1.2",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Tomador y asegurado",
+    "text": "Tomador es la persona que suscribe el contrato y paga la prima. Asegurado es el titular del interés expuesto al riesgo. Salvo indicación en contrario de las condiciones particulares, tomador y asegurado son la misma persona.",
+    "keys": []
+  },
+  {
+    "clause_id": "HB-1.3",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Siniestro",
+    "text": "Todo hecho súbito, accidental y ajeno a la voluntad del asegurado cuyas consecuencias estén cubiertas por alguna de las garantías de la póliza. Se considera un único siniestro el conjunto de daños derivados de una misma causa.",
+    "keys": [
+      "definition:claim"
+    ]
+  },
+  {
+    "clause_id": "HB-1.4",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Franquicia",
+    "text": "Importe que, en cada siniestro, queda a cargo del asegurado y se descuenta de la indemnización que corresponda.",
+    "keys": [
+      "definition:deductible"
+    ]
+  },
+  {
+    "clause_id": "HB-1.5",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Periodo de carencia",
+    "text": "Plazo contado desde la fecha de efecto de la póliza durante el cual los siniestros ocurridos no están cubiertos por la garantía a la que se aplica.",
+    "keys": [
+      "definition:waiting"
+    ]
+  },
+  {
+    "clause_id": "HB-1.6",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Continente y contenido",
+    "text": "Continente es el conjunto de elementos constructivos de la vivienda, incluidas sus instalaciones fijas de agua, gas, electricidad y calefacción. Contenido es el conjunto de bienes muebles, mobiliario y enseres de uso doméstico que se encuentren en la vivienda.",
+    "keys": []
+  },
+  {
+    "clause_id": "HB-2.1",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Daños por agua",
+    "text": "Daños materiales causados al continente y al contenido de la vivienda por escapes accidentales de agua procedentes de las conducciones, depósitos o aparatos fijos de la vivienda asegurada o de viviendas colindantes, así como los gastos de localización y reparación de la avería.",
+    "keys": [
+      "coverage:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HB-2.2",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Robo y daños por robo",
+    "text": "Sustracción de los bienes del contenido de la vivienda asegurada cometida con fuerza en las cosas o con violencia o intimidación en las personas, y los daños materiales causados en la vivienda para cometer el robo o su tentativa.",
+    "keys": [
+      "coverage:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HB-2.3",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Riesgos no incluidos en este producto",
+    "text": "El producto Hogar Básico no incluye las siguientes garantías: rotura de cristales. Los siniestros derivados de estos riesgos no están cubiertos, salvo contratación de un producto superior.",
+    "keys": [
+      "not_included:HOME_GLASS"
+    ]
+  },
+  {
+    "clause_id": "HB-3.1",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones generales",
+    "text": "En ningún caso quedan cubiertos: (a) los siniestros causados intencionadamente por el asegurado o con su complicidad; (b) los daños derivados de guerra, terrorismo, terremotos, inundaciones extraordinarias y demás riesgos extraordinarios cuya cobertura corresponde al Consorcio de Compensación de Seguros; (c) los daños anteriores a la fecha de efecto de la póliza.",
+    "keys": [
+      "exclusion:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "HB-3.2",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de daños por agua",
+    "text": "Además de las exclusiones generales, la garantía de daños por agua no cubre: (a) daños debidos a la falta de mantenimiento o de reparación de las instalaciones, así como humedades por condensación o filtraciones lentas y continuadas; (b) daños causados por agua de lluvia, nieve o inundación que penetre por puertas, ventanas u otras aberturas que hayan quedado sin cerrar.",
+    "keys": [
+      "exclusion:WATER_EXTERIOR",
+      "exclusion:WATER_MAINTENANCE"
+    ]
+  },
+  {
+    "clause_id": "HB-3.3",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de robo y daños por robo",
+    "text": "Además de las exclusiones generales, la garantía de robo y daños por robo no cubre: (a) el hurto, entendido como la sustracción de bienes sin fuerza en las cosas ni violencia o intimidación en las personas, y las simples pérdidas o extravíos; (b) los robos ocurridos cuando la vivienda haya permanecido deshabitada más de 30 días consecutivos.",
+    "keys": [
+      "exclusion:THEFT_UNOCCUPIED",
+      "exclusion:THEFT_WITHOUT_FORCE"
+    ]
+  },
+  {
+    "clause_id": "HB-4.1",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Daños por agua",
+    "text": "La garantía de daños por agua se presta hasta un límite máximo de 6.000 € por siniestro, con una franquicia de 150 € y sin periodo de carencia.",
+    "keys": [
+      "limits:HOME_WATER",
+      "waiting:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HB-4.2",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Robo y daños por robo",
+    "text": "La garantía de robo y daños por robo se presta hasta un límite máximo de 3.000 € por siniestro, sin franquicia y con un periodo de carencia de 30 días desde la fecha de efecto.",
+    "keys": [
+      "limits:HOME_THEFT",
+      "waiting:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HB-4.3",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Cálculo de la indemnización",
+    "text": "La indemnización se calcula sobre el importe de los daños debidamente acreditados y relacionados con el siniestro, con el límite máximo de la garantía afectada. De la cantidad resultante se descuenta la franquicia aplicable. Las partidas de una factura o presupuesto que no guarden relación con el siniestro no son indemnizables.",
+    "keys": [
+      "indemnity"
+    ]
+  },
+  {
+    "clause_id": "HB-5.1",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Plazo de comunicación",
+    "text": "El tomador o el asegurado deberán comunicar el siniestro a la Aseguradora en el plazo máximo de siete días desde que lo conocieron, conforme al artículo 16 de la Ley de Contrato de Seguro. Si la comunicación se produce fuera de plazo, la Aseguradora podrá reclamar los daños y perjuicios causados por la falta de declaración, sin que el retraso suponga por sí solo la pérdida del derecho a la indemnización.",
+    "keys": [
+      "notice"
+    ]
+  },
+  {
+    "clause_id": "HB-5.2",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Deber de aminorar las consecuencias",
+    "text": "El asegurado deberá emplear los medios a su alcance para aminorar las consecuencias del siniestro, conforme al artículo 17 de la Ley de Contrato de Seguro. Los gastos razonables en que incurra por este motivo serán a cargo de la Aseguradora.",
+    "keys": [
+      "mitigation"
+    ]
+  },
+  {
+    "clause_id": "HB-6.1",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación general",
+    "text": "Junto con la comunicación del siniestro, el asegurado facilitará una descripción de las circunstancias, la fecha y el lugar de ocurrencia, y cualquier documento que permita valorar las consecuencias. La Aseguradora podrá solicitar la documentación adicional razonablemente necesaria.",
+    "keys": [
+      "documents:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "HB-6.2",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para daños por agua",
+    "text": "Para tramitar un siniestro de daños por agua es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HB-6.3",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para robo y daños por robo",
+    "text": "Para tramitar un siniestro de robo y daños por robo es imprescindible aportar: copia de la denuncia presentada ante la autoridad competente; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HB-7.1",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Peritación",
+    "text": "La Aseguradora podrá designar un perito para valorar los daños. Las partes podrán acordar la indemnización a la vista de las facturas o presupuestos aportados.",
+    "keys": []
+  },
+  {
+    "clause_id": "HB-7.2",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Pago de la indemnización",
+    "text": "La Aseguradora pagará la indemnización dentro de los cuarenta días siguientes a la recepción de la declaración del siniestro y de la documentación completa, conforme al artículo 18 de la Ley de Contrato de Seguro, mediante transferencia a la cuenta designada por el asegurado.",
+    "keys": [
+      "payment"
+    ]
+  },
+  {
+    "clause_id": "HB-7.3",
+    "product_code": "HB",
+    "product_name": "Hogar Básico",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Verificación y fraude",
+    "text": "La Aseguradora podrá verificar la veracidad de la declaración y de los documentos aportados. Si el siniestro se hubiera declarado con mala fe, conforme al artículo 19 de la Ley de Contrato de Seguro, la Aseguradora quedará liberada del pago. En ningún caso se rechazará un siniestro por sospecha de fraude sin la revisión de un tramitador de Aseguradora Brisa.",
+    "keys": [
+      "fraud"
+    ]
+  },
+  {
+    "clause_id": "HP-1.1",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Objeto del seguro",
+    "text": "Aseguradora Brisa (en adelante, la Aseguradora) se obliga, mediante el cobro de la prima y dentro de los límites pactados, a indemnizar los daños sufridos por la vivienda asegurada como consecuencia de los riesgos expresamente cubiertos en el artículo 2, conforme a la Ley 50/1980, de 8 de octubre, de Contrato de Seguro.",
+    "keys": [
+      "object"
+    ]
+  },
+  {
+    "clause_id": "HP-1.2",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Tomador y asegurado",
+    "text": "Tomador es la persona que suscribe el contrato y paga la prima. Asegurado es el titular del interés expuesto al riesgo. Salvo indicación en contrario de las condiciones particulares, tomador y asegurado son la misma persona.",
+    "keys": []
+  },
+  {
+    "clause_id": "HP-1.3",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Siniestro",
+    "text": "Todo hecho súbito, accidental y ajeno a la voluntad del asegurado cuyas consecuencias estén cubiertas por alguna de las garantías de la póliza. Se considera un único siniestro el conjunto de daños derivados de una misma causa.",
+    "keys": [
+      "definition:claim"
+    ]
+  },
+  {
+    "clause_id": "HP-1.4",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Franquicia",
+    "text": "Importe que, en cada siniestro, queda a cargo del asegurado y se descuenta de la indemnización que corresponda.",
+    "keys": [
+      "definition:deductible"
+    ]
+  },
+  {
+    "clause_id": "HP-1.5",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Periodo de carencia",
+    "text": "Plazo contado desde la fecha de efecto de la póliza durante el cual los siniestros ocurridos no están cubiertos por la garantía a la que se aplica.",
+    "keys": [
+      "definition:waiting"
+    ]
+  },
+  {
+    "clause_id": "HP-1.6",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Continente y contenido",
+    "text": "Continente es el conjunto de elementos constructivos de la vivienda, incluidas sus instalaciones fijas de agua, gas, electricidad y calefacción. Contenido es el conjunto de bienes muebles, mobiliario y enseres de uso doméstico que se encuentren en la vivienda.",
+    "keys": []
+  },
+  {
+    "clause_id": "HP-2.1",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Daños por agua",
+    "text": "Daños materiales causados al continente y al contenido de la vivienda por escapes accidentales de agua procedentes de las conducciones, depósitos o aparatos fijos de la vivienda asegurada o de viviendas colindantes, así como los gastos de localización y reparación de la avería.",
+    "keys": [
+      "coverage:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HP-2.2",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Robo y daños por robo",
+    "text": "Sustracción de los bienes del contenido de la vivienda asegurada cometida con fuerza en las cosas o con violencia o intimidación en las personas, y los daños materiales causados en la vivienda para cometer el robo o su tentativa.",
+    "keys": [
+      "coverage:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HP-2.3",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Rotura de cristales",
+    "text": "Rotura accidental de los cristales, lunas y espejos fijos de la vivienda, incluidas las vitrocerámicas, con los gastos de colocación.",
+    "keys": [
+      "coverage:HOME_GLASS"
+    ]
+  },
+  {
+    "clause_id": "HP-3.1",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones generales",
+    "text": "En ningún caso quedan cubiertos: (a) los siniestros causados intencionadamente por el asegurado o con su complicidad; (b) los daños derivados de guerra, terrorismo, terremotos, inundaciones extraordinarias y demás riesgos extraordinarios cuya cobertura corresponde al Consorcio de Compensación de Seguros; (c) los daños anteriores a la fecha de efecto de la póliza.",
+    "keys": [
+      "exclusion:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "HP-3.2",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de daños por agua",
+    "text": "Además de las exclusiones generales, la garantía de daños por agua no cubre: (a) daños debidos a la falta de mantenimiento o de reparación de las instalaciones, así como humedades por condensación o filtraciones lentas y continuadas; (b) daños causados por agua de lluvia, nieve o inundación que penetre por puertas, ventanas u otras aberturas que hayan quedado sin cerrar.",
+    "keys": [
+      "exclusion:WATER_EXTERIOR",
+      "exclusion:WATER_MAINTENANCE"
+    ]
+  },
+  {
+    "clause_id": "HP-3.3",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de robo y daños por robo",
+    "text": "Además de las exclusiones generales, la garantía de robo y daños por robo no cubre: (a) el hurto, entendido como la sustracción de bienes sin fuerza en las cosas ni violencia o intimidación en las personas, y las simples pérdidas o extravíos; (b) los robos ocurridos cuando la vivienda haya permanecido deshabitada más de 30 días consecutivos.",
+    "keys": [
+      "exclusion:THEFT_UNOCCUPIED",
+      "exclusion:THEFT_WITHOUT_FORCE"
+    ]
+  },
+  {
+    "clause_id": "HP-3.4",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de rotura de cristales",
+    "text": "Además de las exclusiones generales, la garantía de rotura de cristales no cubre: (a) los arañazos, raspaduras, desconchados u otros deterioros de la superficie que no constituyan rotura.",
+    "keys": [
+      "exclusion:GLASS_SCRATCHES"
+    ]
+  },
+  {
+    "clause_id": "HP-4.1",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Daños por agua",
+    "text": "La garantía de daños por agua se presta hasta un límite máximo de 15.000 € por siniestro, con una franquicia de 100 € y sin periodo de carencia.",
+    "keys": [
+      "limits:HOME_WATER",
+      "waiting:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HP-4.2",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Robo y daños por robo",
+    "text": "La garantía de robo y daños por robo se presta hasta un límite máximo de 8.000 € por siniestro, sin franquicia y con un periodo de carencia de 15 días desde la fecha de efecto.",
+    "keys": [
+      "limits:HOME_THEFT",
+      "waiting:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HP-4.3",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Rotura de cristales",
+    "text": "La garantía de rotura de cristales se presta hasta un límite máximo de 1.500 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:HOME_GLASS",
+      "waiting:HOME_GLASS"
+    ]
+  },
+  {
+    "clause_id": "HP-4.4",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Cálculo de la indemnización",
+    "text": "La indemnización se calcula sobre el importe de los daños debidamente acreditados y relacionados con el siniestro, con el límite máximo de la garantía afectada. De la cantidad resultante se descuenta la franquicia aplicable. Las partidas de una factura o presupuesto que no guarden relación con el siniestro no son indemnizables.",
+    "keys": [
+      "indemnity"
+    ]
+  },
+  {
+    "clause_id": "HP-5.1",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Plazo de comunicación",
+    "text": "El tomador o el asegurado deberán comunicar el siniestro a la Aseguradora en el plazo máximo de siete días desde que lo conocieron, conforme al artículo 16 de la Ley de Contrato de Seguro. Si la comunicación se produce fuera de plazo, la Aseguradora podrá reclamar los daños y perjuicios causados por la falta de declaración, sin que el retraso suponga por sí solo la pérdida del derecho a la indemnización.",
+    "keys": [
+      "notice"
+    ]
+  },
+  {
+    "clause_id": "HP-5.2",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Deber de aminorar las consecuencias",
+    "text": "El asegurado deberá emplear los medios a su alcance para aminorar las consecuencias del siniestro, conforme al artículo 17 de la Ley de Contrato de Seguro. Los gastos razonables en que incurra por este motivo serán a cargo de la Aseguradora.",
+    "keys": [
+      "mitigation"
+    ]
+  },
+  {
+    "clause_id": "HP-6.1",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación general",
+    "text": "Junto con la comunicación del siniestro, el asegurado facilitará una descripción de las circunstancias, la fecha y el lugar de ocurrencia, y cualquier documento que permita valorar las consecuencias. La Aseguradora podrá solicitar la documentación adicional razonablemente necesaria.",
+    "keys": [
+      "documents:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "HP-6.2",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para daños por agua",
+    "text": "Para tramitar un siniestro de daños por agua es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HP-6.3",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para robo y daños por robo",
+    "text": "Para tramitar un siniestro de robo y daños por robo es imprescindible aportar: copia de la denuncia presentada ante la autoridad competente; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HP-6.4",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para rotura de cristales",
+    "text": "Para tramitar un siniestro de rotura de cristales es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_GLASS"
+    ]
+  },
+  {
+    "clause_id": "HP-7.1",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Peritación",
+    "text": "La Aseguradora podrá designar un perito para valorar los daños. Las partes podrán acordar la indemnización a la vista de las facturas o presupuestos aportados.",
+    "keys": []
+  },
+  {
+    "clause_id": "HP-7.2",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Pago de la indemnización",
+    "text": "La Aseguradora pagará la indemnización dentro de los cuarenta días siguientes a la recepción de la declaración del siniestro y de la documentación completa, conforme al artículo 18 de la Ley de Contrato de Seguro, mediante transferencia a la cuenta designada por el asegurado.",
+    "keys": [
+      "payment"
+    ]
+  },
+  {
+    "clause_id": "HP-7.3",
+    "product_code": "HP",
+    "product_name": "Hogar Plus",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Verificación y fraude",
+    "text": "La Aseguradora podrá verificar la veracidad de la declaración y de los documentos aportados. Si el siniestro se hubiera declarado con mala fe, conforme al artículo 19 de la Ley de Contrato de Seguro, la Aseguradora quedará liberada del pago. En ningún caso se rechazará un siniestro por sospecha de fraude sin la revisión de un tramitador de Aseguradora Brisa.",
+    "keys": [
+      "fraud"
+    ]
+  },
+  {
+    "clause_id": "HT-1.1",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Objeto del seguro",
+    "text": "Aseguradora Brisa (en adelante, la Aseguradora) se obliga, mediante el cobro de la prima y dentro de los límites pactados, a indemnizar los daños sufridos por la vivienda asegurada como consecuencia de los riesgos expresamente cubiertos en el artículo 2, conforme a la Ley 50/1980, de 8 de octubre, de Contrato de Seguro.",
+    "keys": [
+      "object"
+    ]
+  },
+  {
+    "clause_id": "HT-1.2",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Tomador y asegurado",
+    "text": "Tomador es la persona que suscribe el contrato y paga la prima. Asegurado es el titular del interés expuesto al riesgo. Salvo indicación en contrario de las condiciones particulares, tomador y asegurado son la misma persona.",
+    "keys": []
+  },
+  {
+    "clause_id": "HT-1.3",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Siniestro",
+    "text": "Todo hecho súbito, accidental y ajeno a la voluntad del asegurado cuyas consecuencias estén cubiertas por alguna de las garantías de la póliza. Se considera un único siniestro el conjunto de daños derivados de una misma causa.",
+    "keys": [
+      "definition:claim"
+    ]
+  },
+  {
+    "clause_id": "HT-1.4",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Franquicia",
+    "text": "Importe que, en cada siniestro, queda a cargo del asegurado y se descuenta de la indemnización que corresponda.",
+    "keys": [
+      "definition:deductible"
+    ]
+  },
+  {
+    "clause_id": "HT-1.5",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Periodo de carencia",
+    "text": "Plazo contado desde la fecha de efecto de la póliza durante el cual los siniestros ocurridos no están cubiertos por la garantía a la que se aplica.",
+    "keys": [
+      "definition:waiting"
+    ]
+  },
+  {
+    "clause_id": "HT-1.6",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Continente y contenido",
+    "text": "Continente es el conjunto de elementos constructivos de la vivienda, incluidas sus instalaciones fijas de agua, gas, electricidad y calefacción. Contenido es el conjunto de bienes muebles, mobiliario y enseres de uso doméstico que se encuentren en la vivienda.",
+    "keys": []
+  },
+  {
+    "clause_id": "HT-2.1",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Daños por agua",
+    "text": "Daños materiales causados al continente y al contenido de la vivienda por escapes accidentales de agua procedentes de las conducciones, depósitos o aparatos fijos de la vivienda asegurada o de viviendas colindantes, así como los gastos de localización y reparación de la avería.",
+    "keys": [
+      "coverage:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HT-2.2",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Robo y daños por robo",
+    "text": "Sustracción de los bienes del contenido de la vivienda asegurada cometida con fuerza en las cosas o con violencia o intimidación en las personas, y los daños materiales causados en la vivienda para cometer el robo o su tentativa.",
+    "keys": [
+      "coverage:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HT-2.3",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Rotura de cristales",
+    "text": "Rotura accidental de los cristales, lunas y espejos fijos de la vivienda, incluidas las vitrocerámicas, con los gastos de colocación.",
+    "keys": [
+      "coverage:HOME_GLASS"
+    ]
+  },
+  {
+    "clause_id": "HT-3.1",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones generales",
+    "text": "En ningún caso quedan cubiertos: (a) los siniestros causados intencionadamente por el asegurado o con su complicidad; (b) los daños derivados de guerra, terrorismo, terremotos, inundaciones extraordinarias y demás riesgos extraordinarios cuya cobertura corresponde al Consorcio de Compensación de Seguros; (c) los daños anteriores a la fecha de efecto de la póliza.",
+    "keys": [
+      "exclusion:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "HT-3.2",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de daños por agua",
+    "text": "Además de las exclusiones generales, la garantía de daños por agua no cubre: (a) daños debidos a la falta de mantenimiento o de reparación de las instalaciones, así como humedades por condensación o filtraciones lentas y continuadas; (b) daños causados por agua de lluvia, nieve o inundación que penetre por puertas, ventanas u otras aberturas que hayan quedado sin cerrar.",
+    "keys": [
+      "exclusion:WATER_EXTERIOR",
+      "exclusion:WATER_MAINTENANCE"
+    ]
+  },
+  {
+    "clause_id": "HT-3.3",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de robo y daños por robo",
+    "text": "Además de las exclusiones generales, la garantía de robo y daños por robo no cubre: (a) el hurto, entendido como la sustracción de bienes sin fuerza en las cosas ni violencia o intimidación en las personas, y las simples pérdidas o extravíos; (b) los robos ocurridos cuando la vivienda haya permanecido deshabitada más de 30 días consecutivos.",
+    "keys": [
+      "exclusion:THEFT_UNOCCUPIED",
+      "exclusion:THEFT_WITHOUT_FORCE"
+    ]
+  },
+  {
+    "clause_id": "HT-3.4",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de rotura de cristales",
+    "text": "Además de las exclusiones generales, la garantía de rotura de cristales no cubre: (a) los arañazos, raspaduras, desconchados u otros deterioros de la superficie que no constituyan rotura.",
+    "keys": [
+      "exclusion:GLASS_SCRATCHES"
+    ]
+  },
+  {
+    "clause_id": "HT-4.1",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Daños por agua",
+    "text": "La garantía de daños por agua se presta hasta un límite máximo de 40.000 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:HOME_WATER",
+      "waiting:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HT-4.2",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Robo y daños por robo",
+    "text": "La garantía de robo y daños por robo se presta hasta un límite máximo de 20.000 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:HOME_THEFT",
+      "waiting:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HT-4.3",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Rotura de cristales",
+    "text": "La garantía de rotura de cristales se presta hasta un límite máximo de 3.000 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:HOME_GLASS",
+      "waiting:HOME_GLASS"
+    ]
+  },
+  {
+    "clause_id": "HT-4.4",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Cálculo de la indemnización",
+    "text": "La indemnización se calcula sobre el importe de los daños debidamente acreditados y relacionados con el siniestro, con el límite máximo de la garantía afectada. De la cantidad resultante se descuenta la franquicia aplicable. Las partidas de una factura o presupuesto que no guarden relación con el siniestro no son indemnizables.",
+    "keys": [
+      "indemnity"
+    ]
+  },
+  {
+    "clause_id": "HT-5.1",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Plazo de comunicación",
+    "text": "El tomador o el asegurado deberán comunicar el siniestro a la Aseguradora en el plazo máximo de siete días desde que lo conocieron, conforme al artículo 16 de la Ley de Contrato de Seguro. Si la comunicación se produce fuera de plazo, la Aseguradora podrá reclamar los daños y perjuicios causados por la falta de declaración, sin que el retraso suponga por sí solo la pérdida del derecho a la indemnización.",
+    "keys": [
+      "notice"
+    ]
+  },
+  {
+    "clause_id": "HT-5.2",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Deber de aminorar las consecuencias",
+    "text": "El asegurado deberá emplear los medios a su alcance para aminorar las consecuencias del siniestro, conforme al artículo 17 de la Ley de Contrato de Seguro. Los gastos razonables en que incurra por este motivo serán a cargo de la Aseguradora.",
+    "keys": [
+      "mitigation"
+    ]
+  },
+  {
+    "clause_id": "HT-6.1",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación general",
+    "text": "Junto con la comunicación del siniestro, el asegurado facilitará una descripción de las circunstancias, la fecha y el lugar de ocurrencia, y cualquier documento que permita valorar las consecuencias. La Aseguradora podrá solicitar la documentación adicional razonablemente necesaria.",
+    "keys": [
+      "documents:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "HT-6.2",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para daños por agua",
+    "text": "Para tramitar un siniestro de daños por agua es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_WATER"
+    ]
+  },
+  {
+    "clause_id": "HT-6.3",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para robo y daños por robo",
+    "text": "Para tramitar un siniestro de robo y daños por robo es imprescindible aportar: copia de la denuncia presentada ante la autoridad competente; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_THEFT"
+    ]
+  },
+  {
+    "clause_id": "HT-6.4",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para rotura de cristales",
+    "text": "Para tramitar un siniestro de rotura de cristales es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:HOME_GLASS"
+    ]
+  },
+  {
+    "clause_id": "HT-7.1",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Peritación",
+    "text": "La Aseguradora podrá designar un perito para valorar los daños. Las partes podrán acordar la indemnización a la vista de las facturas o presupuestos aportados.",
+    "keys": []
+  },
+  {
+    "clause_id": "HT-7.2",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Pago de la indemnización",
+    "text": "La Aseguradora pagará la indemnización dentro de los cuarenta días siguientes a la recepción de la declaración del siniestro y de la documentación completa, conforme al artículo 18 de la Ley de Contrato de Seguro, mediante transferencia a la cuenta designada por el asegurado.",
+    "keys": [
+      "payment"
+    ]
+  },
+  {
+    "clause_id": "HT-7.3",
+    "product_code": "HT",
+    "product_name": "Hogar Total",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Verificación y fraude",
+    "text": "La Aseguradora podrá verificar la veracidad de la declaración y de los documentos aportados. Si el siniestro se hubiera declarado con mala fe, conforme al artículo 19 de la Ley de Contrato de Seguro, la Aseguradora quedará liberada del pago. En ningún caso se rechazará un siniestro por sospecha de fraude sin la revisión de un tramitador de Aseguradora Brisa.",
+    "keys": [
+      "fraud"
+    ]
+  },
+  {
+    "clause_id": "AT-1.1",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Objeto del seguro",
+    "text": "Aseguradora Brisa (en adelante, la Aseguradora) se obliga, mediante el cobro de la prima y dentro de los límites pactados, a indemnizar los daños sufridos por el vehículo asegurado como consecuencia de los riesgos expresamente cubiertos en el artículo 2, conforme a la Ley 50/1980, de 8 de octubre, de Contrato de Seguro.",
+    "keys": [
+      "object"
+    ]
+  },
+  {
+    "clause_id": "AT-1.2",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Tomador y asegurado",
+    "text": "Tomador es la persona que suscribe el contrato y paga la prima. Asegurado es el titular del interés expuesto al riesgo. Salvo indicación en contrario de las condiciones particulares, tomador y asegurado son la misma persona.",
+    "keys": []
+  },
+  {
+    "clause_id": "AT-1.3",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Siniestro",
+    "text": "Todo hecho súbito, accidental y ajeno a la voluntad del asegurado cuyas consecuencias estén cubiertas por alguna de las garantías de la póliza. Se considera un único siniestro el conjunto de daños derivados de una misma causa.",
+    "keys": [
+      "definition:claim"
+    ]
+  },
+  {
+    "clause_id": "AT-1.4",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Franquicia",
+    "text": "Importe que, en cada siniestro, queda a cargo del asegurado y se descuenta de la indemnización que corresponda.",
+    "keys": [
+      "definition:deductible"
+    ]
+  },
+  {
+    "clause_id": "AT-1.5",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Periodo de carencia",
+    "text": "Plazo contado desde la fecha de efecto de la póliza durante el cual los siniestros ocurridos no están cubiertos por la garantía a la que se aplica.",
+    "keys": [
+      "definition:waiting"
+    ]
+  },
+  {
+    "clause_id": "AT-1.6",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Vehículo y valor asegurado",
+    "text": "Vehículo asegurado es el identificado por su matrícula en las condiciones particulares, con los accesorios de serie. Valor asegurado es el que figura en las condiciones particulares y constituye el límite máximo de indemnización por daños propios.",
+    "keys": []
+  },
+  {
+    "clause_id": "AT-2.1",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Responsabilidad civil",
+    "text": "La Aseguradora garantiza la responsabilidad civil de suscripción obligatoria y la responsabilidad civil voluntaria derivadas de la circulación del vehículo asegurado, frente a los daños causados a terceros. Los daños sufridos por el propio vehículo solo están cubiertos cuando la póliza incluye la garantía correspondiente de este artículo.",
+    "keys": [
+      "coverage:LIABILITY"
+    ]
+  },
+  {
+    "clause_id": "AT-2.2",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Riesgos no incluidos en este producto",
+    "text": "El producto Auto Terceros no incluye las siguientes garantías: daños propios por colisión, rotura de lunas, robo de accesorios y daños por robo. Los siniestros derivados de estos riesgos no están cubiertos, salvo contratación de un producto superior.",
+    "keys": [
+      "not_included:AUTO_COLLISION",
+      "not_included:AUTO_GLASS",
+      "not_included:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AT-3.1",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones generales",
+    "text": "En ningún caso quedan cubiertos: (a) los siniestros causados intencionadamente por el asegurado o con su complicidad; (b) los daños derivados de guerra, terrorismo, terremotos, inundaciones extraordinarias y demás riesgos extraordinarios cuya cobertura corresponde al Consorcio de Compensación de Seguros; (c) los daños anteriores a la fecha de efecto de la póliza.",
+    "keys": [
+      "exclusion:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AT-5.1",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Plazo de comunicación",
+    "text": "El tomador o el asegurado deberán comunicar el siniestro a la Aseguradora en el plazo máximo de siete días desde que lo conocieron, conforme al artículo 16 de la Ley de Contrato de Seguro. Si la comunicación se produce fuera de plazo, la Aseguradora podrá reclamar los daños y perjuicios causados por la falta de declaración, sin que el retraso suponga por sí solo la pérdida del derecho a la indemnización.",
+    "keys": [
+      "notice"
+    ]
+  },
+  {
+    "clause_id": "AT-5.2",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Deber de aminorar las consecuencias",
+    "text": "El asegurado deberá emplear los medios a su alcance para aminorar las consecuencias del siniestro, conforme al artículo 17 de la Ley de Contrato de Seguro. Los gastos razonables en que incurra por este motivo serán a cargo de la Aseguradora.",
+    "keys": [
+      "mitigation"
+    ]
+  },
+  {
+    "clause_id": "AT-6.1",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación general",
+    "text": "Junto con la comunicación del siniestro, el asegurado facilitará una descripción de las circunstancias, la fecha y el lugar de ocurrencia, y cualquier documento que permita valorar las consecuencias. La Aseguradora podrá solicitar la documentación adicional razonablemente necesaria.",
+    "keys": [
+      "documents:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AT-7.1",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Peritación",
+    "text": "La Aseguradora podrá designar un perito para valorar los daños. Las partes podrán acordar la indemnización a la vista de las facturas o presupuestos aportados.",
+    "keys": []
+  },
+  {
+    "clause_id": "AT-7.2",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Pago de la indemnización",
+    "text": "La Aseguradora pagará la indemnización dentro de los cuarenta días siguientes a la recepción de la declaración del siniestro y de la documentación completa, conforme al artículo 18 de la Ley de Contrato de Seguro, mediante transferencia a la cuenta designada por el asegurado.",
+    "keys": [
+      "payment"
+    ]
+  },
+  {
+    "clause_id": "AT-7.3",
+    "product_code": "AT",
+    "product_name": "Auto Terceros",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Verificación y fraude",
+    "text": "La Aseguradora podrá verificar la veracidad de la declaración y de los documentos aportados. Si el siniestro se hubiera declarado con mala fe, conforme al artículo 19 de la Ley de Contrato de Seguro, la Aseguradora quedará liberada del pago. En ningún caso se rechazará un siniestro por sospecha de fraude sin la revisión de un tramitador de Aseguradora Brisa.",
+    "keys": [
+      "fraud"
+    ]
+  },
+  {
+    "clause_id": "AA-1.1",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Objeto del seguro",
+    "text": "Aseguradora Brisa (en adelante, la Aseguradora) se obliga, mediante el cobro de la prima y dentro de los límites pactados, a indemnizar los daños sufridos por el vehículo asegurado como consecuencia de los riesgos expresamente cubiertos en el artículo 2, conforme a la Ley 50/1980, de 8 de octubre, de Contrato de Seguro.",
+    "keys": [
+      "object"
+    ]
+  },
+  {
+    "clause_id": "AA-1.2",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Tomador y asegurado",
+    "text": "Tomador es la persona que suscribe el contrato y paga la prima. Asegurado es el titular del interés expuesto al riesgo. Salvo indicación en contrario de las condiciones particulares, tomador y asegurado son la misma persona.",
+    "keys": []
+  },
+  {
+    "clause_id": "AA-1.3",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Siniestro",
+    "text": "Todo hecho súbito, accidental y ajeno a la voluntad del asegurado cuyas consecuencias estén cubiertas por alguna de las garantías de la póliza. Se considera un único siniestro el conjunto de daños derivados de una misma causa.",
+    "keys": [
+      "definition:claim"
+    ]
+  },
+  {
+    "clause_id": "AA-1.4",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Franquicia",
+    "text": "Importe que, en cada siniestro, queda a cargo del asegurado y se descuenta de la indemnización que corresponda.",
+    "keys": [
+      "definition:deductible"
+    ]
+  },
+  {
+    "clause_id": "AA-1.5",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Periodo de carencia",
+    "text": "Plazo contado desde la fecha de efecto de la póliza durante el cual los siniestros ocurridos no están cubiertos por la garantía a la que se aplica.",
+    "keys": [
+      "definition:waiting"
+    ]
+  },
+  {
+    "clause_id": "AA-1.6",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Vehículo y valor asegurado",
+    "text": "Vehículo asegurado es el identificado por su matrícula en las condiciones particulares, con los accesorios de serie. Valor asegurado es el que figura en las condiciones particulares y constituye el límite máximo de indemnización por daños propios.",
+    "keys": []
+  },
+  {
+    "clause_id": "AA-2.1",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Responsabilidad civil",
+    "text": "La Aseguradora garantiza la responsabilidad civil de suscripción obligatoria y la responsabilidad civil voluntaria derivadas de la circulación del vehículo asegurado, frente a los daños causados a terceros. Los daños sufridos por el propio vehículo solo están cubiertos cuando la póliza incluye la garantía correspondiente de este artículo.",
+    "keys": [
+      "coverage:LIABILITY"
+    ]
+  },
+  {
+    "clause_id": "AA-2.2",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Rotura de lunas",
+    "text": "Rotura del parabrisas, la luneta trasera, las lunas laterales y el techo acristalado del vehículo asegurado, incluida su colocación.",
+    "keys": [
+      "coverage:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AA-2.3",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Robo de accesorios y daños por robo",
+    "text": "Sustracción de piezas o accesorios fijos del vehículo asegurado y daños materiales causados al vehículo durante el robo o su tentativa.",
+    "keys": [
+      "coverage:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AA-2.4",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Riesgos no incluidos en este producto",
+    "text": "El producto Auto Terceros Ampliado no incluye las siguientes garantías: daños propios por colisión. Los siniestros derivados de estos riesgos no están cubiertos, salvo contratación de un producto superior.",
+    "keys": [
+      "not_included:AUTO_COLLISION"
+    ]
+  },
+  {
+    "clause_id": "AA-3.1",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones generales",
+    "text": "En ningún caso quedan cubiertos: (a) los siniestros causados intencionadamente por el asegurado o con su complicidad; (b) los daños derivados de guerra, terrorismo, terremotos, inundaciones extraordinarias y demás riesgos extraordinarios cuya cobertura corresponde al Consorcio de Compensación de Seguros; (c) los daños anteriores a la fecha de efecto de la póliza.",
+    "keys": [
+      "exclusion:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AA-3.2",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de rotura de lunas",
+    "text": "Además de las exclusiones generales, la garantía de rotura de lunas no cubre: (a) los espejos retrovisores, faros, pilotos e intermitentes, y los arañazos o desperfectos que no constituyan rotura.",
+    "keys": [
+      "exclusion:AUTO_GLASS_MIRRORS"
+    ]
+  },
+  {
+    "clause_id": "AA-3.3",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de robo de accesorios y daños por robo",
+    "text": "Además de las exclusiones generales, la garantía de robo de accesorios y daños por robo no cubre: (a) los robos cometidos utilizando las llaves originales del vehículo, o cuando el vehículo se hubiera dejado abierto o con las llaves en su interior.",
+    "keys": [
+      "exclusion:AUTO_THEFT_KEYS"
+    ]
+  },
+  {
+    "clause_id": "AA-4.1",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Rotura de lunas",
+    "text": "La garantía de rotura de lunas se presta hasta un límite máximo de 1.200 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_GLASS",
+      "waiting:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AA-4.2",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Robo de accesorios y daños por robo",
+    "text": "La garantía de robo de accesorios y daños por robo se presta hasta un límite máximo de 3.000 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_THEFT",
+      "waiting:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AA-4.3",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Cálculo de la indemnización",
+    "text": "La indemnización se calcula sobre el importe de los daños debidamente acreditados y relacionados con el siniestro, con el límite máximo de la garantía afectada. De la cantidad resultante se descuenta la franquicia aplicable. Las partidas de una factura o presupuesto que no guarden relación con el siniestro no son indemnizables.",
+    "keys": [
+      "indemnity"
+    ]
+  },
+  {
+    "clause_id": "AA-5.1",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Plazo de comunicación",
+    "text": "El tomador o el asegurado deberán comunicar el siniestro a la Aseguradora en el plazo máximo de siete días desde que lo conocieron, conforme al artículo 16 de la Ley de Contrato de Seguro. Si la comunicación se produce fuera de plazo, la Aseguradora podrá reclamar los daños y perjuicios causados por la falta de declaración, sin que el retraso suponga por sí solo la pérdida del derecho a la indemnización.",
+    "keys": [
+      "notice"
+    ]
+  },
+  {
+    "clause_id": "AA-5.2",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Deber de aminorar las consecuencias",
+    "text": "El asegurado deberá emplear los medios a su alcance para aminorar las consecuencias del siniestro, conforme al artículo 17 de la Ley de Contrato de Seguro. Los gastos razonables en que incurra por este motivo serán a cargo de la Aseguradora.",
+    "keys": [
+      "mitigation"
+    ]
+  },
+  {
+    "clause_id": "AA-6.1",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación general",
+    "text": "Junto con la comunicación del siniestro, el asegurado facilitará una descripción de las circunstancias, la fecha y el lugar de ocurrencia, y cualquier documento que permita valorar las consecuencias. La Aseguradora podrá solicitar la documentación adicional razonablemente necesaria.",
+    "keys": [
+      "documents:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AA-6.2",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para rotura de lunas",
+    "text": "Para tramitar un siniestro de rotura de lunas es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AA-6.3",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para robo de accesorios y daños por robo",
+    "text": "Para tramitar un siniestro de robo de accesorios y daños por robo es imprescindible aportar: copia de la denuncia presentada ante la autoridad competente; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AA-7.1",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Peritación",
+    "text": "La Aseguradora podrá designar un perito para valorar los daños. Las partes podrán acordar la indemnización a la vista de las facturas o presupuestos aportados.",
+    "keys": []
+  },
+  {
+    "clause_id": "AA-7.2",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Pago de la indemnización",
+    "text": "La Aseguradora pagará la indemnización dentro de los cuarenta días siguientes a la recepción de la declaración del siniestro y de la documentación completa, conforme al artículo 18 de la Ley de Contrato de Seguro, mediante transferencia a la cuenta designada por el asegurado.",
+    "keys": [
+      "payment"
+    ]
+  },
+  {
+    "clause_id": "AA-7.3",
+    "product_code": "AA",
+    "product_name": "Auto Terceros Ampliado",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Verificación y fraude",
+    "text": "La Aseguradora podrá verificar la veracidad de la declaración y de los documentos aportados. Si el siniestro se hubiera declarado con mala fe, conforme al artículo 19 de la Ley de Contrato de Seguro, la Aseguradora quedará liberada del pago. En ningún caso se rechazará un siniestro por sospecha de fraude sin la revisión de un tramitador de Aseguradora Brisa.",
+    "keys": [
+      "fraud"
+    ]
+  },
+  {
+    "clause_id": "AF-1.1",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Objeto del seguro",
+    "text": "Aseguradora Brisa (en adelante, la Aseguradora) se obliga, mediante el cobro de la prima y dentro de los límites pactados, a indemnizar los daños sufridos por el vehículo asegurado como consecuencia de los riesgos expresamente cubiertos en el artículo 2, conforme a la Ley 50/1980, de 8 de octubre, de Contrato de Seguro.",
+    "keys": [
+      "object"
+    ]
+  },
+  {
+    "clause_id": "AF-1.2",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Tomador y asegurado",
+    "text": "Tomador es la persona que suscribe el contrato y paga la prima. Asegurado es el titular del interés expuesto al riesgo. Salvo indicación en contrario de las condiciones particulares, tomador y asegurado son la misma persona.",
+    "keys": []
+  },
+  {
+    "clause_id": "AF-1.3",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Siniestro",
+    "text": "Todo hecho súbito, accidental y ajeno a la voluntad del asegurado cuyas consecuencias estén cubiertas por alguna de las garantías de la póliza. Se considera un único siniestro el conjunto de daños derivados de una misma causa.",
+    "keys": [
+      "definition:claim"
+    ]
+  },
+  {
+    "clause_id": "AF-1.4",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Franquicia",
+    "text": "Importe que, en cada siniestro, queda a cargo del asegurado y se descuenta de la indemnización que corresponda.",
+    "keys": [
+      "definition:deductible"
+    ]
+  },
+  {
+    "clause_id": "AF-1.5",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Periodo de carencia",
+    "text": "Plazo contado desde la fecha de efecto de la póliza durante el cual los siniestros ocurridos no están cubiertos por la garantía a la que se aplica.",
+    "keys": [
+      "definition:waiting"
+    ]
+  },
+  {
+    "clause_id": "AF-1.6",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Vehículo y valor asegurado",
+    "text": "Vehículo asegurado es el identificado por su matrícula en las condiciones particulares, con los accesorios de serie. Valor asegurado es el que figura en las condiciones particulares y constituye el límite máximo de indemnización por daños propios.",
+    "keys": []
+  },
+  {
+    "clause_id": "AF-2.1",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Responsabilidad civil",
+    "text": "La Aseguradora garantiza la responsabilidad civil de suscripción obligatoria y la responsabilidad civil voluntaria derivadas de la circulación del vehículo asegurado, frente a los daños causados a terceros. Los daños sufridos por el propio vehículo solo están cubiertos cuando la póliza incluye la garantía correspondiente de este artículo.",
+    "keys": [
+      "coverage:LIABILITY"
+    ]
+  },
+  {
+    "clause_id": "AF-2.2",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Daños propios por colisión",
+    "text": "Daños sufridos por el vehículo asegurado como consecuencia de colisión con otro vehículo, con un objeto fijo o móvil, o por vuelco, con independencia de la culpa del conductor.",
+    "keys": [
+      "coverage:AUTO_COLLISION"
+    ]
+  },
+  {
+    "clause_id": "AF-2.3",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Rotura de lunas",
+    "text": "Rotura del parabrisas, la luneta trasera, las lunas laterales y el techo acristalado del vehículo asegurado, incluida su colocación.",
+    "keys": [
+      "coverage:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AF-2.4",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Robo de accesorios y daños por robo",
+    "text": "Sustracción de piezas o accesorios fijos del vehículo asegurado y daños materiales causados al vehículo durante el robo o su tentativa.",
+    "keys": [
+      "coverage:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AF-3.1",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones generales",
+    "text": "En ningún caso quedan cubiertos: (a) los siniestros causados intencionadamente por el asegurado o con su complicidad; (b) los daños derivados de guerra, terrorismo, terremotos, inundaciones extraordinarias y demás riesgos extraordinarios cuya cobertura corresponde al Consorcio de Compensación de Seguros; (c) los daños anteriores a la fecha de efecto de la póliza.",
+    "keys": [
+      "exclusion:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AF-3.2",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de daños propios por colisión",
+    "text": "Además de las exclusiones generales, la garantía de daños propios por colisión no cubre: (a) los siniestros ocurridos cuando el conductor supere las tasas de alcohol o haya consumido drogas tóxicas, estupefacientes o psicotrópicos, según la normativa de tráfico vigente; (b) los daños sufridos durante la participación en carreras, competiciones o pruebas de velocidad, o en circuitos cerrados.",
+    "keys": [
+      "exclusion:AUTO_ALCOHOL",
+      "exclusion:AUTO_COMPETITION"
+    ]
+  },
+  {
+    "clause_id": "AF-3.3",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de rotura de lunas",
+    "text": "Además de las exclusiones generales, la garantía de rotura de lunas no cubre: (a) los espejos retrovisores, faros, pilotos e intermitentes, y los arañazos o desperfectos que no constituyan rotura.",
+    "keys": [
+      "exclusion:AUTO_GLASS_MIRRORS"
+    ]
+  },
+  {
+    "clause_id": "AF-3.4",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de robo de accesorios y daños por robo",
+    "text": "Además de las exclusiones generales, la garantía de robo de accesorios y daños por robo no cubre: (a) los robos cometidos utilizando las llaves originales del vehículo, o cuando el vehículo se hubiera dejado abierto o con las llaves en su interior.",
+    "keys": [
+      "exclusion:AUTO_THEFT_KEYS"
+    ]
+  },
+  {
+    "clause_id": "AF-4.1",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Daños propios por colisión",
+    "text": "La garantía de daños propios por colisión se presta hasta un límite máximo del valor asegurado del vehículo que figura en las condiciones particulares por siniestro, con una franquicia de 300 € y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_COLLISION",
+      "waiting:AUTO_COLLISION"
+    ]
+  },
+  {
+    "clause_id": "AF-4.2",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Rotura de lunas",
+    "text": "La garantía de rotura de lunas se presta hasta un límite máximo de 1.500 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_GLASS",
+      "waiting:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AF-4.3",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Robo de accesorios y daños por robo",
+    "text": "La garantía de robo de accesorios y daños por robo se presta hasta un límite máximo de 6.000 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_THEFT",
+      "waiting:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AF-4.4",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Cálculo de la indemnización",
+    "text": "La indemnización se calcula sobre el importe de los daños debidamente acreditados y relacionados con el siniestro, con el límite máximo de la garantía afectada. De la cantidad resultante se descuenta la franquicia aplicable. Las partidas de una factura o presupuesto que no guarden relación con el siniestro no son indemnizables.",
+    "keys": [
+      "indemnity"
+    ]
+  },
+  {
+    "clause_id": "AF-5.1",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Plazo de comunicación",
+    "text": "El tomador o el asegurado deberán comunicar el siniestro a la Aseguradora en el plazo máximo de siete días desde que lo conocieron, conforme al artículo 16 de la Ley de Contrato de Seguro. Si la comunicación se produce fuera de plazo, la Aseguradora podrá reclamar los daños y perjuicios causados por la falta de declaración, sin que el retraso suponga por sí solo la pérdida del derecho a la indemnización.",
+    "keys": [
+      "notice"
+    ]
+  },
+  {
+    "clause_id": "AF-5.2",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Deber de aminorar las consecuencias",
+    "text": "El asegurado deberá emplear los medios a su alcance para aminorar las consecuencias del siniestro, conforme al artículo 17 de la Ley de Contrato de Seguro. Los gastos razonables en que incurra por este motivo serán a cargo de la Aseguradora.",
+    "keys": [
+      "mitigation"
+    ]
+  },
+  {
+    "clause_id": "AF-6.1",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación general",
+    "text": "Junto con la comunicación del siniestro, el asegurado facilitará una descripción de las circunstancias, la fecha y el lugar de ocurrencia, y cualquier documento que permita valorar las consecuencias. La Aseguradora podrá solicitar la documentación adicional razonablemente necesaria.",
+    "keys": [
+      "documents:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AF-6.2",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para daños propios por colisión",
+    "text": "Para tramitar un siniestro de daños propios por colisión es imprescindible aportar: declaración amistosa de accidente o atestado; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_COLLISION"
+    ]
+  },
+  {
+    "clause_id": "AF-6.3",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para rotura de lunas",
+    "text": "Para tramitar un siniestro de rotura de lunas es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AF-6.4",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para robo de accesorios y daños por robo",
+    "text": "Para tramitar un siniestro de robo de accesorios y daños por robo es imprescindible aportar: copia de la denuncia presentada ante la autoridad competente; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AF-7.1",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Peritación",
+    "text": "La Aseguradora podrá designar un perito para valorar los daños. Las partes podrán acordar la indemnización a la vista de las facturas o presupuestos aportados.",
+    "keys": []
+  },
+  {
+    "clause_id": "AF-7.2",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Pago de la indemnización",
+    "text": "La Aseguradora pagará la indemnización dentro de los cuarenta días siguientes a la recepción de la declaración del siniestro y de la documentación completa, conforme al artículo 18 de la Ley de Contrato de Seguro, mediante transferencia a la cuenta designada por el asegurado.",
+    "keys": [
+      "payment"
+    ]
+  },
+  {
+    "clause_id": "AF-7.3",
+    "product_code": "AF",
+    "product_name": "Auto Todo Riesgo con Franquicia",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Verificación y fraude",
+    "text": "La Aseguradora podrá verificar la veracidad de la declaración y de los documentos aportados. Si el siniestro se hubiera declarado con mala fe, conforme al artículo 19 de la Ley de Contrato de Seguro, la Aseguradora quedará liberada del pago. En ningún caso se rechazará un siniestro por sospecha de fraude sin la revisión de un tramitador de Aseguradora Brisa.",
+    "keys": [
+      "fraud"
+    ]
+  },
+  {
+    "clause_id": "AR-1.1",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Objeto del seguro",
+    "text": "Aseguradora Brisa (en adelante, la Aseguradora) se obliga, mediante el cobro de la prima y dentro de los límites pactados, a indemnizar los daños sufridos por el vehículo asegurado como consecuencia de los riesgos expresamente cubiertos en el artículo 2, conforme a la Ley 50/1980, de 8 de octubre, de Contrato de Seguro.",
+    "keys": [
+      "object"
+    ]
+  },
+  {
+    "clause_id": "AR-1.2",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Tomador y asegurado",
+    "text": "Tomador es la persona que suscribe el contrato y paga la prima. Asegurado es el titular del interés expuesto al riesgo. Salvo indicación en contrario de las condiciones particulares, tomador y asegurado son la misma persona.",
+    "keys": []
+  },
+  {
+    "clause_id": "AR-1.3",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Siniestro",
+    "text": "Todo hecho súbito, accidental y ajeno a la voluntad del asegurado cuyas consecuencias estén cubiertas por alguna de las garantías de la póliza. Se considera un único siniestro el conjunto de daños derivados de una misma causa.",
+    "keys": [
+      "definition:claim"
+    ]
+  },
+  {
+    "clause_id": "AR-1.4",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Franquicia",
+    "text": "Importe que, en cada siniestro, queda a cargo del asegurado y se descuenta de la indemnización que corresponda.",
+    "keys": [
+      "definition:deductible"
+    ]
+  },
+  {
+    "clause_id": "AR-1.5",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Periodo de carencia",
+    "text": "Plazo contado desde la fecha de efecto de la póliza durante el cual los siniestros ocurridos no están cubiertos por la garantía a la que se aplica.",
+    "keys": [
+      "definition:waiting"
+    ]
+  },
+  {
+    "clause_id": "AR-1.6",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 1. Objeto del seguro y definiciones",
+    "title": "Vehículo y valor asegurado",
+    "text": "Vehículo asegurado es el identificado por su matrícula en las condiciones particulares, con los accesorios de serie. Valor asegurado es el que figura en las condiciones particulares y constituye el límite máximo de indemnización por daños propios.",
+    "keys": []
+  },
+  {
+    "clause_id": "AR-2.1",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Responsabilidad civil",
+    "text": "La Aseguradora garantiza la responsabilidad civil de suscripción obligatoria y la responsabilidad civil voluntaria derivadas de la circulación del vehículo asegurado, frente a los daños causados a terceros. Los daños sufridos por el propio vehículo solo están cubiertos cuando la póliza incluye la garantía correspondiente de este artículo.",
+    "keys": [
+      "coverage:LIABILITY"
+    ]
+  },
+  {
+    "clause_id": "AR-2.2",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Daños propios por colisión",
+    "text": "Daños sufridos por el vehículo asegurado como consecuencia de colisión con otro vehículo, con un objeto fijo o móvil, o por vuelco, con independencia de la culpa del conductor.",
+    "keys": [
+      "coverage:AUTO_COLLISION"
+    ]
+  },
+  {
+    "clause_id": "AR-2.3",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Rotura de lunas",
+    "text": "Rotura del parabrisas, la luneta trasera, las lunas laterales y el techo acristalado del vehículo asegurado, incluida su colocación.",
+    "keys": [
+      "coverage:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AR-2.4",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 2. Garantías cubiertas",
+    "title": "Robo de accesorios y daños por robo",
+    "text": "Sustracción de piezas o accesorios fijos del vehículo asegurado y daños materiales causados al vehículo durante el robo o su tentativa.",
+    "keys": [
+      "coverage:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AR-3.1",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones generales",
+    "text": "En ningún caso quedan cubiertos: (a) los siniestros causados intencionadamente por el asegurado o con su complicidad; (b) los daños derivados de guerra, terrorismo, terremotos, inundaciones extraordinarias y demás riesgos extraordinarios cuya cobertura corresponde al Consorcio de Compensación de Seguros; (c) los daños anteriores a la fecha de efecto de la póliza.",
+    "keys": [
+      "exclusion:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AR-3.2",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de daños propios por colisión",
+    "text": "Además de las exclusiones generales, la garantía de daños propios por colisión no cubre: (a) los siniestros ocurridos cuando el conductor supere las tasas de alcohol o haya consumido drogas tóxicas, estupefacientes o psicotrópicos, según la normativa de tráfico vigente; (b) los daños sufridos durante la participación en carreras, competiciones o pruebas de velocidad, o en circuitos cerrados.",
+    "keys": [
+      "exclusion:AUTO_ALCOHOL",
+      "exclusion:AUTO_COMPETITION"
+    ]
+  },
+  {
+    "clause_id": "AR-3.3",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de rotura de lunas",
+    "text": "Además de las exclusiones generales, la garantía de rotura de lunas no cubre: (a) los espejos retrovisores, faros, pilotos e intermitentes, y los arañazos o desperfectos que no constituyan rotura.",
+    "keys": [
+      "exclusion:AUTO_GLASS_MIRRORS"
+    ]
+  },
+  {
+    "clause_id": "AR-3.4",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 3. Exclusiones",
+    "title": "Exclusiones de la garantía de robo de accesorios y daños por robo",
+    "text": "Además de las exclusiones generales, la garantía de robo de accesorios y daños por robo no cubre: (a) los robos cometidos utilizando las llaves originales del vehículo, o cuando el vehículo se hubiera dejado abierto o con las llaves en su interior.",
+    "keys": [
+      "exclusion:AUTO_THEFT_KEYS"
+    ]
+  },
+  {
+    "clause_id": "AR-4.1",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Daños propios por colisión",
+    "text": "La garantía de daños propios por colisión se presta hasta un límite máximo del valor asegurado del vehículo que figura en las condiciones particulares por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_COLLISION",
+      "waiting:AUTO_COLLISION"
+    ]
+  },
+  {
+    "clause_id": "AR-4.2",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Rotura de lunas",
+    "text": "La garantía de rotura de lunas se presta hasta un límite máximo de 2.000 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_GLASS",
+      "waiting:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AR-4.3",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Robo de accesorios y daños por robo",
+    "text": "La garantía de robo de accesorios y daños por robo se presta hasta un límite máximo de 10.000 € por siniestro, sin franquicia y sin periodo de carencia.",
+    "keys": [
+      "limits:AUTO_THEFT",
+      "waiting:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AR-4.4",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 4. Límites, franquicias y carencias",
+    "title": "Cálculo de la indemnización",
+    "text": "La indemnización se calcula sobre el importe de los daños debidamente acreditados y relacionados con el siniestro, con el límite máximo de la garantía afectada. De la cantidad resultante se descuenta la franquicia aplicable. Las partidas de una factura o presupuesto que no guarden relación con el siniestro no son indemnizables.",
+    "keys": [
+      "indemnity"
+    ]
+  },
+  {
+    "clause_id": "AR-5.1",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Plazo de comunicación",
+    "text": "El tomador o el asegurado deberán comunicar el siniestro a la Aseguradora en el plazo máximo de siete días desde que lo conocieron, conforme al artículo 16 de la Ley de Contrato de Seguro. Si la comunicación se produce fuera de plazo, la Aseguradora podrá reclamar los daños y perjuicios causados por la falta de declaración, sin que el retraso suponga por sí solo la pérdida del derecho a la indemnización.",
+    "keys": [
+      "notice"
+    ]
+  },
+  {
+    "clause_id": "AR-5.2",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 5. Comunicación del siniestro",
+    "title": "Deber de aminorar las consecuencias",
+    "text": "El asegurado deberá emplear los medios a su alcance para aminorar las consecuencias del siniestro, conforme al artículo 17 de la Ley de Contrato de Seguro. Los gastos razonables en que incurra por este motivo serán a cargo de la Aseguradora.",
+    "keys": [
+      "mitigation"
+    ]
+  },
+  {
+    "clause_id": "AR-6.1",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación general",
+    "text": "Junto con la comunicación del siniestro, el asegurado facilitará una descripción de las circunstancias, la fecha y el lugar de ocurrencia, y cualquier documento que permita valorar las consecuencias. La Aseguradora podrá solicitar la documentación adicional razonablemente necesaria.",
+    "keys": [
+      "documents:GENERAL"
+    ]
+  },
+  {
+    "clause_id": "AR-6.2",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para daños propios por colisión",
+    "text": "Para tramitar un siniestro de daños propios por colisión es imprescindible aportar: declaración amistosa de accidente o atestado; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_COLLISION"
+    ]
+  },
+  {
+    "clause_id": "AR-6.3",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para rotura de lunas",
+    "text": "Para tramitar un siniestro de rotura de lunas es imprescindible aportar: factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_GLASS"
+    ]
+  },
+  {
+    "clause_id": "AR-6.4",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 6. Documentación del siniestro",
+    "title": "Documentación para robo de accesorios y daños por robo",
+    "text": "Para tramitar un siniestro de robo de accesorios y daños por robo es imprescindible aportar: copia de la denuncia presentada ante la autoridad competente; factura o presupuesto detallado de la reparación o reposición. Hasta su recepción, la Aseguradora suspenderá la tramitación y lo comunicará al asegurado.",
+    "keys": [
+      "documents:AUTO_THEFT"
+    ]
+  },
+  {
+    "clause_id": "AR-7.1",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Peritación",
+    "text": "La Aseguradora podrá designar un perito para valorar los daños. Las partes podrán acordar la indemnización a la vista de las facturas o presupuestos aportados.",
+    "keys": []
+  },
+  {
+    "clause_id": "AR-7.2",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Pago de la indemnización",
+    "text": "La Aseguradora pagará la indemnización dentro de los cuarenta días siguientes a la recepción de la declaración del siniestro y de la documentación completa, conforme al artículo 18 de la Ley de Contrato de Seguro, mediante transferencia a la cuenta designada por el asegurado.",
+    "keys": [
+      "payment"
+    ]
+  },
+  {
+    "clause_id": "AR-7.3",
+    "product_code": "AR",
+    "product_name": "Auto Todo Riesgo",
+    "article": "Artículo 7. Tramitación y pago",
+    "title": "Verificación y fraude",
+    "text": "La Aseguradora podrá verificar la veracidad de la declaración y de los documentos aportados. Si el siniestro se hubiera declarado con mala fe, conforme al artículo 19 de la Ley de Contrato de Seguro, la Aseguradora quedará liberada del pago. En ningún caso se rechazará un siniestro por sospecha de fraude sin la revisión de un tramitador de Aseguradora Brisa.",
+    "keys": [
+      "fraud"
+    ]
+  }
+]
