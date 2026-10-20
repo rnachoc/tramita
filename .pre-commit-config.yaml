@@ -1,0 +1,24 @@
+# Install once with:  pre-commit install
+# The secret scan runs on every commit; CI runs the same scan on the full history.
+repos:
+  - repo: local
+    hooks:
+      # Uses the gitleaks binary on PATH (https://github.com/gitleaks/gitleaks#installing).
+      # Defined locally instead of using the upstream "gitleaks" hook, which builds
+      # the scanner with Go on every machine; this matches the binary CI downloads,
+      # so local and CI scans behave the same.
+      - id: gitleaks
+        name: Detect hardcoded secrets (gitleaks)
+        entry: gitleaks git --pre-commit --redact --staged --verbose
+        language: system
+        pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: \.md$

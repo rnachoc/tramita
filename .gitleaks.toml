@@ -1,0 +1,9 @@
+title = "tramita gitleaks config"
+
+[extend]
+useDefault = true
+
+# Local-development placeholders in .env.example are not secrets.
+[[allowlists]]
+description = "Documented local-only placeholder values"
+regexes = ['''change-me-local-only''']
