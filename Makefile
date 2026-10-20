@@ -28,6 +28,8 @@ logs: ## Follow infrastructure logs
 	$(COMPOSE) logs -f --tail=100
 
 # --- Python (uv workspace) ----------------------------------------------------
+PY_TYPED := services/agents/src services/agents/tests data/generator/src data/generator/tests
+
 .PHONY: py-sync py-lint py-test
 py-sync: ## Install the Python workspace
 	uv sync --all-packages
@@ -35,10 +37,15 @@ py-sync: ## Install the Python workspace
 py-lint: py-sync ## Lint, check formatting and type-check Python code
 	uv run ruff check .
 	uv run ruff format --check .
-	uv run mypy services/agents/src services/agents/tests
+	uv run mypy $(PY_TYPED)
 
 py-test: py-sync ## Run Python tests
-	uv run pytest services/agents
+	uv run pytest services/agents data/generator
+
+# --- Data ---------------------------------------------------------------------------
+.PHONY: data
+data: py-sync ## Render policy conditions and generate the synthetic dataset (seeded)
+	uv run tramita-datagen
 
 # --- Java (core service) --------------------------------------------------------
 .PHONY: core-lint core-test
