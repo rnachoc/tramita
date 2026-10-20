@@ -75,23 +75,29 @@ services:
       timeout: 10s
       retries: 30
 
-  minio:
-    # S3-compatible store for the original claim documents.
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
-    command: server /data --console-address ":9001"
+  object-store:
+    # S3-compatible store for the original claim documents. RustFS replaces
+    # MinIO, whose upstream was archived (see docs/decisions/0006). Services
+    # only speak the S3 API, so any S3-compatible backend works.
+    image: rustfs/rustfs:1.0.3
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-tramita}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-change-me-local-only}
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY:-tramita}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY:-change-me-local-only}
     ports:
-      - "${MINIO_API_PORT:-9000}:9000"
-      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+      - "${S3_API_PORT:-9000}:9000"
+      - "${S3_CONSOLE_PORT:-9001}:9001"
     volumes:
-      - minio-data:/data
+      - object-store-data:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/health > /dev/null || wget -qO /dev/null http://localhost:9000/health"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 30
+      start_period: 10s
 
   temporal:
     # Temporal server; persists its own schemas in the shared PostgreSQL.
@@ -129,4 +135,4 @@ services:
 volumes:
   postgres-data:
   opensearch-data:
-  minio-data:
+  object-store-data:
