@@ -38,8 +38,8 @@ jobs:
         with:
           enable-cache: true
       - run: uv python install 3.12
-      - run: make py-lint
-      - run: make py-test
+      - run: .github/scripts/run-step.sh "python lint" make py-lint
+      - run: .github/scripts/run-step.sh "python tests" make py-test
 
   java:
     name: java build and tests
@@ -51,7 +51,7 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
-      - run: make core-test
+      - run: .github/scripts/run-step.sh "java build" make core-test
 
   compose:
     name: infrastructure smoke test
@@ -59,13 +59,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Start the stack and wait for every health check
-        run: timeout 600 make up
+        run: .github/scripts/run-step.sh "compose up" timeout 600 make up
       - name: Show service status
         if: always()
         run: make ps
       - name: Dump logs on failure
         if: failure()
-        run: docker compose -f deploy/compose/docker-compose.yml logs --tail=200
+        run: |
+          for svc in $(docker compose -f deploy/compose/docker-compose.yml ps -a --format '{{.Service}}'); do
+            ANNOTATION_LINES=40 .github/scripts/run-step.sh "logs: $svc" \
+              bash -c "docker compose -f deploy/compose/docker-compose.yml logs --no-color --tail=40 $svc; false" || true
+          done
       - name: Tear down
         if: always()
         run: make reset
