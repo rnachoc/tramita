@@ -1,0 +1,19 @@
+package dev.tramita.core.domain;
+
+/** Why the rules reached a decision or a routing. */
+public enum Reason {
+  COVERED,
+  POLICY_NOT_IN_FORCE,
+  NOT_INCLUDED,
+  EXCLUSION,
+  WAITING_PERIOD,
+  MISSING_DOCUMENTS,
+  LATE_NOTICE,
+  AMOUNT_ADJUSTED,
+  AMOUNT_RECALCULATED,
+  LIMIT_APPLIED,
+  DEDUCTIBLE_APPLIED,
+  ABOVE_REVIEW_THRESHOLD,
+  FRAUD_SUSPECTED,
+  RULE_VIOLATION
+}
