@@ -4,7 +4,8 @@ spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:tramita}
     username: ${POSTGRES_USER:tramita}
-    password: ${POSTGRES_PASSWORD:}
+    # Local-development default, the same as Docker Compose; set POSTGRES_PASSWORD anywhere else.
+    password: ${POSTGRES_PASSWORD:change-me-local-only}
   jpa:
     open-in-view: false
     hibernate:
