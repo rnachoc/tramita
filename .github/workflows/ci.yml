@@ -29,6 +29,27 @@ jobs:
       - name: Scan full history
         run: gitleaks git --redact --verbose
 
+  history:
+    # Keeps the history bisectable: every pushed commit must build on its own.
+    name: every commit builds
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - uses: astral-sh/setup-uv@v7
+      - name: Build each pushed commit
+        run: |
+          cp .github/scripts/run-step.sh .github/scripts/check-each-commit.sh "$RUNNER_TEMP/"
+          "$RUNNER_TEMP/run-step.sh" "history" \
+            "$RUNNER_TEMP/check-each-commit.sh" "${{ github.event.before }}" "${{ github.sha }}"
+
   python:
     name: python lint, types and tests
     runs-on: ubuntu-latest
