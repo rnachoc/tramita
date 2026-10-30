@@ -53,8 +53,15 @@ data: py-sync ## Render policy conditions and generate the synthetic dataset (se
 data-json: py-sync ## Generate the dataset records only, without rendering documents (fast)
 	uv run tramita-datagen --no-documents
 
+.PHONY: seed
+seed: ## Load the generated policies into a running core service (TRAMITA_CORE_URL, TRAMITA_API_KEYS)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-seed
+
 # --- Java (core service) --------------------------------------------------------
-.PHONY: core-lint core-test
+.PHONY: core-lint core-test core-run
+core-run: ## Run the core service against the local stack (needs `make up`)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) cd services/core && mvn -B -q spring-boot:run
+
 core-lint: ## Check Java formatting
 	cd services/core && mvn -B -q spotless:check
 
