@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Usage: check-each-commit.sh <base> <head>
+# Maven resolves dependencies online; after the first commit the local repository
+# is warm, so later commits only download what their pom adds.
 # Run a copy of this script from outside the work tree: it checks out older
 # commits, in which this file may not exist.
 # Builds every commit in base..head on its own, so the history stays bisectable:
@@ -23,15 +25,12 @@ if [[ -z "$commits" ]]; then
   exit 0
 fi
 
-# Resolve Maven dependencies once, at the head, so per-commit builds are fast.
-(cd services/core && mvn -B -q -DskipTests dependency:go-offline > /dev/null 2>&1 || true)
-
 failed=0
 report=""
 for commit in $commits; do
   subject="$(git log -1 --format=%s "$commit")"
   git checkout -q "$commit"
-  if [[ -f services/core/pom.xml ]] && ! (cd services/core && mvn -B -q -o -DskipTests -Dspotless.check.skip=true compile > /tmp/build.log 2>&1); then
+  if [[ -f services/core/pom.xml ]] && ! (cd services/core && mvn -B -q -DskipTests compile > /tmp/build.log 2>&1); then
     echo "FAIL ${commit:0:7} $subject (java)"; tail -20 /tmp/build.log
     report+="FAIL ${commit:0:7} $subject (java)"$'\n'; failed=1; continue
   fi
