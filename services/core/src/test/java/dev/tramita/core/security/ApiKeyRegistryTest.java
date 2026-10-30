@@ -9,11 +9,11 @@ class ApiKeyRegistryTest {
 
   private final ApiKeyRegistry registry =
       new ApiKeyRegistry(
-          "agents:AGENT:agent-key-0123456789; console:REVIEWER:console-key-0123456789");
+          "agents:AGENT:agent-change-me-local-only; console:REVIEWER:console-change-me-local-only");
 
   @Test
   void identifiesTheClientOfAKnownKey() {
-    assertThat(registry.authenticate("console-key-0123456789"))
+    assertThat(registry.authenticate("console-change-me-local-only"))
         .contains(new ApiClient("console", Role.REVIEWER));
   }
 
