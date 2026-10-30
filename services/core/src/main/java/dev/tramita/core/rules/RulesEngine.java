@@ -138,8 +138,10 @@ public final class RulesEngine {
       return;
     }
     if (proposal.decision() == Decision.REQUEST_INFO) {
-      // The agents may ask for more than the minimum, for example when a scan is unreadable.
+      // The agents may ask for more than the catalog requires (an unreadable scan, say), but only
+      // a person may confirm such a request; otherwise a manipulated agent could stall any claim.
       a.decision = Decision.REQUEST_INFO;
+      a.reasons.add(Reason.ADDITIONAL_INFORMATION);
       return;
     }
     if (claim.amounts().isEmpty()) {
@@ -247,12 +249,14 @@ public final class RulesEngine {
     if (score >= fraud.reviewThreshold()) {
       return Routing.HUMAN_REVIEW;
     }
-    if (a.decision == Decision.REQUEST_INFO) {
-      // Asking for documents is low risk; the claim is assessed again when they arrive.
+    if (a.decision == Decision.REQUEST_INFO && a.reasons.contains(Reason.MISSING_DOCUMENTS)) {
+      // Asking for a document the catalog requires is low risk; the claim is reassessed when it
+      // arrives.
       return Routing.AUTO;
     }
     boolean needsHuman =
         a.decision == Decision.REJECT
+            || a.decision == Decision.REQUEST_INFO
             || late
             || !a.violations.isEmpty()
             || a.reasons.contains(Reason.AMOUNT_ADJUSTED)

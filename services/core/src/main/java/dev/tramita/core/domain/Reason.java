@@ -8,6 +8,8 @@ public enum Reason {
   EXCLUSION,
   WAITING_PERIOD,
   MISSING_DOCUMENTS,
+  /** The agents ask for information the catalog does not require; a person must confirm. */
+  ADDITIONAL_INFORMATION,
   LATE_NOTICE,
   AMOUNT_ADJUSTED,
   AMOUNT_RECALCULATED,

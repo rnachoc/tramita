@@ -297,6 +297,30 @@ class RulesEngineTest {
       // Asking for documents is low risk, so it happens without a human.
       assertThat(e.routing()).isEqualTo(Routing.AUTO);
     }
+
+    @Test
+    void requestsForInformationTheCatalogDoesNotRequireNeedAHuman() {
+      Proposal askForMore =
+          new Proposal(Decision.REQUEST_INFO, null, null, null, List.of("HP-1.1"), List.of());
+
+      Evaluation e = engine.evaluate(policy("HP"), waterClaim("1000.00"), askForMore);
+
+      assertThat(e.decision()).isEqualTo(Decision.REQUEST_INFO);
+      assertThat(e.reasons()).contains(Reason.ADDITIONAL_INFORMATION);
+      assertThat(e.missingDocuments()).isEmpty();
+      assertThat(e.routing()).isEqualTo(Routing.HUMAN_REVIEW);
+    }
+
+    @Test
+    void approvalWithoutExtractedAmountsAsksForThemThroughAHuman() {
+      ClaimFacts noAmounts = claim(CoverageCode.HOME_WATER, EnumSet.of(DocumentType.INVOICE), null);
+
+      Evaluation e = engine.evaluate(policy("HP"), noAmounts, approve("1210.00", "HP-2.1"));
+
+      assertThat(e.decision()).isEqualTo(Decision.REQUEST_INFO);
+      assertThat(violationCodes(e)).contains("NO_AMOUNTS");
+      assertThat(e.routing()).isEqualTo(Routing.HUMAN_REVIEW);
+    }
   }
 
   // --- exclusions -------------------------------------------------------------------------------
