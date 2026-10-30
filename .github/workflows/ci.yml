@@ -65,6 +65,8 @@ jobs:
       - uses: actions/checkout@v7
       - name: Start the stack and wait for every health check
         run: .github/scripts/run-step.sh "compose up" timeout 600 make up
+      - name: Exercise every service with a real request
+        run: .github/scripts/run-step.sh "compose smoke" make smoke
       - name: Show service status
         if: always()
         run: make ps

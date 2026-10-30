@@ -11,9 +11,12 @@ help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 # --- Infrastructure -----------------------------------------------------------
-.PHONY: up down reset ps logs
+.PHONY: up down reset ps logs smoke
 up: ## Start the local infrastructure and wait until every service is healthy
 	$(COMPOSE) up -d --wait
+
+smoke: ## Exercise every running service with a real request (vectors, events, search, S3, Temporal)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) bash deploy/compose/smoke-test.sh
 
 down: ## Stop the local infrastructure (keeps data volumes)
 	$(COMPOSE) down
