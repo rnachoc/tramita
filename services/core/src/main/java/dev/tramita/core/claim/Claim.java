@@ -78,7 +78,7 @@ public class Claim {
   /** Moves the claim to a new status. Paid and rejected claims are final. */
   public void moveTo(ClaimStatus next, Instant now) {
     if (status == ClaimStatus.PAID || status == ClaimStatus.REJECTED) {
-      throw new IllegalStateException("claim " + claimId + " is closed (" + status + ")");
+      throw new ClaimClosedException(claimId, status);
     }
     this.status = next;
     this.updatedAt = now;

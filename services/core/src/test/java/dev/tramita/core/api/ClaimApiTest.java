@@ -301,6 +301,24 @@ class ClaimApiTest {
   }
 
   @Test
+  void malformedBodiesAreExplainedFieldByField() throws Exception {
+    agent(post("/api/claims").content("{\"claim_id\": \"CL-X\", \"colour\": \"red\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("$.detail")
+                .value(org.hamcrest.Matchers.containsString("Unknown field 'colour'")));
+    agent(post("/api/claims").content("{\"claim_id\": \"CL-X\", \"claim_type\": \"FLOOD\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("$.detail")
+                .value(org.hamcrest.Matchers.containsString("allowed values: HOME_WATER")));
+    http.perform(get("/api/claims").param("status", "LOST").header("X-Api-Key", ANALYST))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("parameter 'status'")));
+  }
+
+  @Test
   void validationErrorsExplainWhatToFix() throws Exception {
     agent(post("/api/claims").content("{\"claim_id\": \"CL-X\"}"))
         .andExpect(status().isBadRequest())
