@@ -15,6 +15,7 @@ dependencies = [
 
 [project.scripts]
 tramita-datagen = "tramita_datagen.cli:main"
+tramita-seed = "tramita_datagen.seed:main"
 
 [dependency-groups]
 dev = ["types-pyyaml>=6.0", "types-reportlab>=4.4"]
