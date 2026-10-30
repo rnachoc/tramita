@@ -184,6 +184,14 @@ class ClaimApiTest {
             jdbc.queryForObject(
                 "select count(*) from core.payments where claim_id = ?", Integer.class, claim))
         .isEqualTo(1);
+    // Evidence is frozen once the claim is decided.
+    agent(
+            post("/api/claims/{id}/documents", claim)
+                .content(
+                    "{\"document_id\": \"LATE-"
+                        + claim
+                        + "\", \"document_type\": \"INVOICE\", \"filename\": \"otra.pdf\"}"))
+        .andExpect(status().isConflict());
     assertThat(auditTypes(claim))
         .containsExactly(
             "CLAIM_RECEIVED",

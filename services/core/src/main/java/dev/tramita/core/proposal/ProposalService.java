@@ -15,11 +15,9 @@ import dev.tramita.core.rules.Violation;
 import dev.tramita.core.web.ConflictException;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class ProposalService {
-
-  /** Statuses in which the agents may (re)assess a claim. */
-  private static final Set<ClaimStatus> OPEN_FOR_PROPOSALS =
-      EnumSet.of(ClaimStatus.RECEIVED, ClaimStatus.WAITING_DOCUMENTS);
 
   private final ProposalRepository proposals;
   private final ClaimService claims;
@@ -78,14 +72,14 @@ public class ProposalService {
     }
 
     Claim claim = claims.get(claimId);
-    if (!OPEN_FOR_PROPOSALS.contains(claim.getStatus())) {
+    if (!ClaimService.OPEN_FOR_EVIDENCE.contains(claim.getStatus())) {
       throw new ConflictException(
           "Claim "
               + claimId
               + " is "
               + claim.getStatus()
               + "; proposals are accepted only while it is "
-              + OPEN_FOR_PROPOSALS);
+              + ClaimService.OPEN_FOR_EVIDENCE);
     }
     ClaimFacts claimFacts = facts.assemble(claim);
     Evaluation evaluation =

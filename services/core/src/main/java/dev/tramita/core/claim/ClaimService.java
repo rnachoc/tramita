@@ -8,17 +8,23 @@ import dev.tramita.core.web.ConflictException;
 import dev.tramita.core.web.NotFoundException;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ClaimService {
+
+  /** Statuses in which documents and their extractions may still change. */
+  public static final Set<ClaimStatus> OPEN_FOR_EVIDENCE =
+      EnumSet.of(ClaimStatus.RECEIVED, ClaimStatus.WAITING_DOCUMENTS);
 
   private final ClaimRepository claims;
   private final ClaimDocumentRepository documents;
@@ -94,11 +100,14 @@ public class ClaimService {
     Claim claim = get(claimId);
     Optional<ClaimDocument> existing = documents.findById(r.documentId());
     if (existing.isPresent()) {
-      if (!existing.get().getClaim().getClaimId().equals(claimId)) {
-        throw new ConflictException("Document " + r.documentId() + " belongs to another claim");
+      ClaimDocument d = existing.get();
+      if (!d.getClaim().getClaimId().equals(claimId) || d.getDocumentType() != r.documentType()) {
+        throw new ConflictException(
+            "Document " + r.documentId() + " already exists with a different claim or type");
       }
-      return existing.get();
+      return d;
     }
+    requireOpenForEvidence(claim);
     ClaimDocument doc =
         documents.save(
             new ClaimDocument(
@@ -126,6 +135,7 @@ public class ClaimService {
                 () ->
                     new NotFoundException(
                         "Unknown document " + documentId + " in claim " + claimId));
+    requireOpenForEvidence(doc.getClaim());
     doc.recordExtraction(
         r.fields(),
         r.issueDate(),
@@ -140,6 +150,22 @@ public class ClaimService {
     details.put("has_amounts", doc.hasAmounts());
     audit.record(claimId, "DOCUMENT_EXTRACTED", details);
     return doc;
+  }
+
+  /**
+   * Documents and extractions can only change while the agents may still assess the claim. Once a
+   * proposal awaits a human, or the claim is closed, the evidence it was judged on is frozen.
+   */
+  private static void requireOpenForEvidence(Claim claim) {
+    if (!OPEN_FOR_EVIDENCE.contains(claim.getStatus())) {
+      throw new ConflictException(
+          "Claim "
+              + claim.getClaimId()
+              + " is "
+              + claim.getStatus()
+              + "; documents can only change while it is "
+              + OPEN_FOR_EVIDENCE);
+    }
   }
 
   @Transactional(readOnly = true)
