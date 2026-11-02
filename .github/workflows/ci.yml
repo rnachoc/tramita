@@ -66,6 +66,8 @@ jobs:
           tesseract --list-langs | grep -qx spa
       - run: .github/scripts/run-step.sh "python lint" make py-lint
       - run: .github/scripts/run-step.sh "python tests" make py-test
+      - name: Evaluate document reading (fake provider) with its regression gate
+        run: .github/scripts/run-step.sh "extraction eval" bash -c 'make data && make eval-extraction ARGS=--gate'
 
   java:
     name: java build and tests
