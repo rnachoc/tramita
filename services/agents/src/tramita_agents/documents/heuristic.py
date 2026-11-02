@@ -4,7 +4,7 @@ It parses the masked text quoted in the request (the PDF text layer or the scan'
 regular expressions written for Spanish invoices, estimates, police reports and accident
 reports. It never looks at the image, so on scans it is only as good as the OCR. It is a
 deterministic baseline that lets the whole pipeline run without an API key; every report
-labels its numbers as coming from this responder, never as model quality (ADR 0007).
+labels its numbers as coming from this responder, never as model quality (ADR 0010).
 """
 
 from __future__ import annotations

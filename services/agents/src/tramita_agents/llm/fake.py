@@ -1,4 +1,4 @@
-"""Deterministic stand-in for the model, so everything runs without an API key (ADR 0005).
+"""Deterministic stand-in for the model, so everything runs without an API key (ADRs 0005 and 0010).
 
 Resolution order for every request:
 

@@ -1,4 +1,4 @@
-"""Deterministic answers the fake model gives, per task, when no recording exists (ADR 0007)."""
+"""Deterministic answers the fake model gives, per task, when no recording exists (ADR 0010)."""
 
 from collections.abc import Mapping
 

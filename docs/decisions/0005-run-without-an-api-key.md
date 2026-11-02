@@ -1,6 +1,6 @@
 # ADR 0005: Everything runs without an API key, using a deterministic fake model
 
-- Status: accepted
+- Status: accepted (refined by [ADR 0010](0010-fake-model-recordings-then-rule-based-responders.md))
 - Date: 2026-10-20
 
 ## Context
