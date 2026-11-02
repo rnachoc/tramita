@@ -2,9 +2,12 @@
 
 from enum import StrEnum
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
 class ModelProvider(StrEnum):
@@ -21,6 +24,10 @@ class Settings(BaseSettings):
     # Model identifiers are configuration, never code: they change over time.
     tramita_model_fast: str = "claude-haiku-5-5"
     tramita_model_smart: str = "claude-sonnet-5-5"
+    # Recorded real answers, replayed by the fake model (ADR 0005).
+    tramita_recordings_dir: Path = REPO_ROOT / "evals" / "recordings"
+    # With a key, also store every real answer so keyless runs can replay it.
+    tramita_record_model: bool = False
 
     @property
     def model_provider(self) -> ModelProvider:
