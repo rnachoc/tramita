@@ -98,8 +98,14 @@ def main() -> None:
             checked += 1
             scans += expected["format"] == "SCAN"
             instructions += bool(found)
-    print(f"  ok   {checked} documents ({scans} scans) stored intact, typed and extracted")
-    print(f"  ok   no personal data in any extraction; {instructions} with instructions flagged")
+    summary = (
+        f"{len(chosen)} claims ingested twice; {checked} documents ({scans} scans) stored intact, "
+        f"typed and extracted; no personal data in any extraction; {instructions} with "
+        "instructions flagged"
+    )
+    print(f"  ok   {summary}")
+    if os.environ.get("GITHUB_ACTIONS"):
+        print(f"::notice title=ingest check::{summary}")
 
 
 if __name__ == "__main__":
