@@ -206,3 +206,14 @@ def test_valid_cif() -> None:
     assert not valid_cif("809318460")
     assert valid_cif("Q2826000H")
     assert not valid_cif("Q28260008")
+
+
+def test_an_invoice_without_lines_goes_to_review() -> None:
+    read = _invoice()
+    assert read.repair is not None
+    read.repair.lines.clear()
+
+    result = score(read, Source.TEXT_LAYER, INVOICE_TEXT)
+
+    assert result.low_confidence() == ["lines"]
+    assert result.line_amounts() is None

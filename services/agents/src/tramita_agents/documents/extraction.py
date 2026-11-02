@@ -386,10 +386,10 @@ def score(read: DocumentRead, source: Source, second_reading: str) -> ExtractedD
     keys = KEY_FIELDS[kind]
     if kind in {ReadDocumentType.INVOICE, ReadDocumentType.ESTIMATE}:
         lines = _repair(read, scorer, checks)
-        keys = keys + tuple(f"lines[{i}].amount" for i in range(lines))
+        keys = keys + (tuple(f"lines[{i}].amount" for i in range(lines)) or ("lines",))
         filled = read.repair is not None
-        if filled and lines == 0:
-            notes.append("no lines were read")
+        if lines == 0:
+            scorer.fields["lines"] = FieldValue(None, 0.0, ("no lines were read",))
     elif kind is ReadDocumentType.POLICE_REPORT:
         filled = _police(read, scorer)
     elif kind is ReadDocumentType.ACCIDENT_REPORT:
