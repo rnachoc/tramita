@@ -135,3 +135,13 @@ def test_amount_parsing_round_trips_through_the_scoring() -> None:
 
     assert read.repair is not None
     assert Decimal(str(read.repair.total)) == Decimal("454.96")
+
+
+def test_vehicle_b_is_detected_from_its_insurer_column() -> None:
+    with_b = ACCIDENT.replace("Aseguradora Brisa -", "Aseguradora Brisa Seguros Albada (ficticia)")
+    lost_dash = ACCIDENT.replace("Aseguradora Brisa -", "Aseguradora Brisa")
+
+    for text, expected in ((ACCIDENT, False), (with_b, True), (lost_dash, False)):
+        report = read_text(text).accident_report
+        assert report is not None
+        assert report.other_party_involved is expected
