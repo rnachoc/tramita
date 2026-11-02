@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     # With a key, also store every real answer so keyless runs can replay it.
     tramita_record_model: bool = False
 
+    # S3-compatible document store (RustFS locally, ADR 0006).
+    s3_endpoint: str = "http://localhost:9000"
+    s3_access_key: str = "tramita"
+    s3_secret_key: SecretStr = SecretStr("change-me-local-only")
+    s3_bucket: str = "claim-documents"
+
     @property
     def model_provider(self) -> ModelProvider:
         """Without an API key the whole system runs on the deterministic fake model."""

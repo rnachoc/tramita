@@ -5,6 +5,7 @@ description = "Agent service: document reading, policy search, claim analysis an
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "anthropic>=2.3",
+    "boto3>=1.43",
     "fastapi>=0.120",
     "pydantic>=2.12",
     "pydantic-settings>=2.11",
@@ -12,7 +13,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["httpx2>=2.15"]
+dev = ["boto3-stubs[s3]>=1.43", "httpx2>=2.15", "moto[s3]>=5.1"]
 
 [build-system]
 requires = ["hatchling>=1.27"]
