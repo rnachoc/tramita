@@ -53,6 +53,14 @@ _STREET_TYPES = (
     "Glorieta|Acceso|Cuesta|Partida|Plazuela|Polígono|Poligono"
 )
 
+_CITY = r"[A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+(?:\s+(?:de|del|la|las|los|el|[A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+))*"
+# Street, number, then optionally floor and door ("3º B", also as OCR misreads it: "3? B")
+# and postal code with city.
+_ADDRESS = (
+    rf"\b(?:{_STREET_TYPES})\s+[^,\n]{{2,60}},\s*\d{{1,4}}"
+    r"(?:,\s*\d{1,2}\s?\S?\s*[A-Z]\b)?"
+    rf"(?:,\s*\d{{5}}\b(?:\s+{_CITY})?)?"
+)
 
 # The Public Suffix List snapshot bundled with tldextract: no network call at runtime.
 _OFFLINE_SUFFIXES = tldextract.TLDExtract(suffix_list_urls=())
@@ -82,13 +90,7 @@ def _recognizers() -> list[object]:
     address = PatternRecognizer(
         supported_entity="ADDRESS",
         supported_language=LANGUAGE,
-        patterns=[
-            Pattern(
-                "street and number",
-                rf"\b(?:{_STREET_TYPES})\s+[^,\n]{{2,60}},\s*\d{{1,4}}(?:,\s*\d{{1,2}}º\s*[A-Z])?",
-                0.6,
-            )
-        ],
+        patterns=[Pattern("street and number", _ADDRESS, 0.6)],
     )
     # Checksum-free fallbacks: a NIF or IBAN misread by OCR fails validation in the standard
     # recognisers and would reach the model unmasked. Here privacy wins over precision.

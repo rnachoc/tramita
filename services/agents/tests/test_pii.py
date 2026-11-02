@@ -83,3 +83,11 @@ def test_identifiers_misread_by_ocr_are_still_masked() -> None:
 
     assert "12345678A" not in masked.text
     assert "9999 0000" not in masked.text
+
+
+def test_addresses_include_floor_postal_code_and_city_even_when_misread() -> None:
+    text = "Cliente: Rambla Lupe Méndez, 123, 4? D, 30171 Las Palmas de Gran Canaria. Total 10 €"
+
+    masked = mask(text, Pseudonymizer())
+
+    assert masked.text == "Cliente: <ADDRESS_1>. Total 10 €"
