@@ -91,7 +91,8 @@ def pdf_text(data: bytes) -> str:
         pages = []
         for page in pdf:
             textpage = page.get_textpage()
-            pages.append(textpage.get_text_range())
+            # pdfium ends lines with CR LF; the rest of the pipeline expects LF.
+            pages.append(textpage.get_text_range().replace("\r\n", "\n").replace("\r", "\n"))
             textpage.close()
             page.close()
         return "\n\n".join(pages)
