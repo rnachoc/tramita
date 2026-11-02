@@ -18,7 +18,14 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 
 import tldextract
-from presidio_analyzer import AnalyzerEngine, Pattern, PatternRecognizer, RecognizerRegistry
+from presidio_analyzer import (
+    AnalyzerEngine,
+    EntityRecognizer,
+    Pattern,
+    PatternRecognizer,
+    RecognizerRegistry,
+    RecognizerResult,
+)
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_analyzer.predefined_recognizers import (
     EmailRecognizer,
@@ -32,6 +39,7 @@ from presidio_analyzer.predefined_recognizers import (
 LANGUAGE = "es"
 SPACY_MODEL = "es_core_news_md"
 MIN_SCORE = 0.35
+MIN_NAME_WORDS = 2
 
 PERSONAL_ENTITIES = (
     "PERSON",
@@ -44,23 +52,91 @@ PERSONAL_ENTITIES = (
     "ADDRESS",
 )
 
+_CAPITALISED = re.compile(r"\b[A-ZÁÉÍÓÚÑ][a-záéíóúñü]+")
+
+
+class _LabelBefore:
+    """Matches a label that ends right before a position (a fixed-width lookbehind would not
+    allow the optional colon and spaces)."""
+
+    def __init__(self, label: str) -> None:
+        self.pattern = re.compile(rf"\b{label}[ \t]*:?[ \t]*$")
+
+    def search(self, text: str, start: int, end: int) -> bool:
+        return self.pattern.search(text[max(start, end - 12) : end]) is not None
+
+
+_CIF_LABEL = _LabelBefore("CIF")
+
 # Company names keep their legal form; a person-name match inside one is not personal data.
-_COMPANY = re.compile(r"[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ.\- ]{1,80}?\bS\.(?:L|A)\.(?:U\.)?")
+_COMPANY = re.compile(
+    r"[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ.\- ]{1,80}?\bS\.(?:L|A)\.(?:U\.)?"
+    r"|\b(?:Aseguradora|Mutua|Seguros)(?:[ \t]+[A-ZÁÉÍÓÚÑ][\wáéíóúñ]+){1,3}"
+)
 
 _STREET_TYPES = (
     "Calle|C\\.|Avenida|Avda\\.|Plaza|Paseo|Camino|Ronda|Callejón|Callejon|Urbanización|"
-    "Urbanizacion|Pasaje|Carretera|Vía|Via|Travesía|Travesia|Cañada|Canada|Rambla|Alameda|"
-    "Glorieta|Acceso|Cuesta|Partida|Plazuela|Polígono|Poligono"
+    "Urbanizacion|Pasaje|Pasadizo|Carretera|Vía|Via|Vial|Travesía|Travesia|Cañada|Canada|"
+    "Rambla|Alameda|Glorieta|Acceso|Cuesta|Partida|Plazuela|Polígono|Poligono|Bulevar|Senda|"
+    "Carrer|Barrio|Colonia|Muelle|Paraje|Sector|Lugar"
 )
 
-_CITY = r"[A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+(?:\s+(?:de|del|la|las|los|el|[A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+))*"
+# Horizontal space only: an address never continues on the next line, and letting it do so
+# swallowed the invoice number and date printed under the issuer's address.
+_SP = r"[ \t]"
+_CITY = rf"[A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+(?:{_SP}+(?:de|del|la|las|los|el|[A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+))*"
 # Street, number, then optionally floor and door ("3º B", also as OCR misreads it: "3? B")
 # and postal code with city.
 _ADDRESS = (
-    rf"\b(?:{_STREET_TYPES})\s+[^,\n]{{2,60}},\s*\d{{1,4}}"
-    r"(?:,\s*\d{1,2}\s?\S?\s*[A-Z]\b)?"
-    rf"(?:,\s*\d{{5}}\b(?:\s+{_CITY})?)?"
+    rf"\b(?:{_STREET_TYPES}){_SP}+[^,\n]{{2,60}},{_SP}*\d{{1,4}}"
+    rf"(?:,{_SP}*\d{{1,2}}{_SP}?\S?{_SP}*[A-Z]\b)?"
+    rf"(?:,{_SP}*\d{{5}}\b(?:{_SP}+{_CITY})?)?"
 )
+
+_NAME_WORD = r"[A-ZÁÉÍÓÚÑ][a-záéíóúñü]+"
+_NAME = rf"{_NAME_WORD}(?:{_SP}+(?:de{_SP}+(?:la{_SP}+)?)?{_NAME_WORD}){{1,5}}"
+# Names in the places our documents print them, which spaCy misses when OCR breaks the
+# sentence: after a label ("Cliente", "Conductor"...) or right before the person's NIF.
+_LABELLED_NAMES = (
+    re.compile(rf"\b(?:Cliente|Conductor|Compareciente|Nombre|Asegurado|Tomador):?\s*({_NAME})"),
+    re.compile(rf"({_NAME}){_SP}*(?:[·\-\u2013,]{_SP}*)?(?:con{_SP}+)?NIF\b"),
+)
+
+# Whatever follows a "NIF" label, even when OCR misread or dropped the letter.
+_NIF_AFTER_LABEL = re.compile(r"\b(?:NIF|NIE|DNI):?[ \t]*([A-Z]?\d{7,8}[^\s,.;]?)")
+# The plates row of an accident report: OCR often garbles plates beyond any plate pattern.
+_PLATES_ROW = re.compile(r"^Matr[ií]cula:?[ \t]+(\S[^\n]*)$", re.MULTILINE)
+
+
+class LabelledFieldRecognizer(EntityRecognizer):
+    """Personal data identified by where the document prints it rather than by its shape."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            supported_entities=["PERSON", "ES_PLATE", "ES_NIF"], supported_language=LANGUAGE
+        )
+
+    def load(self) -> None:
+        pass
+
+    def analyze(
+        self, text: str, entities: list[str], nlp_artifacts: object = None
+    ) -> list[RecognizerResult]:
+        names = [
+            RecognizerResult("PERSON", m.start(1), m.end(1), 0.7)
+            for pattern in _LABELLED_NAMES
+            for m in pattern.finditer(text)
+        ]
+        plates = [
+            RecognizerResult("ES_PLATE", m.start(1), m.end(1), 0.6)
+            for m in _PLATES_ROW.finditer(text)
+        ]
+        nifs = [
+            RecognizerResult("ES_NIF", m.start(1), m.end(1), 0.6)
+            for m in _NIF_AFTER_LABEL.finditer(text)
+        ]
+        return names + plates + nifs
+
 
 # The Public Suffix List snapshot bundled with tldextract: no network call at runtime.
 _OFFLINE_SUFFIXES = tldextract.TLDExtract(suffix_list_urls=())
@@ -97,15 +173,27 @@ def _recognizers() -> list[object]:
     unverified_nif = PatternRecognizer(
         supported_entity="ES_NIF",
         supported_language=LANGUAGE,
-        patterns=[Pattern("NIF without check", r"\b\d{8}\s?-?[A-Z]\b", 0.45)],
+        patterns=[Pattern("NIF without check", r"\b\d{8}\s?-?[A-Z]{1,2}\b", 0.45)],
     )
     unverified_iban = PatternRecognizer(
         supported_entity="IBAN_CODE",
         supported_language=LANGUAGE,
         patterns=[Pattern("Spanish IBAN without check", r"\bES\d{2}(?:\s?\d{4}){5}\b", 0.6)],
     )
+    # Phone numbers that OCR split over two lines, which the phonenumbers library rejects.
+    split_phone = PatternRecognizer(
+        supported_entity="PHONE_NUMBER",
+        supported_language=LANGUAGE,
+        patterns=[
+            Pattern(
+                "Spanish phone", r"(?<![\d\w])(?:\+34\s*)?[6789]\d{2}(?:\s*\d{3}){2}(?!\d)", 0.4
+            )
+        ],
+    )
     return [
         EsNifRecognizer(supported_language=LANGUAGE),
+        split_phone,
+        LabelledFieldRecognizer(),
         unverified_nif,
         unverified_iban,
         EsNieRecognizer(supported_language=LANGUAGE),
@@ -181,8 +269,15 @@ def find_personal_data(text: str) -> list[Finding]:
     companies = [m.span() for m in _COMPANY.finditer(text)]
     findings = []
     for r in results:
-        inside_company = any(start <= r.start and r.end <= end for start, end in companies)
-        if r.entity_type == "PERSON" and inside_company:
+        value = text[r.start : r.end]
+        if r.entity_type == "PERSON":
+            inside_company = any(start <= r.start and r.end <= end for start, end in companies)
+            # A single capitalised word is far more often a product or a place than a person.
+            if inside_company or len(_CAPITALISED.findall(value)) < MIN_NAME_WORDS:
+                continue
+        # A company tax id is not personal data; OCR reading its letter as a digit makes it
+        # look like a phone number or a NIF.
+        if r.entity_type in {"PHONE_NUMBER", "ES_NIF"} and _CIF_LABEL.search(text, 0, r.start):
             continue
         findings.append(Finding(r.entity_type, r.start, r.end, r.score))
     return _without_overlaps(findings)
