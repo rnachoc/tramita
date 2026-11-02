@@ -470,6 +470,16 @@ def markdown(summary: dict[str, Any], label: str) -> str:
         "",
         f"Answered by: {label}. {summary['documents']} documents, "
         f"classification accuracy {_pct(summary['classification_accuracy'])}.",
+        *(
+            [
+                "",
+                "The rule-based responder reads the masked OCR text of a scan, which is also what "
+                "its answer is checked against, so on scans its confidences say less than a "
+                "vision model's would.",
+            ]
+            if "rule-based responder" in label
+            else []
+        ),
         "",
         "## Fields by document type and format",
         "",

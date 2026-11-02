@@ -110,5 +110,6 @@ def test_the_report_names_who_answered_and_holds_no_personal_values() -> None:
     report = markdown(summary, provider_label(summary))
 
     assert "rule-based responder" in report
+    assert "on scans its confidences say less" in report
     assert HOLDER.name not in report
     assert HOLDER.tax_id not in report
