@@ -9,16 +9,28 @@ dependencies = [
     # Spanish NER for person names, used by Presidio. Pinned wheel from spaCy's GitHub releases.
     "es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl",
     "fastapi>=0.120",
+    "pillow>=11.0",  # scan images: redaction boxes and format conversion
     "presidio-analyzer>=2.2.366",
     "pydantic>=2.12",
     "pydantic-settings>=2.11",
+    "pypdfium2>=4.30",  # text layer of born-digital PDFs
+    "pytesseract>=0.3.13",  # OCR wrapper; needs the tesseract binary with Spanish data
     # Offline public-suffix check for e-mail domains (imported directly in documents/pii.py).
     "tldextract>=5.4",
     "uvicorn[standard]>=0.38",
 ]
 
 [dependency-groups]
-dev = ["boto3-stubs[s3]>=1.43", "httpx2>=2.15", "moto[s3]>=5.1"]
+dev = [
+    "boto3-stubs[s3]>=1.43",
+    "httpx2>=2.15",
+    "moto[s3]>=5.1",
+    # Tests render synthetic documents with the data generator.
+    "tramita-datagen",
+]
+
+[tool.uv.sources]
+tramita-datagen = { workspace = true }
 
 [build-system]
 requires = ["hatchling>=1.27"]

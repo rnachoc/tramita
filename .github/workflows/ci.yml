@@ -59,6 +59,11 @@ jobs:
         with:
           enable-cache: true
       - run: uv python install 3.12
+      - name: install tesseract with Spanish data (scan OCR)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends tesseract-ocr tesseract-ocr-spa
+          tesseract --list-langs | grep -qx spa
       - run: .github/scripts/run-step.sh "python lint" make py-lint
       - run: .github/scripts/run-step.sh "python tests" make py-test
 
