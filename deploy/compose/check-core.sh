@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Starts the core service jar against the running Compose stack, seeds it with
-# the generated policies and reads one back through the API. Needs `make up`,
-# `make data-json` and a built jar (mvn -DskipTests package). Used by CI.
+# the generated policies, reads one back through the API and ingests a sample of
+# claims end to end (check-ingest.py). Needs `make up`, tesseract with Spanish data,
+# `make data` and a built jar (mvn -DskipTests package). Used by CI.
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
@@ -34,3 +35,5 @@ echo "  ok   policy $policy readable with the analyst role"
 status=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:$port/api/policies/$policy")
 [[ "$status" == "401" ]] || { echo "anonymous read returned $status, expected 401" >&2; exit 1; }
 echo "  ok   anonymous requests are refused"
+
+TRAMITA_CORE_URL="http://localhost:$port" uv run python deploy/compose/check-ingest.py
