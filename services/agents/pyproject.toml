@@ -23,6 +23,7 @@ dependencies = [
 
 [project.scripts]
 tramita-ingest = "tramita_agents.ingest:main"
+tramita-eval-extraction = "tramita_agents.evals.extraction:main"
 
 [dependency-groups]
 dev = [
