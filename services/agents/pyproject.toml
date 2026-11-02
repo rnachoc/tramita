@@ -6,9 +6,14 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "anthropic>=2.3",
     "boto3>=1.43",
+    # Spanish NER for person names, used by Presidio. Pinned wheel from spaCy's GitHub releases.
+    "es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl",
     "fastapi>=0.120",
+    "presidio-analyzer>=2.2.366",
     "pydantic>=2.12",
     "pydantic-settings>=2.11",
+    # Offline public-suffix check for e-mail domains (imported directly in documents/pii.py).
+    "tldextract>=5.4",
     "uvicorn[standard]>=0.38",
 ]
 
@@ -21,3 +26,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tramita_agents"]
+
+[tool.hatch.metadata]
+# The Spanish spaCy model is only published as a wheel on GitHub releases.
+allow-direct-references = true
