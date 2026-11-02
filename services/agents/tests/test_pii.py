@@ -91,3 +91,41 @@ def test_addresses_include_floor_postal_code_and_city_even_when_misread() -> Non
     masked = mask(text, Pseudonymizer())
 
     assert masked.text == "Cliente: <ADDRESS_1>. Total 10 €"
+
+
+def test_names_next_to_labels_and_nifs_are_masked_even_when_ner_misses_them() -> None:
+    text = (
+        "Cliente\nOfelia Ferrero Uribe - NIF 71260208K\n"
+        "Conductor Ana López Gil Pedro Ruiz Sanz\n"
+        "Matrícula 10232 XFD 6170.DJ8\n"
+    )
+
+    masked = mask(text, Pseudonymizer())
+
+    for value in ("Ofelia", "Ferrero", "Ana López", "Pedro Ruiz", "10232", "6170"):
+        assert value not in masked.text, value
+
+
+def test_ocr_damage_does_not_expose_identifiers() -> None:
+    # Letter read as a comma, letter doubled, phone split over two lines.
+    text = "NIF 33469590, y NIF 59890829WW. Teléfono +34 679\n037 894."
+
+    masked = mask(text, Pseudonymizer())
+
+    for value in ("33469590", "59890829", "679", "037 894"):
+        assert value not in masked.text, value
+
+
+def test_company_tax_ids_misread_as_numbers_are_kept() -> None:
+    # OCR reads the "B" of a CIF as an "8": nine digits, shaped like a phone number.
+    masked = mask("CIF 816618928 - Ronda de Asdrúbal, 83", Pseudonymizer())
+
+    assert "CIF 816618928" in masked.text
+
+
+def test_single_capitalised_words_and_insurers_are_not_people() -> None:
+    text = "Suministro e instalación de placa. Aseguradora Cierzo (ficticia)."
+
+    masked = mask(text, Pseudonymizer())
+
+    assert masked.text == text
