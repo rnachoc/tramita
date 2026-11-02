@@ -173,6 +173,18 @@ def _police(text: str) -> PoliceReportRead:
     )
 
 
+OWN_INSURER = "Aseguradora Brisa"
+
+
+def _other_insurer(row: str | None) -> bool:
+    """Vehicle B is described when its insurer column names one. Vehicle A is our policyholder,
+    insured by us; OCR often loses the lone "-" printed in an empty column."""
+    if row is None:
+        return False
+    rest = row.replace(OWN_INSURER, "", 1)
+    return re.search(r"[A-Za-zÁÉÍÓÚÑáéíóúñ]{3,}", rest) is not None
+
+
 def _accident(text: str) -> AccidentReportRead:
     insurers = _search(r"^Aseguradora\s+(.*)$", text, re.MULTILINE)
     circumstances = _search(r"Circunstancias\s*\n(.*?)(?:\n\s*Firma|$)", text, re.DOTALL)
@@ -180,7 +192,7 @@ def _accident(text: str) -> AccidentReportRead:
         report_date=_iso(_search(rf"Fecha de la declaraci[óo]n:?\s*({_DATE})", text)),
         incident_date=_iso(_search(rf"Fecha del accidente:?\s*({_DATE})", text)),
         location=_search(r"Lugar:?\s*(.+)$", text, re.MULTILINE),
-        other_party_involved=insurers is not None and not insurers.rstrip().endswith(" -"),
+        other_party_involved=_other_insurer(insurers),
         circumstances=" ".join(circumstances.split()) if circumstances else None,
     )
 
