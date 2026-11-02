@@ -1,13 +1,15 @@
 """Turns what the model read into checked facts with a confidence for every field.
 
 The model's answer is a proposal. Code parses each value, checks its format, cross-checks
-amounts against each other and looks for each value in an independent reading of the same
-document (the PDF text layer, or Tesseract's OCR of a scan). The confidence of a field comes
-from that evidence, not from the model's own opinion of itself:
+amounts against each other and looks each value up in a second reading of the document. For a
+scan, that is Tesseract's OCR, independent of the model's vision. For a PDF, it is the text
+layer the model was given: finding the value there catches invented or mangled values, though
+not a value taken from the wrong place. The confidence of a field comes from that evidence,
+not from the model's own opinion of itself:
 
 * a value that is missing scores 0, and one that cannot be parsed scores 0.2;
 * the starting point depends on the source: 0.85 for PDF text, 0.7 for a scan read by vision;
-* found in the independent reading: +0.13; not found: x0.75;
+* found in the second reading: +0.13; not found: x0.75;
 * failing a format check (CIF control digit) or an arithmetic check it takes part in: x0.6.
 
 A stated total that does not add up is reported as a failed check but does not lower the
@@ -172,7 +174,7 @@ def _date_spellings(value: date) -> list[str]:
 
 
 class Evidence:
-    """An independent reading of the document to look values up in."""
+    """A second reading of the document to look values up in."""
 
     def __init__(self, text: str) -> None:
         self.folded = _fold(text)
@@ -230,7 +232,7 @@ class _Scorer:
                 confidence += _FOUND_BONUS
             else:
                 confidence *= _NOT_FOUND
-                notes.append("not confirmed by the independent reading")
+                notes.append("not found in the second reading")
         if not valid:
             confidence *= _FAILED_CHECK
             notes.append("fails its format check")
@@ -375,9 +377,9 @@ def _accident(read: DocumentRead, s: _Scorer) -> bool:
     return True
 
 
-def score(read: DocumentRead, source: Source, independent_text: str) -> ExtractedDocument:
-    """Checks the model's reading of a document against an independent reading of it."""
-    scorer = _Scorer(source, Evidence(independent_text))
+def score(read: DocumentRead, source: Source, second_reading: str) -> ExtractedDocument:
+    """Checks the model's reading of a document against a second reading of it."""
+    scorer = _Scorer(source, Evidence(second_reading))
     checks: list[Check] = []
     notes: list[str] = []
     kind = read.document_type
