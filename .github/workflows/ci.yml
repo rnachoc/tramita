@@ -103,11 +103,15 @@ jobs:
         run: .github/scripts/run-step.sh "compose up" timeout 600 make up
       - name: Exercise every service with a real request
         run: .github/scripts/run-step.sh "compose smoke" make smoke
-      - name: Run the core against the stack and seed it
+      - name: install tesseract with Spanish data (scan OCR)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends tesseract-ocr tesseract-ocr-spa
+      - name: Run the core against the stack, seed it and ingest claims end to end
         run: |
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "core against stack" bash -c \
-            'make data-json && (cd services/core && mvn -B -q -DskipTests package) && deploy/compose/check-core.sh'
+            'make data && (cd services/core && mvn -B -q -DskipTests package) && deploy/compose/check-core.sh'
       - name: Show service status
         if: always()
         run: make ps
