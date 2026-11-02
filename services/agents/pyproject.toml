@@ -9,6 +9,7 @@ dependencies = [
     # Spanish NER for person names, used by Presidio. Pinned wheel from spaCy's GitHub releases.
     "es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl",
     "fastapi>=0.120",
+    "httpx>=0.28",  # calls to the core system's API
     "pillow>=11.0",  # scan images: redaction boxes and format conversion
     "presidio-analyzer>=2.2.366",
     "pydantic>=2.12",
