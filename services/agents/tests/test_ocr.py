@@ -73,3 +73,14 @@ def test_redacted_image_is_a_grey_png_of_the_same_size() -> None:
         assert image.format == "PNG"
         assert image.mode == "L"
         assert image.size == load_image(data).size
+
+
+def test_table_rows_are_read_across_columns() -> None:
+    page = read_page(load_image(render(invoice(DocumentFormat.SCAN))))
+
+    rows = page.text.splitlines()
+    assert "Sustitución de tubería de cobre 2 120,50 € 241,00 €" in rows
+    # OCR may drop the accent of "fontanería"; the row must still hold all four columns.
+    assert any(
+        r.startswith("Mano de obra de fontan") and r.endswith(" 3 45,00 € 135,00 €") for r in rows
+    )

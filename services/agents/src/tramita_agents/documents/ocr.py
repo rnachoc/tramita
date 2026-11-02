@@ -12,6 +12,7 @@ personal data survives it (re-running OCR on the redacted image) instead of assu
 from __future__ import annotations
 
 import io
+import statistics
 from dataclasses import dataclass
 
 import pytesseract
@@ -26,6 +27,13 @@ OCR_CONFIG = "--psm 3 --oem 1"
 # ids and digits in amounts. Upscaling to about this width (300 dpi for A4) fixed every value
 # in a sample of generated invoices, at roughly twice the OCR time.
 OCR_TARGET_WIDTH = 2500
+# Lines whose vertical extents overlap by this fraction of the smaller one share a row.
+ROW_OVERLAP = 0.5
+# A vertical gap larger than this many word heights starts a new section (blank line).
+SECTION_GAP = 1.2
+# Lines with fewer words do not say much about the page's rotation.
+MIN_WORDS_FOR_SKEW = 3
+MIN_RUN_FOR_SKEW = 150
 # Extra pixels around each redacted word, so anti-aliased edges do not survive.
 BOX_PADDING = 3
 
@@ -59,46 +67,136 @@ def load_image(data: bytes) -> Image.Image:
         return image.convert("L")
 
 
-def read_page(image: Image.Image) -> OcrPage:
-    """Runs Tesseract and joins the words into lines and blocks, keeping offsets.
+@dataclass(frozen=True)
+class _Box:
+    text: str
+    left: int
+    top: int
+    width: int
+    height: int
+    confidence: float
+    line: tuple[int, int, int]  # Tesseract's block, paragraph and line numbers
 
-    Word boxes are in the coordinates of ``image``, whatever scale OCR ran at.
-    """
+
+def _tesseract_words(image: Image.Image) -> list[_Box]:
     scale = max(1, round(OCR_TARGET_WIDTH / image.width))
     upscaled = image.resize((image.width * scale, image.height * scale), Image.Resampling.LANCZOS)
     data = pytesseract.image_to_data(
         upscaled, lang=OCR_LANGUAGE, config=OCR_CONFIG, output_type=pytesseract.Output.DICT
     )
+    boxes = []
+    for i, raw in enumerate(data["text"]):
+        text = str(raw).strip()
+        if text:
+            boxes.append(
+                _Box(
+                    text=text,
+                    left=int(data["left"][i]) // scale,
+                    top=int(data["top"][i]) // scale,
+                    width=-(-int(data["width"][i]) // scale),
+                    height=-(-int(data["height"][i]) // scale),
+                    confidence=max(float(data["conf"][i]), 0.0),
+                    line=(
+                        int(data["block_num"][i]),
+                        int(data["par_num"][i]),
+                        int(data["line_num"][i]),
+                    ),
+                )
+            )
+    return boxes
+
+
+def _skew(lines: dict[tuple[int, int, int], list[_Box]], height: float) -> float:
+    """Median slope along Tesseract's lines: the page's slight rotation.
+
+    Only words of ordinary height are used (accents and descenders make boxes taller), and only
+    lines long enough for the slope to show.
+    """
+    slopes = []
+    for boxes in lines.values():
+        plain = [b for b in boxes if 0.8 * height <= b.height <= 1.25 * height]
+        if len(plain) >= MIN_WORDS_FOR_SKEW:
+            first, last = plain[0], plain[-1]
+            run = (last.left + last.width / 2) - (first.left + first.width / 2)
+            if run >= MIN_RUN_FOR_SKEW:
+                rise = (last.top + last.height / 2) - (first.top + first.height / 2)
+                slopes.append(rise / run)
+    return statistics.median(slopes) if slopes else 0.0
+
+
+def _rows(boxes: list[_Box]) -> list[list[_Box]]:
+    """Groups words into visual rows, also across Tesseract's blocks.
+
+    Tesseract reads a table column by column, which separates each line description from its
+    amounts. Rows are rebuilt from positions instead, after undoing the page's slight rotation:
+    a line joins a row when their vertical extents overlap by at least half the smaller one.
+    """
+    lines: dict[tuple[int, int, int], list[_Box]] = {}
+    for box in boxes:
+        lines.setdefault(box.line, []).append(box)
+    height = statistics.median(b.height for b in boxes)
+    slope = _skew(lines, height)
+
+    def extent(line: list[_Box]) -> tuple[float, float]:
+        tops = [b.top - slope * (b.left + b.width / 2) for b in line]
+        bottoms = [t + b.height for t, b in zip(tops, line, strict=True)]
+        return min(tops), max(bottoms)
+
+    rows: list[tuple[tuple[float, float], list[_Box]]] = []
+    for line in sorted(lines.values(), key=lambda line: extent(line)[0]):
+        top, bottom = extent(line)
+        joined = False
+        for (row_top, row_bottom), row in reversed(rows[-3:]):
+            overlap = min(bottom, row_bottom) - max(top, row_top)
+            if overlap >= ROW_OVERLAP * min(bottom - top, row_bottom - row_top):
+                row.extend(line)
+                joined = True
+                break
+        if not joined:
+            rows.append(((top, bottom), list(line)))
+    return [sorted(row, key=lambda b: b.left) for _, row in rows]
+
+
+def read_page(image: Image.Image) -> OcrPage:
+    """Runs Tesseract and lays the words out in visual rows, keeping their offsets.
+
+    Rows are separated by a line break, and by a blank line where the vertical gap is large
+    (a new section). Word boxes are in the coordinates of ``image``, whatever scale OCR ran at.
+    """
+    boxes = _tesseract_words(image)
+    if not boxes:
+        return OcrPage(text="", words=())
+    rows = _rows(boxes)
+    height = statistics.median(b.height for b in boxes)
     parts: list[str] = []
     words: list[OcrWord] = []
     offset = 0
-    previous_line: tuple[int, int, int] | None = None
-    for i, raw in enumerate(data["text"]):
-        text = str(raw).strip()
-        if not text:
-            continue
-        line = (int(data["block_num"][i]), int(data["par_num"][i]), int(data["line_num"][i]))
-        if previous_line is not None:
-            separator = " " if line == previous_line else "\n"
-            if line[0] != previous_line[0]:
-                separator = "\n\n"
+    previous_bottom: float | None = None
+    for row in rows:
+        top = min(b.top for b in row)
+        if previous_bottom is not None:
+            separator = "\n\n" if top - previous_bottom > height * SECTION_GAP else "\n"
             parts.append(separator)
             offset += len(separator)
-        previous_line = line
-        words.append(
-            OcrWord(
-                text=text,
-                left=int(data["left"][i]) // scale,
-                top=int(data["top"][i]) // scale,
-                width=-(-int(data["width"][i]) // scale),
-                height=-(-int(data["height"][i]) // scale),
-                confidence=max(float(data["conf"][i]), 0.0),
-                start=offset,
-                end=offset + len(text),
+        previous_bottom = max(b.top + b.height for b in row)
+        for index, box in enumerate(row):
+            if index:
+                parts.append(" ")
+                offset += 1
+            words.append(
+                OcrWord(
+                    text=box.text,
+                    left=box.left,
+                    top=box.top,
+                    width=box.width,
+                    height=box.height,
+                    confidence=box.confidence,
+                    start=offset,
+                    end=offset + len(box.text),
+                )
             )
-        )
-        parts.append(text)
-        offset += len(text)
+            parts.append(box.text)
+            offset += len(box.text)
     return OcrPage(text="".join(parts), words=tuple(words))
 
 
