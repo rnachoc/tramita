@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Agent service: document reading, policy search, claim analysis and orchestration."
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "anthropic>=2.3",
     "fastapi>=0.120",
     "pydantic>=2.12",
     "pydantic-settings>=2.11",
