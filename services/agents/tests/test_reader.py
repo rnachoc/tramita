@@ -11,6 +11,7 @@ from tramita_agents.documents.reader import (
     DocumentReader,
     UnsupportedDocumentError,
     _quoted,
+    pdf_text,
 )
 from tramita_agents.documents.schemas import (
     DocumentRead,
@@ -162,3 +163,10 @@ def test_the_document_cannot_close_its_own_quotes() -> None:
 def test_only_pdf_jpeg_and_png_are_accepted(reader: DocumentReader) -> None:
     with pytest.raises(UnsupportedDocumentError):
         reader.read(b"GIF89a....", Pseudonymizer())
+
+
+def test_pdf_text_uses_plain_line_feeds() -> None:
+    text = pdf_text(render(invoice()))
+
+    assert "\r" not in text
+    assert "Fontanería Hermanos Robledo S.L.\n" in text
