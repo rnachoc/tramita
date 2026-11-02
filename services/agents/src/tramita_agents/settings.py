@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     s3_secret_key: SecretStr = SecretStr("change-me-local-only")
     s3_bucket: str = "claim-documents"
 
+    # Core system API; the agents call it with the AGENT entry of TRAMITA_API_KEYS.
+    tramita_core_url: str = "http://localhost:8080"
+    tramita_api_keys: SecretStr | None = None
+
     @property
     def model_provider(self) -> ModelProvider:
         """Without an API key the whole system runs on the deterministic fake model."""
