@@ -9,10 +9,10 @@ later phases implement; everything else describes the code as it is.
 |---|---|---|
 | Core service | `services/core` | System of record: policies, claims, rules engine, fraud scoring, payments, audit |
 | Data generator | `data/generator` | Reproducible synthetic policies, policyholders, claims, documents and expected resolutions |
-| Agent service | `services/agents` | Document reading, policy search, agents, Kafka consumers, Temporal workflows (*skeleton*) |
+| Agent service | `services/agents` | Document reading and ingestion (*implemented*); policy search, agents, Kafka consumers, Temporal workflows (*planned*) |
 | MCP server | `services/mcp` | Analyst tools over the core API, guarded by the same rules (*planned*) |
 | Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject (*planned*) |
-| Evals | `evals` | Eval set, runner, reports and baseline with a CI gate (*planned*) |
+| Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading evaluation with a CI gate (*implemented*); full eval set and baseline (*planned*) |
 
 ## Trust boundary
 
@@ -51,6 +51,43 @@ in order; the first three decide regardless of the proposal:
 | 8 | Fraud score from rule and model signals | 0.4 review, 0.7 investigation |
 | 9 | Citations exist, belong to the product and include the grounding clause | Otherwise a violation |
 | 10 | Routing | `AUTO` only for consistent payments up to 3,000 EUR and requests for required documents |
+
+## Document reading
+
+`tramita_agents.documents` turns a stored document into masked, checked facts
+([ADR 0011](decisions/0011-reading-documents-with-masked-inputs.md)). Personal data never reaches
+the model: born-digital PDFs are sent as masked text, scans as an image with personal data
+blacked out plus the masked OCR text.
+
+```mermaid
+flowchart TD
+    F[Original file<br/>S3: claims/claim/doc/file] --> K{PDF with a<br/>text layer?}
+    K -- yes --> T[Text layer] --> M[Mask personal data<br/>Presidio es + Spain recognisers<br/>tokens like PERSON_1, per claim]
+    K -- "no (scan)" --> O[Tesseract spa at ~300 dpi<br/>words laid out in rows] --> M
+    O --> B[Black out the words<br/>that hold personal data]
+    M --> Q[Model request<br/>strict output schema<br/>document quoted as data]
+    B --> Q
+    Q --> S[Score in code<br/>formats, arithmetic,<br/>second reading]
+    M --> D[Injection detector]
+    S --> P[Extraction payload<br/>masked values + confidences;<br/>typed facts only if trusted]
+    D --> P
+    P --> C[Core API<br/>PUT extraction]
+```
+
+- **Model client** (`tramita_agents.llm`): one interface for the Anthropic client (structured
+  outputs, vision, prompt caching), a recorder, and the fake model, which replays recordings or
+  answers with a labelled rule-based responder ([ADR 0010](decisions/0010-fake-model-recordings-then-rule-based-responders.md)).
+  Extraction uses the fast model for text and the smart one for scans; model ids are configuration.
+- **Confidence** comes from evidence, not from the model: each value is parsed, format-checked,
+  cross-checked (lines, tax, total) and looked up in a second reading. Key fields below 0.6 are
+  listed for review, and the typed facts the rules use are sent only above that threshold.
+- **Injection**: the model reports embedded instructions in a dedicated field, a deterministic
+  detector flags them independently, and nothing in the output can approve or pay.
+- **Ingestion** (`make ingest`): registers each claim, stores each original, reads it, registers
+  it with the type it was read as and records the extraction. All steps are idempotent.
+- **Evaluation** (`make eval-extraction`): field accuracy by type and format, calibration, wrong
+  facts sent to the rules, personal values reaching the model, the redacted scans or the core,
+  over-masking, and planted instructions, against the generated ground truth.
 
 ## Claim lifecycle
 
@@ -139,7 +176,9 @@ and waits until every health check passes; `make smoke` then sends each service 
 
 ## Continuous integration
 
-Every push runs: a secret scan of the full history; Python lint, strict types and tests; the Java
-build with unit, integration (Testcontainers PostgreSQL) and cross-check tests; the compose stack
-with its smoke test; and a build of every pushed commit on its own. Test counts are published as
-annotations, and releases are created from `docs/releases/*.md`.
+Every push runs: a secret scan of the full history; Python lint, strict types and tests; the
+document reading evaluation with its regression gate (fake provider); the Java build with unit,
+integration (Testcontainers PostgreSQL) and cross-check tests; the compose stack with its smoke
+test, the core against it, seeding, and an end-to-end ingest of a sample of claims checked through
+the API and the object store; and a build of every pushed commit on its own. Test counts and eval
+headlines are published as annotations, and releases are created from `docs/releases/*.md`.
