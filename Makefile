@@ -57,6 +57,10 @@ data-json: py-sync ## Generate the dataset records only, without rendering docum
 seed: ## Load the generated policies into a running core service (TRAMITA_CORE_URL, TRAMITA_API_KEYS)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-seed
 
+.PHONY: ingest
+ingest: ## Read the generated claims' documents and record them in a running core (stack up, policies seeded)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-ingest $(ARGS)
+
 # --- Java (core service) --------------------------------------------------------
 .PHONY: core-lint core-test core-run
 core-run: ## Run the core service against the local stack (needs `make up`)

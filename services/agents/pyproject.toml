@@ -21,6 +21,9 @@ dependencies = [
     "uvicorn[standard]>=0.38",
 ]
 
+[project.scripts]
+tramita-ingest = "tramita_agents.ingest:main"
+
 [dependency-groups]
 dev = [
     "boto3-stubs[s3]>=1.43",

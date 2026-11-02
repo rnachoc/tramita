@@ -85,6 +85,13 @@ def sniff(data: bytes) -> FileKind:
     raise UnsupportedDocumentError("Only PDF, JPEG and PNG documents can be read.")
 
 
+def media_type(data: bytes) -> str:
+    kind = sniff(data)
+    if kind is FileKind.PDF:
+        return "application/pdf"
+    return "image/png" if data.startswith(b"\x89PNG") else "image/jpeg"
+
+
 def pdf_text(data: bytes) -> str:
     pdf = pdfium.PdfDocument(data)
     try:
