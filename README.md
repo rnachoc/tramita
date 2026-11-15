@@ -141,3 +141,7 @@ commit on its own so the history stays bisectable. Test counts are published as 
 ## License
 
 [MIT](LICENSE)
+
+## Contact
+
+[LinkedIn](https://www.linkedin.com/in/ignaciorodriguezcaro/)
