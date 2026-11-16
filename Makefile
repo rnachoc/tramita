@@ -73,6 +73,14 @@ ingest: ## Read the generated claims' documents and record them in a running cor
 index: py-sync ## Index the policy conditions for search in OpenSearch and pgvector (stack up; downloads models once)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-index-policies $(ARGS)
 
+.PHONY: process
+process: ## Analyse the open claims with the agents and submit proposals to a running core (after ingest and index)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-process $(ARGS)
+
+.PHONY: eval-agents
+eval-agents: ## Evaluate the agents end to end against the expected resolutions (after `make process`)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-eval-agents $(ARGS)
+
 # --- Java (core service) --------------------------------------------------------
 .PHONY: core-lint core-test core-run
 core-run: ## Run the core service against the local stack (needs `make up`)
