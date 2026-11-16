@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 7: review console (Angular)** (next). Phases 0 to 6 are complete.
+**Phase 8: MCP server** (next). Phases 0 to 7 are complete.
 
 ## Phase status
 
@@ -18,7 +18,7 @@ resuming work, read this file first.
 | 4 | Policy search | done | v0.5.0 |
 | 5 | Agents | done | v0.6.0 |
 | 6 | Events and long-running processes | done | v0.7.0 |
-| 7 | Review console (Angular) | pending | |
+| 7 | Review console (Angular) | done | v0.8.0 |
 | 8 | MCP server | pending | |
 | 9 | Full evaluation | pending | |
 | 10 | Observability and cost | pending | |
@@ -148,7 +148,23 @@ resuming work, read this file first.
   API reaches the workflow through Kafka and the claim ends paid; events in order, no personal
   data, empty dead-letter topic.
 
+## Phase 7: done
+
+- `web/console`: Angular 22 review console in Spanish. Inbox by queue; claim page with facts,
+  the rules' evaluation, cited clauses with text, documents as read, fraud signals, the agents'
+  review requests and the audit trail; approve, correct or reject with the core's checks
+  mirrored and an idempotency key per submission.
+- Served by an unprivileged nginx that proxies `/api` to the core and adds the REVIEWER key; the
+  browser holds no credential (ADR 0015). Strict CSP, no inline script.
+- Tests: 12 Vitest unit tests; 3 Playwright end-to-end tests in CI against the console container
+  and the core (a payment approved through the console ends paid; no key in any request or
+  file; a rejection without a comment is refused before sending).
+- The agents now keep their review requests in the proposal's metadata, shown to the handler.
+
 ## Open issues and notes
+
+- **Reviewers are not individually authenticated** (ADR 0009, ADR 0015): whoever reaches the
+  console reviews as the console. Production needs OIDC and per-user sessions.
 
 - **One relay per core**: several core instances would need a lock on the relay row.
 - **Overdue workflows end** (`documents_overdue`, `review_overdue`) for a person to chase; there

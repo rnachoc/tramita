@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 6 (events and long-running processes)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 7 (review console)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -69,7 +69,7 @@ in [docs/decisions](docs/decisions).
 | Documents | S3 API (RustFS locally, see [ADR 0006](docs/decisions/0006-object-store-rustfs-instead-of-minio.md)) |
 | Search | OpenSearch (BM25) + pgvector, reciprocal rank fusion, local embeddings and reranker (fastembed, ONNX) |
 | Personal data | Microsoft Presidio (Spanish) |
-| Review console | Angular, TypeScript |
+| Review console | Angular 22, TypeScript, Vitest, Playwright, nginx |
 | Tool access for analysts | MCP server (official Python SDK) |
 | Observability | OpenTelemetry (GenAI semantic conventions), Tempo/Jaeger, Prometheus, Grafana |
 | Infrastructure | Docker Compose, Helm + kind, GitHub Actions |
@@ -77,6 +77,7 @@ in [docs/decisions](docs/decisions).
 ## Quick start
 
 Requirements: Docker with Compose v2, [uv](https://docs.astral.sh/uv/), Java 17 and Maven 3.9+,
+Node.js 22 for the console,
 [Tesseract](https://tesseract-ocr.github.io/) with Spanish data (`apt install tesseract-ocr-spa`,
 `brew install tesseract-lang`) for scanned documents, and
 [gitleaks](https://github.com/gitleaks/gitleaks#installing) for the pre-commit hook.
@@ -97,6 +98,7 @@ make eval-agents          # end-to-end report: what the core decided against the
 make worker               # Temporal worker for the claim workflows (another terminal)
 make bridge               # claim events on Kafka -> workflow signals (core with TRAMITA_EVENTS_ENABLED=true)
 make start-claims         # one durable workflow per ingested claim
+make console-up           # review console on http://localhost:4200 (core running on the host)
 make test                 # Python and Java test suites (the Java integration tests need Docker)
 make help                 # every available target
 ```
@@ -193,6 +195,16 @@ agents are deterministic baselines that read nothing:
 
 No real-model numbers yet: with `ANTHROPIC_API_KEY` set the same commands use Claude and the
 report says so.
+
+## Review console
+
+Claims handlers work in `web/console` (Angular): an inbox of what the rules sent to a person and,
+for each claim, the facts, the rules' evaluation, the clauses cited with their text, the
+documents as read, the fraud signals, why the agents asked for review and the audit trail, with a
+form to approve, correct or reject. The browser never holds a credential: nginx serves the
+console and adds the REVIEWER key on its way to the core, under a strict Content-Security-Policy.
+CI approves a claim through the console in a real browser and expects it paid. See
+[ADR 0015](docs/decisions/0015-review-console-behind-a-key-injecting-proxy.md).
 
 ## Events and workflows
 
