@@ -9,7 +9,7 @@ later phases implement; everything else describes the code as it is.
 |---|---|---|
 | Core service | `services/core` | System of record: policies, claims, rules engine, fraud scoring, payments, audit |
 | Data generator | `data/generator` | Reproducible synthetic policies, policyholders, claims, documents and expected resolutions |
-| Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents and their coordinator (*implemented*); Kafka consumers, Temporal workflows (*planned*) |
+| Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents, claim event consumers and the per-claim Temporal workflows |
 | MCP server | `services/mcp` | Analyst tools over the core API, guarded by the same rules (*planned*) |
 | Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject (*planned*) |
 | Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading, policy search and end-to-end agent evaluations with CI gates (*implemented*); full eval set and baseline (*planned*) |
@@ -151,11 +151,49 @@ flowchart TD
   compares the core's decisions with the expected resolutions and gates automatic settlements
   that a person should have seen.
 
+## Events and workflows
+
+Kafka carries the public record of facts and Temporal drives each claim
+([ADR 0004](decisions/0004-kafka-choreography-temporal-orchestration.md),
+[ADR 0014](decisions/0014-audit-trail-as-outbox-one-ordered-topic.md)).
+
+```mermaid
+sequenceDiagram
+    participant I as Ingestion
+    participant W as ClaimWorkflow (Temporal)
+    participant A as Agents (activity)
+    participant C as Core
+    participant K as Kafka tramita.claim-events
+    participant B as Bridge
+    participant H as Claims handler
+    I->>C: register claim, documents, extractions
+    I->>W: start claim-<id>
+    W->>A: analyse_claim
+    A->>C: proposal (rules decide)
+    C-->>K: relay publishes the audit trail in order
+    Note over W: waits for documents or a review, with deadlines
+    H->>C: review (approve, correct, reject)
+    C-->>K: REVIEW_RECORDED, PAYMENT_EXECUTED
+    K->>B: workflow-signals group
+    B->>W: signal review_recorded(event_id)
+    W->>C: read final status, end
+```
+
+- **Outbox**: the audit trail, written in the same transaction as each change, published by a
+  relay in the core (`TRAMITA_EVENTS_ENABLED=true`) after its cursor; sequence gaps from
+  in-flight transactions are waited for, old ones skipped. At least once, deduplicated by
+  `event_id`.
+- **One topic** keyed by claim, so a claim's events keep their order across types. Only listed
+  fields leave the core; the contract is `docs/events/claim-event.schema.json`.
+- **Consumers** commit after handling, retry in place with backoff and park failures in
+  `tramita.claim-events.dlt.<group>`.
+- **ClaimWorkflow**: analyse; wait for documents (then analyse again) or for a review (then read
+  the final status), each with a deadline; end when paid or rejected. Signals carry the event id.
+- **Commands**: `make worker`, `make bridge`, `make start-claims`.
+
 ## Claim lifecycle
 
-Implemented in the core (`ClaimStatus`). Events and workflows around it are *planned*: Kafka will
-carry the public record of facts and Temporal will drive each claim
-([ADR 0004](decisions/0004-kafka-choreography-temporal-orchestration.md)).
+Implemented in the core (`ClaimStatus`) and followed by the claim workflow above.
 
 ```mermaid
 stateDiagram-v2
@@ -230,10 +268,10 @@ and waits until every health check passes; `make smoke` then sends each service 
 | Service | Image | Purpose |
 |---|---|---|
 | postgres | `pgvector/pgvector:0.8.7-pg17-trixie` | Core data, clause embeddings (schema `policy_search`), Temporal persistence |
-| kafka | `apache/kafka:4.2.2` | Domain events, KRaft mode, no topic auto-creation |
+| kafka | `apache/kafka:4.2.2` | Claim events (`tramita.claim-events` and dead-letter topics), KRaft, no topic auto-creation |
 | opensearch | `opensearchproject/opensearch:3.9.0` | Lexical (BM25) side of the policy search |
 | object-store | `rustfs/rustfs:1.0.3` | S3-compatible storage for claim documents |
-| temporal | `temporalio/auto-setup:1.29.7` | Durable per-claim workflows |
+| temporal | `temporalio/auto-setup:1.29.7` | Durable per-claim workflows (task queue `claims`) |
 | temporal-ui | `temporalio/ui:2.56.0` | Workflow inspection |
 
 ## Continuous integration
@@ -243,6 +281,7 @@ document reading evaluation with its regression gate (fake provider); the Java b
 integration (Testcontainers PostgreSQL) and cross-check tests; the compose stack with its smoke
 test, the core against it, seeding, and an end-to-end ingest of a sample of claims checked through
 the API and the object store; the policy search index and its evaluation with a hit@5 gate; every
-claim analysed by the agents with a gate on unsafe automatic settlements; and a build of every
-pushed commit on its own. Test counts and eval headlines are published as annotations, and releases
-are created from `docs/releases/*.md`.
+claim analysed by the agents with a gate on unsafe automatic settlements; claim events and workflows
+end to end, with a review signalled through Kafka; and a build of every pushed commit on its own.
+Test counts and eval headlines are published as annotations, and releases are created from
+`docs/releases/*.md`.
