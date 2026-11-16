@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 4: policy search** (next). Phases 0 to 3 are complete.
+**Phase 5: agents** (next). Phases 0 to 4 are complete.
 
 ## Phase status
 
@@ -15,7 +15,7 @@ resuming work, read this file first.
 | 1 | Synthetic data generator | done | v0.2.0 |
 | 2 | Core system and rules (Java) | done | v0.3.0 |
 | 3 | Document reading | done | v0.4.0 |
-| 4 | Policy search | pending | |
+| 4 | Policy search | done | v0.5.0 |
 | 5 | Agents | pending | |
 | 6 | Events and long-running processes | pending | |
 | 7 | Review console (Angular) | pending | |
@@ -95,7 +95,32 @@ resuming work, read this file first.
   injections found in 3 of 3 PDFs, 0 of 3 scans, no false alarms.
 - Tests: 141 Python, 41 Java.
 
+## Phase 4: done
+
+- Hybrid policy search (`tramita_agents.search`), one clause per entry, always within the
+  policy's product: BM25 in OpenSearch (Spanish light stemmer, accent folding), local embeddings
+  (`jinaai/jina-embeddings-v2-base-es`) in pgvector (schema `policy_search`, keyed by model),
+  reciprocal rank fusion of ten candidates per stage, and a local cross-encoder
+  (`BAAI/bge-reranker-v2-m3`, int8). Models run on CPU through fastembed; no API key.
+- Queries are masked like documents before any backend or model; each hit keeps its rank at
+  every stage. The search refuses to run on a missing or stale index.
+- `make index`, `make eval-retrieval`, and `POST /policy-search` on the agent service.
+- Evaluation on 432 queries: 72 claim descriptions answered by the clause that grounds the
+  expected decision, 295 everyday questions, 65 keyword searches. Hit@5: BM25 60.4%, vectors
+  90.7%, hybrid 87.7%, hybrid + reranker 91.9% (hit@1 73.6%, 1.5 s per query on CPU). Each first
+  stage has a blind spot (BM25 on everyday words, vectors on literal terms); the reranked hybrid
+  has none. Four embedding models, two rerankers and two candidate counts compared (ADR 0012).
+- CI indexes the conditions and gates hit@5 per mode and query set.
+- Tests: 174 Python, 41 Java.
+
 ## Open issues and notes
+
+- **Policy search queries are synthetic** and written by the project's author; the numbers
+  compare options, they do not predict accuracy on real policyholder text (ADR 0012).
+- **Reranking costs about 1.5 s per query on CPU**. Fine for background claim processing; an
+  interactive tool would want a GPU or a smaller reranker.
+- **ONNX scores vary slightly across CPUs**: one query of 137 differed between a desktop and the
+  CI runner. Gate floors leave room for it.
 
 - **Small print in scans** is invisible to Tesseract: planted instructions there are left to the
   vision model, and personal data printed that small would not be redacted.

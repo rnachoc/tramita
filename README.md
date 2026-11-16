@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 3 (document reading)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 4 (policy search)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -67,7 +67,7 @@ in [docs/decisions](docs/decisions).
 | Events | Apache Kafka (KRaft) |
 | Long-running processes | Temporal |
 | Documents | S3 API (RustFS locally, see [ADR 0006](docs/decisions/0006-object-store-rustfs-instead-of-minio.md)) |
-| Search | OpenSearch + pgvector + reranker, reciprocal rank fusion |
+| Search | OpenSearch (BM25) + pgvector, reciprocal rank fusion, local embeddings and reranker (fastembed, ONNX) |
 | Personal data | Microsoft Presidio (Spanish) |
 | Review console | Angular, TypeScript |
 | Tool access for analysts | MCP server (official Python SDK) |
@@ -90,6 +90,8 @@ make core-run             # run the core service on :8080 (another terminal)
 make seed                 # load the generated policies into the core
 make ingest               # store, read (masked) and record every claim's documents in the core
 make eval-extraction      # document reading accuracy, privacy and injection report
+make index                # index the policy conditions (OpenSearch + pgvector; downloads ~1.2 GB of models once)
+make eval-retrieval       # policy search report: lexical, vector, hybrid and reranked (a few minutes on CPU)
 make test                 # Python and Java test suites (the Java integration tests need Docker)
 make help                 # every available target
 ```
@@ -98,7 +100,8 @@ No Anthropic API key is needed: with `ANTHROPIC_API_KEY` empty, the agents use a
 model that replays recorded answers or, for document reading, a labelled rule-based reader
 ([ADR 0005](docs/decisions/0005-run-without-an-api-key.md),
 [ADR 0010](docs/decisions/0010-fake-model-recordings-then-rule-based-responders.md)). With a key
-they use Claude (model ids in `.env`), and `TRAMITA_RECORD_MODEL=true` records the answers.
+they use Claude (model ids in `.env`), and `TRAMITA_RECORD_MODEL=true` records the answers. The
+policy search uses small local models (embeddings and a reranker on CPU), never an API.
 
 Local endpoints after `make up`:
 
@@ -139,6 +142,28 @@ quality; `make eval-extraction`):
 | Personal values reaching the model, the redacted scans or the core | 0 of 1,044 |
 | Rule values lost to masking | 0 of 1,321 |
 | Planted instructions found | 3 of 3 in PDFs, 0 of 3 in scans (too small for OCR), no false alarms |
+
+## Policy search
+
+The coverage agent can only cite what the search hands it, so `services/agents` searches the
+Spanish policy conditions clause by clause, always within the policy's product: BM25 in
+OpenSearch and local embeddings in pgvector, fused by reciprocal rank, then reordered by a local
+cross-encoder. Queries are masked like documents before any model sees them, and every hit keeps
+its rank at each stage. `POST /policy-search` exposes it. Models were chosen by measurement; see
+[ADR 0012](docs/decisions/0012-hybrid-policy-search-measured.md).
+
+Hit@5 (the answer among the five clauses an agent reads) on 432 queries (`make eval-retrieval`):
+
+| Query set | BM25 | Vectors | Hybrid + reranker |
+|---|---|---|---|
+| Claim descriptions (72) | 51.4% | 87.5% | 91.7% |
+| Everyday questions (295) | 53.9% | 95.6% | 90.2% |
+| Keyword searches (65) | 100% | 72.3% | 100% |
+| All | 60.4% | 90.7% | 91.9% (hit@1 73.6%) |
+
+Each first stage has a blind spot; the reranked hybrid is the only option without one, at about
+1.5 s per query on CPU. The queries are synthetic and written by the project's author, so these
+numbers compare options rather than predict production accuracy.
 
 ## Core system
 
