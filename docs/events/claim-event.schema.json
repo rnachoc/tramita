@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "data": {
+    "CLAIM_RECEIVED": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_type": {
+          "title": "Claim Type",
+          "type": "string"
+        },
+        "policy_number": {
+          "title": "Policy Number",
+          "type": "string"
+        }
+      },
+      "required": [
+        "policy_number",
+        "claim_type"
+      ],
+      "title": "ClaimReceived",
+      "type": "object"
+    },
+    "DOCUMENT_EXTRACTED": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "title": "Document Id",
+          "type": "string"
+        },
+        "has_amounts": {
+          "title": "Has Amounts",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "document_id",
+        "has_amounts"
+      ],
+      "title": "DocumentExtracted",
+      "type": "object"
+    },
+    "DOCUMENT_RECEIVED": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "title": "Document Id",
+          "type": "string"
+        },
+        "document_type": {
+          "title": "Document Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "document_id",
+        "document_type"
+      ],
+      "title": "DocumentReceived",
+      "type": "object"
+    },
+    "PAYMENT_EXECUTED": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "payment_id": {
+          "title": "Payment Id",
+          "type": "string"
+        },
+        "triggered_by": {
+          "title": "Triggered By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payment_id",
+        "amount",
+        "triggered_by"
+      ],
+      "title": "PaymentExecuted",
+      "type": "object"
+    },
+    "PROPOSAL_EVALUATED": {
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "fraud_score": {
+          "title": "Fraud Score",
+          "type": "number"
+        },
+        "payable_amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Payable Amount"
+        },
+        "proposal_id": {
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "proposed_decision": {
+          "title": "Proposed Decision",
+          "type": "string"
+        },
+        "routing": {
+          "title": "Routing",
+          "type": "string"
+        },
+        "violations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Violations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "proposed_decision",
+        "decision",
+        "routing",
+        "fraud_score",
+        "violations"
+      ],
+      "title": "ProposalEvaluated",
+      "type": "object"
+    },
+    "REVIEW_RECORDED": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "agrees_with_proposal": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agrees With Proposal"
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "review_id": {
+          "title": "Review Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "review_id",
+        "action",
+        "decision"
+      ],
+      "title": "ReviewRecorded",
+      "type": "object"
+    }
+  },
+  "description": "Messages on the Kafka topic tramita.claim-events, keyed by claim id.",
+  "envelope": {
+    "additionalProperties": false,
+    "description": "The envelope. ``event_id`` is unique and increasing per core; consumers deduplicate by it.",
+    "properties": {
+      "actor_role": {
+        "title": "Actor Role",
+        "type": "string"
+      },
+      "claim_id": {
+        "title": "Claim Id",
+        "type": "string"
+      },
+      "data": {
+        "additionalProperties": true,
+        "title": "Data",
+        "type": "object"
+      },
+      "event_id": {
+        "title": "Event Id",
+        "type": "string"
+      },
+      "event_type": {
+        "title": "Event Type",
+        "type": "string"
+      },
+      "occurred_at": {
+        "format": "date-time",
+        "title": "Occurred At",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": 1,
+        "title": "Schema Version",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "event_id",
+      "event_type",
+      "schema_version",
+      "claim_id",
+      "occurred_at",
+      "actor_role",
+      "data"
+    ],
+    "title": "ClaimEvent",
+    "type": "object"
+  },
+  "title": "Tramita claim event"
+}

@@ -73,6 +73,10 @@ ingest: ## Read the generated claims' documents and record them in a running cor
 index: py-sync ## Index the policy conditions for search in OpenSearch and pgvector (stack up; downloads models once)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-index-policies $(ARGS)
 
+.PHONY: event-schemas
+event-schemas: py-sync ## Regenerate docs/events/claim-event.schema.json from the event contracts
+	uv run tramita-event-schemas
+
 .PHONY: process
 process: ## Analyse the open claims with the agents and submit proposals to a running core (after ingest and index)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-process $(ARGS)

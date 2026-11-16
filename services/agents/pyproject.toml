@@ -7,6 +7,7 @@ dependencies = [
     "anthropic>=2.3",
     "boto3>=1.43",
     # Spanish NER for person names, used by Presidio. Pinned wheel from spaCy's GitHub releases.
+    "confluent-kafka>=2.6",  # claim events: consumers with retries and dead-letter topics
     "es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl",
     "fastapi>=0.120",
     "fastembed>=0.9",  # local embeddings and reranker for the policy search (ONNX, no PyTorch)
@@ -20,6 +21,7 @@ dependencies = [
     "pytesseract>=0.3.13",  # OCR wrapper; needs the tesseract binary with Spanish data
     # Offline public-suffix check for e-mail domains (imported directly in documents/pii.py).
     "pyyaml>=6.0",
+    "temporalio>=1.9",  # one durable workflow per claim
     "tldextract>=5.4",
     "uvicorn[standard]>=0.38",
 ]
@@ -31,6 +33,7 @@ tramita-index-policies = "tramita_agents.search.factory:main"
 tramita-eval-retrieval = "tramita_agents.evals.retrieval:main"
 tramita-process = "tramita_agents.process:main"
 tramita-eval-agents = "tramita_agents.evals.agents:main"
+tramita-event-schemas = "tramita_agents.events.contracts:main"
 
 [dependency-groups]
 dev = [
