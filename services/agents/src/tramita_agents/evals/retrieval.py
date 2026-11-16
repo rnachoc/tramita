@@ -380,7 +380,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             for mode, scores in summary.items()
         )
         print(
-            f"::notice title=retrieval eval ({args.sets})::{len(queries)} queries: {modes_line}; "
+            f"::notice title=retrieval eval ({' + '.join(sets)})::{len(queries)} queries: {modes_line}; "
             f"gate {'FAILED: ' + '; '.join(failures) if failures else 'passed'}"
         )
     if args.gate and failures:
