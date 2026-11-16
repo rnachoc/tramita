@@ -31,7 +31,7 @@ logs: ## Follow infrastructure logs
 	$(COMPOSE) logs -f --tail=100
 
 # --- Python (uv workspace) ----------------------------------------------------
-PY_TYPED := services/agents/src services/agents/tests data/generator/src data/generator/tests
+PY_TYPED := services/agents/src services/agents/tests services/mcp/src services/mcp/tests data/generator/src data/generator/tests
 
 .PHONY: py-sync py-lint py-test
 py-sync: ## Install the Python workspace
@@ -43,7 +43,7 @@ py-lint: py-sync ## Lint, check formatting and type-check Python code
 	uv run mypy $(PY_TYPED)
 
 py-test: py-sync ## Run Python tests
-	uv run pytest services/agents data/generator
+	uv run pytest services/agents services/mcp data/generator
 
 # --- Data ---------------------------------------------------------------------------
 .PHONY: data data-json

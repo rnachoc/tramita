@@ -10,7 +10,7 @@ requires-python = ">=3.12,<3.13"
 package = false
 
 [tool.uv.workspace]
-members = ["services/agents", "data/generator"]
+members = ["services/agents", "services/mcp", "data/generator"]
 
 [dependency-groups]
 dev = [
@@ -32,7 +32,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["tramita_agents", "tramita_datagen"]
+known-first-party = ["tramita_agents", "tramita_datagen", "tramita_mcp"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101", "PLR2004"]
