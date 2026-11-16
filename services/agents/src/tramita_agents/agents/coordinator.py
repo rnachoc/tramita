@@ -100,6 +100,7 @@ class _Draft:
             "model_metadata": {
                 "agents": self.plan.agents,
                 "agent_citations": self.plan.agent_citations,
+                "review_requests": list(self.reviews),
                 "masked": context.masked,
             },
             **extra,

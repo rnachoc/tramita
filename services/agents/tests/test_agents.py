@@ -252,6 +252,8 @@ def test_an_approval_has_code_computed_amount_signals_and_review_requests() -> N
         "1 instrucción(es) incrustada(s) en los documentos.",
         "Dudo de la línea 1.",
     ]
+    # Stored with the proposal, so the claims handler sees why.
+    assert body["model_metadata"]["review_requests"] == body["review_requests"]
 
 
 def test_late_notice_adds_the_notice_clause() -> None:
