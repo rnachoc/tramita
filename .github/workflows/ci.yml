@@ -154,6 +154,10 @@ jobs:
         run: |
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "events and workflows" deploy/compose/check-workflows.sh
+      - name: Read every claim through the MCP server without personal data
+        run: |
+          set -a && . ./.env && set +a
+          .github/scripts/run-step.sh "mcp end to end" deploy/compose/check-mcp.sh
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
