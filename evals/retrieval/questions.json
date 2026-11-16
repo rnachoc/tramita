@@ -1,0 +1,40 @@
+{
+  "_about": "Policyholder questions for the policy search evaluation (ADR 0012). Each template names the clause key that answers it; {guarantee} is replaced by every colloquial name of every guarantee the product mentions. A coverage question about a guarantee the product does not include is answered by its 'not included' clause. Written in everyday words on purpose, avoiding the wording of the conditions where possible.",
+  "guarantees": {
+    "HOME_WATER": ["una fuga de agua en casa", "una tubería que ha reventado"],
+    "HOME_THEFT": ["que entren a robar en mi casa", "un robo en la vivienda"],
+    "HOME_GLASS": ["el cristal roto de una ventana", "la vitrocerámica partida"],
+    "AUTO_COLLISION": ["un golpe con el coche", "un choque contra otro vehículo"],
+    "AUTO_GLASS": ["el parabrisas roto", "una ventanilla del coche rota"],
+    "AUTO_THEFT": ["que me roben piezas del coche", "el robo de la radio del coche"],
+    "LIABILITY": ["los daños que cause a otros con el coche"]
+  },
+  "questions": [
+    {"key": "coverage:{guarantee}", "text": "¿Mi seguro cubre {guarantee}?"},
+    {"key": "coverage:{guarantee}", "text": "Si tengo {guarantee}, ¿me lo pagáis?"},
+    {"key": "documents:{guarantee}", "text": "¿Qué papeles tengo que enviar por {guarantee}?"},
+    {"key": "limits:{guarantee}", "text": "¿Cuánto es lo máximo que me pagáis por {guarantee} y cuánto me toca poner a mí?"},
+    {"key": "waiting:{guarantee}", "text": "Acabo de hacerme la póliza: ¿desde qué día estoy cubierto por {guarantee}?"},
+    {"key": "notice", "text": "¿Cuántos días tengo para avisar de que ha pasado algo?"},
+    {"key": "notice", "text": "Di parte dos semanas después de lo ocurrido, ¿hay algún problema?"},
+    {"key": "payment", "text": "¿Cuánto tardáis en pagarme una vez aprobado?"},
+    {"key": "fraud", "text": "¿Qué pasa si exagero en el parte lo que me han quitado?"},
+    {"key": "mitigation", "text": "¿Tengo que hacer algo para que el daño no vaya a más mientras tanto?"},
+    {"key": "indemnity", "text": "¿Cómo calculáis cuánto dinero me corresponde?"},
+    {"key": "definition:deductible", "text": "¿Qué es eso de la franquicia?"},
+    {"key": "definition:waiting", "text": "¿Qué significa que haya un periodo de carencia?"},
+    {"key": "definition:claim", "text": "¿Qué se considera exactamente un siniestro?"},
+    {"key": "documents:GENERAL", "text": "¿Qué tengo que contar cuando doy parte de lo que ha pasado?"},
+    {"key": "exclusion:GENERAL", "text": "¿Me cubrís si el daño lo he provocado yo a propósito?"},
+    {"key": "exclusion:GENERAL", "text": "¿Y si los daños son por un terremoto?"},
+    {"key": "exclusion:WATER_MAINTENANCE", "text": "Tengo humedad en la pared desde hace meses porque la junta de la bañera está mal, ¿entra en el seguro?"},
+    {"key": "exclusion:WATER_EXTERIOR", "text": "Me dejé la ventana abierta, llovió mucho y se ha mojado todo el suelo, ¿me cubre?"},
+    {"key": "exclusion:THEFT_WITHOUT_FORCE", "text": "Me quitaron la cartera en casa durante una fiesta sin forzar nada, ¿está cubierto?"},
+    {"key": "exclusion:THEFT_UNOCCUPIED", "text": "Nos han robado en el apartamento de la playa, que llevaba medio año cerrado"},
+    {"key": "exclusion:GLASS_SCRATCHES", "text": "La mampara tiene una raya muy marcada aunque no se ha roto"},
+    {"key": "exclusion:AUTO_ALCOHOL", "text": "Tuve un accidente con el coche y di positivo en el control de alcohol"},
+    {"key": "exclusion:AUTO_COMPETITION", "text": "Me di un golpe con el coche durante una carrera en un circuito"},
+    {"key": "exclusion:AUTO_GLASS_MIRRORS", "text": "Se ha roto el cristal del retrovisor y un faro delantero"},
+    {"key": "exclusion:AUTO_THEFT_KEYS", "text": "Se llevaron cosas del coche porque me dejé las llaves dentro y sin cerrar"}
+  ]
+}

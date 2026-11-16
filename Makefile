@@ -61,6 +61,10 @@ seed: ## Load the generated policies into a running core service (TRAMITA_CORE_U
 eval-extraction: py-sync ## Evaluate document reading on the generated data (needs `make data`; report in evals/reports)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-eval-extraction $(ARGS)
 
+.PHONY: eval-retrieval
+eval-retrieval: py-sync ## Evaluate the policy search (stack up, `make data` and `make index`; report in evals/reports)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-eval-retrieval $(ARGS)
+
 .PHONY: ingest
 ingest: ## Read the generated claims' documents and record them in a running core (stack up, policies seeded)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-ingest $(ARGS)

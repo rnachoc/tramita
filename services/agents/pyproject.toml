@@ -27,6 +27,7 @@ dependencies = [
 tramita-ingest = "tramita_agents.ingest:main"
 tramita-eval-extraction = "tramita_agents.evals.extraction:main"
 tramita-index-policies = "tramita_agents.search.factory:main"
+tramita-eval-retrieval = "tramita_agents.evals.retrieval:main"
 
 [dependency-groups]
 dev = [
