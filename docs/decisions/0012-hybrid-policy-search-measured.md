@@ -122,8 +122,8 @@ Models are configuration (`TRAMITA_EMBEDDING_MODEL`, `TRAMITA_RERANKER_MODEL`,
   that runs in the background; an interactive tool would want a GPU or a smaller reranker.
 - About 1.2 GB of models are downloaded once into `models-cache/` (cached in CI).
 - ONNX Runtime gives slightly different scores on different CPUs, so near ties can flip: the
-  reranked claims and terms scored 95.6% hit@5 locally and 96.4% on the CI runner (one query).
-  The gate floors leave room for that.
+  reranked claims and terms scored 95.6% hit@5 locally and on one CI run, 96.4% on another (one
+  query; hosted runners do not all have the same CPU). The gate floors leave room for that.
 - The evaluation is synthetic. The questions and keyword searches were written by the same
   author as the system, from the conditions; the claims come from the generator's templates
   (72 unique descriptions for 150 claims). Real policyholder text would be messier, and the

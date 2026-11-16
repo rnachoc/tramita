@@ -119,8 +119,8 @@ resuming work, read this file first.
   compare options, they do not predict accuracy on real policyholder text (ADR 0012).
 - **Reranking costs about 1.5 s per query on CPU**. Fine for background claim processing; an
   interactive tool would want a GPU or a smaller reranker.
-- **ONNX scores vary slightly across CPUs**: one query of 137 differed between a desktop and the
-  CI runner. Gate floors leave room for it.
+- **ONNX scores vary slightly across CPUs**: one query of 137 differed between two CI runs on
+  different runners. Gate floors leave room for it.
 
 - **Small print in scans** is invisible to Tesseract: planted instructions there are left to the
   vision model, and personal data printed that small would not be redacted.
