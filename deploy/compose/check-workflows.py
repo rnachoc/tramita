@@ -207,4 +207,7 @@ def main(claim_ids: list[str]) -> None:
 
 
 if __name__ == "__main__":
+    from tramita_agents.workflows.cli import exit_now
+
     main(sys.argv[1].split(","))
+    exit_now()  # see exit_now: the Temporal client must not race interpreter shutdown

@@ -14,7 +14,9 @@ import argparse
 import asyncio
 import json
 import logging
+import os
 import signal
+import sys
 import threading
 from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
@@ -36,6 +38,18 @@ SIGNALS = {
     EventType.DOCUMENT_EXTRACTED: ClaimWorkflow.documents_received,
     EventType.REVIEW_RECORDED: ClaimWorkflow.review_recorded,
 }
+
+
+def exit_now(code: int = 0) -> None:
+    """Ends a short-lived command once its work is done and its output flushed.
+
+    The Temporal client's native (Rust) threads can race the interpreter's finalisation and abort
+    the process ("PyGILState_Release ... must be current"), intermittently, after everything has
+    already succeeded. Skipping finalisation avoids it; nothing is left to clean up by then.
+    """
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(code)
 
 
 def worker_main(argv: Sequence[str] | None = None) -> None:
@@ -109,6 +123,7 @@ def start_main(argv: Sequence[str] | None = None) -> None:
                     print(f"{claim_id}  FAILED {error.cause}")
 
     asyncio.run(run())
+    exit_now()
 
 
 def bridge_main(argv: Sequence[str] | None = None) -> None:
