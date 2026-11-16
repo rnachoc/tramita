@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 4 (policy search)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 5 (agents)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -92,6 +92,8 @@ make ingest               # store, read (masked) and record every claim's docume
 make eval-extraction      # document reading accuracy, privacy and injection report
 make index                # index the policy conditions (OpenSearch + pgvector; downloads ~1.2 GB of models once)
 make eval-retrieval       # policy search report: lexical, vector, hybrid and reranked (a few minutes on CPU)
+make process              # analyse every open claim with the agents and submit proposals to the core
+make eval-agents          # end-to-end report: what the core decided against the expected resolutions
 make test                 # Python and Java test suites (the Java integration tests need Docker)
 make help                 # every available target
 ```
@@ -164,6 +166,30 @@ Hit@5 (the answer among the five clauses an agent reads) on 432 queries (`make e
 Each first stage has a blind spot; the reranked hybrid is the only option without one, at about
 1.5 s per query on CPU. The queries are synthetic and written by the project's author, so these
 numbers compare options rather than predict production accuracy.
+
+## Agents
+
+A coordinator written in code checks what needs no reading and asks three agents for the
+judgements: the **coverage agent** searches the product's conditions and decides whether an
+exclusion applies, the **damage agent** says which repair lines belong to the incident (code adds
+them up), and the **fraud agent** reports signals whose quoted evidence must appear in the claim.
+The core's rules then decide, compute and route. Agents can only make a claim safer: any of them,
+and any document with embedded instructions, can ask for a person, and nothing they return can
+skip a review. See [ADR 0013](docs/decisions/0013-agents-judge-code-coordinates-escalation-only.md).
+
+End to end on the 150 claims without an API key (`make process && make eval-agents`), where the
+agents are deterministic baselines that read nothing:
+
+| Measure | Result |
+|---|---|
+| Decision correct, scored on the merits | 96.2% |
+| Exclusions found / proposed wrongly | 10 of 14 / 0 |
+| Rule violations | 1 |
+| Settled automatically but should not be | **0** (10 before the baselines asked for review) |
+| Routing as expected | 58.0%: without a model every payment goes to a person |
+
+No real-model numbers yet: with `ANTHROPIC_API_KEY` set the same commands use Claude and the
+report says so.
 
 ## Core system
 

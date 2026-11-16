@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 5: agents** (next). Phases 0 to 4 are complete.
+**Phase 6: events and long-running processes** (next). Phases 0 to 5 are complete.
 
 ## Phase status
 
@@ -16,7 +16,7 @@ resuming work, read this file first.
 | 2 | Core system and rules (Java) | done | v0.3.0 |
 | 3 | Document reading | done | v0.4.0 |
 | 4 | Policy search | done | v0.5.0 |
-| 5 | Agents | pending | |
+| 5 | Agents | done | v0.6.0 |
 | 6 | Events and long-running processes | pending | |
 | 7 | Review console (Angular) | pending | |
 | 8 | MCP server | pending | |
@@ -113,7 +113,30 @@ resuming work, read this file first.
 - CI indexes the conditions and gates hit@5 per mode and query set.
 - Tests: 174 Python, 41 Java.
 
+## Phase 5: done
+
+- Agent loop on the plain SDK (ADR 0003): typed read-only tools, the answer as a `submit` tool
+  validated against the output schema, tool errors returned to the model, step budget and
+  timeout. Every model client can take tool-use steps; the fake replays recorded steps or asks a
+  deterministic step responder (ADR 0010).
+- Coordinator in code (ADR 0013): guarantee included, waiting period and required documents
+  checked without a model; coverage agent (exclusions, searching the product's conditions),
+  damage agent (which lines belong; code computes the amount) and fraud agent (signals with
+  quoted evidence; code drops unquoted ones). Grounding citations from the clause index.
+- Agents can only escalate: review requests from any agent, or from documents with embedded
+  instructions, make the core route to a person (`REVIEW_REQUESTED`, new in the core).
+- `make process`, `make eval-agents`; CI ingests and analyses every claim and gates the outcome.
+- Keyless end to end on 150 claims: decision 96.2%, exclusions 10 of 14 with none wrong, 1 rule
+  violation, 0 automatic settlements that a person should have seen (10 before escalation).
+- Tests: 197 Python, 43 Java.
+
 ## Open issues and notes
+
+- **No real-model numbers for the agents.** The keyless baselines read nothing, so they escalate
+  every payment; automation rates with Claude are unmeasured until a key is available.
+- **The baselines miss unrelated repair lines and document/incident mismatches**; with
+  escalation those claims reach a person, but the six mismatch frauds go to review rather than
+  investigation.
 
 - **Policy search queries are synthetic** and written by the project's author; the numbers
   compare options, they do not predict accuracy on real policyholder text (ADR 0012).
