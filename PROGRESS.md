@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 3: document reading** (next). Phases 0 to 2 are complete.
+**Phase 4: policy search** (next). Phases 0 to 3 are complete.
 
 ## Phase status
 
@@ -14,7 +14,7 @@ resuming work, read this file first.
 | 0 | Foundations: repo, tooling, compose stack, CI, first ADRs | done | v0.1.0 |
 | 1 | Synthetic data generator | done | v0.2.0 |
 | 2 | Core system and rules (Java) | done | v0.3.0 |
-| 3 | Document reading | pending | |
+| 3 | Document reading | done | v0.4.0 |
 | 4 | Policy search | pending | |
 | 5 | Agents | pending | |
 | 6 | Events and long-running processes | pending | |
@@ -77,7 +77,30 @@ resuming work, read this file first.
   test counts.
 - `make seed`, `make core-run`, `make smoke`.
 
+## Phase 3: done
+
+- Model client (`tramita_agents.llm`): Anthropic structured outputs, vision and prompt caching;
+  recorder; fake model that replays recordings, then answers with labelled rule-based responders
+  (ADR 0010).
+- Masking with Presidio (Spanish) plus Spain-specific and OCR-tolerant recognisers; stable
+  pseudonyms per claim. Scans: Tesseract at ~300 dpi, rows rebuilt across table columns, personal
+  data blacked out in the image (ADR 0011).
+- Strict extraction schema; confidence computed in code from formats, arithmetic and a second
+  reading; facts below 0.6 withheld from the rules and listed for review.
+- Injection: documents quoted as data, model reports instructions, deterministic detector.
+- `make ingest` (S3 + core) and `make eval-extraction` with a CI gate; CI ingests a sample of
+  claims end to end against the stack.
+- Baseline results (233 documents): 100% classification and key fields; 0 wrong facts sent;
+  0 personal values leaked to the model, the redacted scans or the core; 0 rule values over-masked;
+  injections found in 3 of 3 PDFs, 0 of 3 scans, no false alarms.
+- Tests: 141 Python, 41 Java.
+
 ## Open issues and notes
+
+- **Small print in scans** is invisible to Tesseract: planted instructions there are left to the
+  vision model, and personal data printed that small would not be redacted.
+- **No real-model numbers yet**: CI has no `ANTHROPIC_API_KEY`; with one, `make eval-extraction`
+  reports Claude's results and `TRAMITA_RECORD_MODEL=true` stores recordings.
 
 - **MinIO replaced by RustFS** (ADR 0006): MinIO community images are no longer published.
 - **Spotless runs google-java-format 1.28.0**, the newest version Spotless supports on Java 17.

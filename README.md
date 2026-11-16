@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 2 (core system and rules)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 3 (document reading)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -77,7 +77,9 @@ in [docs/decisions](docs/decisions).
 ## Quick start
 
 Requirements: Docker with Compose v2, [uv](https://docs.astral.sh/uv/), Java 17 and Maven 3.9+,
-and [gitleaks](https://github.com/gitleaks/gitleaks#installing) for the pre-commit hook.
+[Tesseract](https://tesseract-ocr.github.io/) with Spanish data (`apt install tesseract-ocr-spa`,
+`brew install tesseract-lang`) for scanned documents, and
+[gitleaks](https://github.com/gitleaks/gitleaks#installing) for the pre-commit hook.
 
 ```bash
 cp .env.example .env      # local-only placeholder values, including the core API keys
@@ -86,12 +88,17 @@ make smoke                # send every service a real request
 make data                 # generate the synthetic dataset (seeded, a few seconds)
 make core-run             # run the core service on :8080 (another terminal)
 make seed                 # load the generated policies into the core
+make ingest               # store, read (masked) and record every claim's documents in the core
+make eval-extraction      # document reading accuracy, privacy and injection report
 make test                 # Python and Java test suites (the Java integration tests need Docker)
 make help                 # every available target
 ```
 
-No Anthropic API key will be needed: with `ANTHROPIC_API_KEY` empty, the agents (phase 5) use a
-deterministic fake model with recorded responses ([ADR 0005](docs/decisions/0005-run-without-an-api-key.md)).
+No Anthropic API key is needed: with `ANTHROPIC_API_KEY` empty, the agents use a deterministic fake
+model that replays recorded answers or, for document reading, a labelled rule-based reader
+([ADR 0005](docs/decisions/0005-run-without-an-api-key.md),
+[ADR 0010](docs/decisions/0010-fake-model-recordings-then-rule-based-responders.md)). With a key
+they use Claude (model ids in `.env`), and `TRAMITA_RECORD_MODEL=true` records the answers.
 
 Local endpoints after `make up`:
 
@@ -109,6 +116,29 @@ Everything is synthetic and reproducible from a seed (`make data`): seven produc
 policy conditions rendered from one catalog, 200 policyholders, 150 claims with PDF and scanned
 documents, and an expected resolution for each claim derived from the generated facts. See
 [data/README.md](data/README.md) and [ADR 0007](docs/decisions/0007-synthetic-dataset-and-ground-truth.md).
+
+## Document reading
+
+`services/agents` reads invoices, estimates, police reports and accident reports, born-digital or
+scanned, without any personal data reaching the model: PDFs are sent as masked text, and scans as
+an image with personal data blacked out (located with Tesseract OCR) plus the masked OCR text.
+The model fills a strict schema; code then checks formats and arithmetic and looks every value up
+in a second reading to compute its confidence, and only facts above the review threshold reach
+the rules. Text that tries to instruct the system is reported, never obeyed. See
+[ADR 0011](docs/decisions/0011-reading-documents-with-masked-inputs.md).
+
+Results on the 233 generated documents with the keyless rule-based reader (a baseline, not model
+quality; `make eval-extraction`):
+
+| Measure | Result |
+|---|---|
+| Classification | 100% |
+| Key fields (number, date, CIF, total, rate; report dates) | 100% on PDFs and scans |
+| Line items read exactly | all 131 PDFs; 37 of 39 scans (the other 2 go to review) |
+| Wrong typed facts sent to the rules | 0 of 1,071 |
+| Personal values reaching the model, the redacted scans or the core | 0 of 1,044 |
+| Rule values lost to masking | 0 of 1,321 |
+| Planted instructions found | 3 of 3 in PDFs, 0 of 3 in scans (too small for OCR), no false alarms |
 
 ## Core system
 
@@ -134,9 +164,10 @@ pre-commit install        # secret scan and hygiene checks on every commit
 ```
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org/), one per change. CI
-scans the full history for secrets, lints, type-checks and tests every service, starts the compose
-stack and sends each service a real request, runs the core against it, and builds every pushed
-commit on its own so the history stays bisectable. Test counts are published as annotations.
+scans the full history for secrets, lints, type-checks and tests every service, gates on the
+document reading evaluation, starts the compose stack and sends each service a real request, runs
+the core against it and ingests a sample of claims end to end, and builds every pushed commit on
+its own so the history stays bisectable. Test counts are published as annotations.
 
 ## License
 
