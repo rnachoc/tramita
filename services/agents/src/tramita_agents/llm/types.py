@@ -7,9 +7,12 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from pydantic import BaseModel
+
+if TYPE_CHECKING:
+    from tramita_agents.llm.steps import StepRequest, StepResponse
 
 
 class Tier(StrEnum):
@@ -96,3 +99,7 @@ class ModelError(RuntimeError):
 
 class ModelClient(Protocol):
     def complete(self, request: ModelRequest) -> ModelResponse: ...
+
+    def step(self, request: StepRequest) -> StepResponse:
+        """One agent turn: the model answers with tool calls (see ``llm.steps``)."""
+        ...

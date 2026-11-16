@@ -19,6 +19,13 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from tramita_agents.llm.recording import load_recording
+from tramita_agents.llm.steps import (
+    StepRequest,
+    StepResponder,
+    StepResponse,
+    ToolCall,
+    calls_from_json,
+)
 from tramita_agents.llm.types import ModelError, ModelRequest, ModelResponse, Usage
 
 Responder = Callable[[ModelRequest], str]
@@ -29,10 +36,14 @@ FAKE_MODEL = "fake"
 
 class FakeModelClient:
     def __init__(
-        self, recordings: Path | None = None, responders: dict[str, Responder] | None = None
+        self,
+        recordings: Path | None = None,
+        responders: dict[str, Responder] | None = None,
+        step_responders: dict[str, StepResponder] | None = None,
     ) -> None:
         self.recordings = recordings
         self.responders = dict(responders or {})
+        self.step_responders = dict(step_responders or {})
 
     def register(self, task: str, responder: Responder) -> None:
         self.responders[task] = responder
@@ -71,6 +82,39 @@ class FakeModelClient:
         return ModelResponse(
             parsed=parsed,
             raw_text=text,
+            model=model,
+            provider=provider,
+            usage=usage,
+            latency_ms=(time.perf_counter() - started) * 1000,
+        )
+
+    def step(self, request: StepRequest) -> StepResponse:
+        """Same order as :meth:`complete`: a recording of the step, then the task's responder."""
+        started = time.perf_counter()
+        fingerprint = request.fingerprint()
+        recording = (
+            load_recording(self.recordings, request.task, fingerprint) if self.recordings else None
+        )
+        if recording is not None:
+            calls = calls_from_json(recording.text)
+            model, provider, usage = recording.model, "fake:recording", recording.usage
+        elif request.task in self.step_responders:
+            turn = len(request.history) + 1
+            answer = self.step_responders[request.task](request)
+            calls = tuple(
+                ToolCall(f"call_{turn}_{i}", name, tool_input)
+                for i, (name, tool_input) in enumerate(answer, start=1)
+            )
+            model, provider, usage = FAKE_MODEL, "fake:responder", Usage()
+        else:
+            raise ModelError(
+                f"No recording and no responder for agent task '{request.task}' "
+                f"(fingerprint {fingerprint[:12]}). Run once with ANTHROPIC_API_KEY to record it."
+            )
+        if not calls:
+            raise ModelError(f"{provider} answered '{request.task}' without calling a tool")
+        return StepResponse(
+            calls=calls,
             model=model,
             provider=provider,
             usage=usage,

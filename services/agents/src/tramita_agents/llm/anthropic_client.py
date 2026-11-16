@@ -5,6 +5,8 @@
 - Vision: image blocks are sent as base64 sources.
 - Prompt caching: the system prompt carries a cache breakpoint, so long, stable instructions
   (and, later, policy conditions) are billed at the cache-read rate after the first call.
+- Agent steps: tools are sent with ``tool_choice: any``, so every turn is a tool call; the
+  conversation so far is replayed as tool-use and tool-result blocks.
 """
 
 from __future__ import annotations
@@ -17,9 +19,13 @@ from anthropic.types import (
     MessageParam,
     OutputConfigParam,
     TextBlockParam,
+    ToolParam,
+    ToolResultBlockParam,
+    ToolUseBlockParam,
 )
 from pydantic import ValidationError
 
+from tramita_agents.llm.steps import StepRequest, StepResponse, ToolCall
 from tramita_agents.llm.types import (
     ImageBlock,
     ModelError,
@@ -96,6 +102,66 @@ class AnthropicModelClient:
         return ModelResponse(
             parsed=parsed,
             raw_text=text,
+            model=message.model,
+            provider="anthropic",
+            usage=Usage(
+                input_tokens=usage.input_tokens,
+                output_tokens=usage.output_tokens,
+                cache_read_input_tokens=usage.cache_read_input_tokens or 0,
+                cache_creation_input_tokens=usage.cache_creation_input_tokens or 0,
+            ),
+            latency_ms=(time.perf_counter() - started) * 1000,
+        )
+
+    def step(self, request: StepRequest) -> StepResponse:
+        model = self.models[request.tier]
+        started = time.perf_counter()
+        messages: list[MessageParam] = [
+            {"role": "user", "content": [{"type": "text", "text": request.prompt}]}
+        ]
+        for exchange in request.history:
+            uses: list[ToolUseBlockParam] = [
+                {"type": "tool_use", "id": c.call_id, "name": c.name, "input": c.input}
+                for c in exchange.calls
+            ]
+            results: list[ToolResultBlockParam] = [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": r.call_id,
+                    "content": r.content,
+                    "is_error": r.is_error,
+                }
+                for r in exchange.results
+            ]
+            messages.append({"role": "assistant", "content": uses})
+            messages.append({"role": "user", "content": results})
+        tools: list[ToolParam] = [
+            {"name": t.name, "description": t.description, "input_schema": t.input_schema}
+            for t in request.tools
+        ]
+        try:
+            message = self.client.messages.create(
+                model=model,
+                max_tokens=request.max_tokens,
+                system=[
+                    {"type": "text", "text": request.system, "cache_control": {"type": "ephemeral"}}
+                ],
+                messages=messages,
+                tools=tools,
+                tool_choice={"type": "any"},
+            )
+        except anthropic.APIError as error:
+            raise ModelError(f"Anthropic API call for '{request.task}' failed: {error}") from error
+        if message.stop_reason == "refusal":
+            raise ModelError(f"The model declined the '{request.task}' request.")
+        calls = tuple(
+            ToolCall(b.id, b.name, dict(b.input)) for b in message.content if b.type == "tool_use"
+        )
+        if not calls:
+            raise ModelError(f"The model answered '{request.task}' without calling a tool.")
+        usage = message.usage
+        return StepResponse(
+            calls=calls,
             model=message.model,
             provider="anthropic",
             usage=Usage(

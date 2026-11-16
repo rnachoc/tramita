@@ -6,6 +6,7 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from tramita_agents.llm.steps import StepRequest, StepResponse, calls_to_json
 from tramita_agents.llm.types import ModelClient, ModelRequest, ModelResponse, Usage
 
 
@@ -60,6 +61,20 @@ class RecordingModelClient:
                 fingerprint=request.fingerprint(),
                 model=response.model,
                 text=response.raw_text,
+                usage=response.usage,
+            ),
+        )
+        return response
+
+    def step(self, request: StepRequest) -> StepResponse:
+        response = self.inner.step(request)
+        save_recording(
+            self.directory,
+            Recording(
+                task=request.task,
+                fingerprint=request.fingerprint(),
+                model=response.model,
+                text=calls_to_json(response.calls),
                 usage=response.usage,
             ),
         )
