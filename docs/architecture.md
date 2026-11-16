@@ -11,7 +11,7 @@ later phases implement; everything else describes the code as it is.
 | Data generator | `data/generator` | Reproducible synthetic policies, policyholders, claims, documents and expected resolutions |
 | Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents, claim event consumers and the per-claim Temporal workflows |
 | MCP server | `services/mcp` | Analyst tools over the core API, guarded by the same rules (*planned*) |
-| Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject (*planned*) |
+| Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject, behind a key-holding proxy |
 | Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading, policy search and end-to-end agent evaluations with CI gates (*implemented*); full eval set and baseline (*planned*) |
 
 ## Trust boundary
@@ -151,6 +151,28 @@ flowchart TD
   compares the core's decisions with the expected resolutions and gates automatic settlements
   that a person should have seen.
 
+## Review console
+
+`web/console` (Angular 22, standalone components and signals) is where claims handlers decide
+what the rules sent to a person ([ADR 0015](decisions/0015-review-console-behind-a-key-injecting-proxy.md)).
+
+```mermaid
+flowchart LR
+    B[Browser<br/>no credential] -- same origin --> N[nginx, unprivileged<br/>CSP: script-src self]
+    N -- static build --> B
+    N -- "/api + X-Api-Key (REVIEWER)" --> C[Core API]
+```
+
+- **Inbox** by queue (to review, under investigation, waiting for documents, closed).
+- **Claim**: facts, the rules' evaluation (decision, payable amount, routing, reasons, rule
+  corrections, fraud score and signals), why the agents asked for review, the cited clauses with
+  their text, the documents as read (doubtful fields and embedded instructions flagged) and the
+  audit trail.
+- **Review**: approve, correct (decision and amount) or reject, with the core's checks mirrored
+  for clear messages and an idempotency key per submission.
+- **Tests**: Vitest unit tests; Playwright end to end against the console container and the core
+  (approve a payment and see the claim paid, with no key in the browser).
+
 ## Events and workflows
 
 Kafka carries the public record of facts and Temporal drives each claim
@@ -273,6 +295,7 @@ and waits until every health check passes; `make smoke` then sends each service 
 | object-store | `rustfs/rustfs:1.0.3` | S3-compatible storage for claim documents |
 | temporal | `temporalio/auto-setup:1.29.7` | Durable per-claim workflows (task queue `claims`) |
 | temporal-ui | `temporalio/ui:2.56.0` | Workflow inspection |
+| console (profile) | built from `web/console/Dockerfile` | Review console behind nginx, proxying `/api` to the core |
 
 ## Continuous integration
 
