@@ -1,0 +1,8 @@
+# Build context is the repository root: send only what the console image needs.
+*
+!data/policies/clauses.json
+!web/console/
+web/console/node_modules
+web/console/dist
+web/console/.angular
+web/console/public/clauses.json

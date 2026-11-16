@@ -95,6 +95,23 @@ process: ## Analyse the open claims with the agents and submit proposals to a ru
 eval-agents: ## Evaluate the agents end to end against the expected resolutions (after `make process`)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-eval-agents $(ARGS)
 
+# --- Review console (Angular) ---------------------------------------------------------
+.PHONY: console-install console-test console-build console-up console-e2e
+console-install: ## Install the console's dependencies (npm ci)
+	cd web/console && npm ci --no-audit --no-fund
+
+console-test: ## Check formatting and run the console's unit tests
+	cd web/console && npx prettier --check src && npm test
+
+console-build: ## Build the console for production
+	cd web/console && npm run build
+
+console-up: ## Build and start the console on :4200, proxying to the core on the host
+	$(COMPOSE) --profile console up -d --build --wait console
+
+console-e2e: ## Review a claim through the console in a real browser (core running, console up)
+	cd web/console && npx playwright test
+
 # --- Java (core service) --------------------------------------------------------
 .PHONY: core-lint core-test core-run
 core-run: ## Run the core service against the local stack (needs `make up`)

@@ -132,6 +132,27 @@ services:
     ports:
       - "${TEMPORAL_UI_PORT:-8233}:8080"
 
+  console:
+    # Review console (profile "console": `make console-up`). nginx serves the Angular build and
+    # proxies /api to the core with the REVIEWER key, which never reaches the browser (ADR 0015).
+    # The core runs on the host (`make core-run`), reached through host.docker.internal.
+    profiles: ["console"]
+    build:
+      context: ../..
+      dockerfile: web/console/Dockerfile
+    environment:
+      TRAMITA_CONSOLE_CORE_URL: ${TRAMITA_CONSOLE_CORE_URL:-http://host.docker.internal:8080}
+      TRAMITA_CONSOLE_API_KEY: ${TRAMITA_CONSOLE_API_KEY:-console-change-me-local-only}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${CONSOLE_PORT:-4200}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:8080/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
 volumes:
   postgres-data:
   opensearch-data:

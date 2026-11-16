@@ -1,0 +1,29 @@
+# Serves the console and proxies /api to the core, adding the REVIEWER key from the
+# environment: the browser never holds it (ADR 0015). Rendered by the image's envsubst step;
+# only the variables set in the environment are replaced.
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+    server_tokens off;
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy no-referrer always;
+
+    location /api/ {
+        proxy_pass ${TRAMITA_CONSOLE_CORE_URL};
+        proxy_set_header X-Api-Key "${TRAMITA_CONSOLE_API_KEY}";
+        proxy_set_header Host $proxy_host;
+        proxy_read_timeout 30s;
+    }
+
+    location = /healthz {
+        access_log off;
+        return 200 "ok\n";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
