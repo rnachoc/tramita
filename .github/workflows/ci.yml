@@ -86,6 +86,20 @@ jobs:
       - run: uv python install 3.12
       - run: .github/scripts/run-step.sh "java build" make core-test
 
+  console:
+    name: console format, tests and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/console/package-lock.json
+      - run: .github/scripts/run-step.sh "console install" make console-install
+      - run: .github/scripts/run-step.sh "console tests" make console-test
+      - run: .github/scripts/run-step.sh "console build" make console-build
+
   compose:
     name: infrastructure smoke test
     runs-on: ubuntu-latest
@@ -140,6 +154,16 @@ jobs:
         run: |
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "events and workflows" deploy/compose/check-workflows.sh
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/console/package-lock.json
+      - name: Review a claim through the console in a real browser
+        run: |
+          set -a && . ./.env && set +a
+          make console-install
+          .github/scripts/run-step.sh "console end to end" deploy/compose/check-console.sh
       - name: Show service status
         if: always()
         run: make ps
