@@ -79,6 +79,9 @@ public final class RulesEngine {
     if (!a.violations.isEmpty()) {
       a.reasons.add(Reason.RULE_VIOLATION);
     }
+    if (!proposal.reviewRequests().isEmpty()) {
+      a.reasons.add(Reason.REVIEW_REQUESTED);
+    }
 
     Routing routing = route(a, late, score, fraud);
     return new Evaluation(
@@ -259,6 +262,7 @@ public final class RulesEngine {
             || a.decision == Decision.REQUEST_INFO
             || late
             || !a.violations.isEmpty()
+            || a.reasons.contains(Reason.REVIEW_REQUESTED)
             || a.reasons.contains(Reason.AMOUNT_ADJUSTED)
             || a.reasons.contains(Reason.ABOVE_REVIEW_THRESHOLD);
     return needsHuman ? Routing.HUMAN_REVIEW : Routing.AUTO;

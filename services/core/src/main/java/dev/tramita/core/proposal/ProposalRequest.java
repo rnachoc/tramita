@@ -23,7 +23,8 @@ public record ProposalRequest(
     @NotNull List<@NotBlank String> citations,
     @NotNull @Valid List<Signal> fraudSignals,
     @NotBlank @Size(max = 20_000) String rationale,
-    Map<String, Object> modelMetadata) {
+    Map<String, Object> modelMetadata,
+    @Size(max = 10) List<@NotBlank @Size(max = 500) String> reviewRequests) {
 
   /** A fraud signal proposed by the fraud agent. */
   public record Signal(@NotNull FraudSignalType type, String evidence, double confidence) {}
@@ -34,6 +35,12 @@ public record ProposalRequest(
             .map(s -> new FraudSignal(s.type(), s.evidence(), s.confidence(), SignalSource.MODEL))
             .toList();
     return new Proposal(
-        decision, eligibleAmount, proposedAmount, exclusionCode, citations, signals);
+        decision,
+        eligibleAmount,
+        proposedAmount,
+        exclusionCode,
+        citations,
+        signals,
+        reviewRequests);
   }
 }

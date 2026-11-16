@@ -109,6 +109,46 @@ class RulesEngineTest {
   }
 
   @Test
+  void aReviewRequestSendsAnOtherwiseAutomaticPaymentToAPerson() {
+    Proposal asked =
+        new Proposal(
+            Decision.APPROVE,
+            new BigDecimal("1210.00"),
+            null,
+            null,
+            List.of("HP-2.1"),
+            List.of(),
+            List.of("The damage assessment was not made by a model"));
+
+    Evaluation e = engine.evaluate(policy("HP"), waterClaim("1000.00"), asked);
+
+    assertThat(e.decision()).isEqualTo(Decision.APPROVE);
+    assertThat(e.payableAmount()).isEqualByComparingTo("1110.00");
+    assertThat(e.routing()).isEqualTo(Routing.HUMAN_REVIEW);
+    assertThat(e.reasons()).contains(Reason.REVIEW_REQUESTED);
+    assertThat(e.violations()).isEmpty();
+  }
+
+  @Test
+  void aReviewRequestNeverLowersTheRouting() {
+    Proposal asked =
+        new Proposal(
+            Decision.APPROVE,
+            new BigDecimal("1210.00"),
+            null,
+            null,
+            List.of("HP-1.1"),
+            List.of(),
+            List.of("check"));
+
+    Evaluation e = engine.evaluate(policy("HP"), waterClaim("1000.00"), asked);
+
+    // A missing grounding citation is still a violation; the request only adds a reason.
+    assertThat(e.routing()).isEqualTo(Routing.HUMAN_REVIEW);
+    assertThat(e.reasons()).contains(Reason.REVIEW_REQUESTED, Reason.RULE_VIOLATION);
+  }
+
+  @Test
   void capsPaymentAtTheGuaranteeLimit() {
     ClaimFacts glass =
         claim(CoverageCode.HOME_GLASS, EnumSet.of(DocumentType.INVOICE), invoice("1500.00"));

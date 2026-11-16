@@ -12,6 +12,8 @@ import java.util.List;
  * @param proposedAmount the payment the agents propose
  * @param exclusionCode the catalog exclusion the agents rely on to reject, if any
  * @param citations clause ids the agents cite
+ * @param reviewRequests why the agents ask for a person to look, if they do. Agents can only make a
+ *     claim safer: a request always sends it to a person, and its absence never skips one.
  */
 public record Proposal(
     Decision decision,
@@ -19,4 +21,28 @@ public record Proposal(
     BigDecimal proposedAmount,
     String exclusionCode,
     List<String> citations,
-    List<FraudSignal> fraudSignals) {}
+    List<FraudSignal> fraudSignals,
+    List<String> reviewRequests) {
+
+  public Proposal {
+    reviewRequests = reviewRequests == null ? List.of() : List.copyOf(reviewRequests);
+  }
+
+  /** A proposal that does not ask for review. */
+  public Proposal(
+      Decision decision,
+      BigDecimal eligibleAmount,
+      BigDecimal proposedAmount,
+      String exclusionCode,
+      List<String> citations,
+      List<FraudSignal> fraudSignals) {
+    this(
+        decision,
+        eligibleAmount,
+        proposedAmount,
+        exclusionCode,
+        citations,
+        fraudSignals,
+        List.of());
+  }
+}

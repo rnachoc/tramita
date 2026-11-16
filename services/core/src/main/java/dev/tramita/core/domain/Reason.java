@@ -10,6 +10,8 @@ public enum Reason {
   MISSING_DOCUMENTS,
   /** The agents ask for information the catalog does not require; a person must confirm. */
   ADDITIONAL_INFORMATION,
+  /** The agents ask for a person to look (they can escalate, never skip a review). */
+  REVIEW_REQUESTED,
   LATE_NOTICE,
   AMOUNT_ADJUSTED,
   AMOUNT_RECALCULATED,
