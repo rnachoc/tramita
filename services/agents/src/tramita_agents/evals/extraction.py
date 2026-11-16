@@ -555,6 +555,10 @@ def main(argv: Sequence[str] | None = None) -> None:
     documents = json.loads((args.dataset / "documents.json").read_text(encoding="utf-8"))
     documents = documents[: args.limit] if args.limit else documents
     started = time.perf_counter()
+    if args.workers > 1:
+        # Tesseract spreads each page over every core; with one process per core that
+        # oversubscribes the machine (several times slower on a CI runner).
+        os.environ.setdefault("OMP_THREAD_LIMIT", "1")
     outcomes = run(args.dataset, documents, args.workers, not args.no_reocr)
     summary = summarise(outcomes)
     summary["seconds"] = round(time.perf_counter() - started, 1)
