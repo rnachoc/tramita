@@ -164,7 +164,9 @@ class EventConsumer:
 
 def connect(bootstrap: str, group: str) -> tuple[Consumer, Producer]:
     """Real Kafka clients, and the dead-letter topic created if missing (no auto-creation)."""
-    admin = AdminClient({"bootstrap.servers": bootstrap})
+    # The local broker advertises "localhost"; IPv4 only avoids a refused ::1 attempt per connect.
+    common: dict[str, Any] = {"bootstrap.servers": bootstrap, "broker.address.family": "v4"}
+    admin = AdminClient(common)
     dlt = dead_letter_topic(group)
     if dlt not in admin.list_topics(timeout=10).topics:
         for future in admin.create_topics([NewTopic(dlt, 1, 1)]).values():
@@ -174,11 +176,11 @@ def connect(bootstrap: str, group: str) -> tuple[Consumer, Producer]:
                 log.info("dead-letter topic %s: %s", dlt, error)
     consumer = KafkaConsumer(
         {
-            "bootstrap.servers": bootstrap,
+            **common,
             "group.id": group,
             "enable.auto.commit": False,
             "auto.offset.reset": "earliest",
         }
     )
-    producer = KafkaProducer({"bootstrap.servers": bootstrap, "enable.idempotence": True})
+    producer = KafkaProducer({**common, "enable.idempotence": True})
     return consumer, producer  # type: ignore[return-value]
