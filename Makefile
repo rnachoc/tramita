@@ -65,6 +65,10 @@ eval-extraction: py-sync ## Evaluate document reading on the generated data (nee
 ingest: ## Read the generated claims' documents and record them in a running core (stack up, policies seeded)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-ingest $(ARGS)
 
+.PHONY: index
+index: py-sync ## Index the policy conditions for search in OpenSearch and pgvector (stack up; downloads models once)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-index-policies $(ARGS)
+
 # --- Java (core service) --------------------------------------------------------
 .PHONY: core-lint core-test core-run
 core-run: ## Run the core service against the local stack (needs `make up`)
