@@ -1,5 +1,6 @@
 package dev.tramita.core.security;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +42,11 @@ public class SecurityConfiguration {
             new ApiKeyAuthenticationFilter(registry), UsernamePasswordAuthenticationFilter.class)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/actuator/health/**", "/actuator/info")
+                // The container forwards errors (a 403 included) to /error on a second, internal
+                // dispatch that carries no API key; without this it would turn every 403 into 401.
+                auth.dispatcherTypeMatchers(DispatcherType.ERROR)
+                    .permitAll()
+                    .requestMatchers("/actuator/health/**", "/actuator/info")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/import/**")
                     .hasRole(ADMIN)
