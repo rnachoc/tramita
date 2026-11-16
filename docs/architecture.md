@@ -10,7 +10,7 @@ later phases implement; everything else describes the code as it is.
 | Core service | `services/core` | System of record: policies, claims, rules engine, fraud scoring, payments, audit |
 | Data generator | `data/generator` | Reproducible synthetic policies, policyholders, claims, documents and expected resolutions |
 | Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents, claim event consumers and the per-claim Temporal workflows |
-| MCP server | `services/mcp` | Analyst tools over the core API, guarded by the same rules (*planned*) |
+| MCP server | `services/mcp` | Read-only analyst tools over the core, results masked for the model |
 | Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject, behind a key-holding proxy |
 | Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading, policy search and end-to-end agent evaluations with CI gates (*implemented*); full eval set and baseline (*planned*) |
 
@@ -172,6 +172,24 @@ flowchart LR
   for clear messages and an idempotency key per submission.
 - **Tests**: Vitest unit tests; Playwright end to end against the console container and the core
   (approve a payment and see the claim paid, with no key in the browser).
+
+## MCP server
+
+`services/mcp` (`tramita-mcp`) gives analysts' assistants read-only tools over the core
+([ADR 0016](decisions/0016-read-only-mcp-for-analysts.md)).
+
+| Tool or resource | Returns |
+|---|---|
+| `search_policy_conditions` | Clauses of the conditions, best first (the hybrid search) |
+| `list_claims` | Ids, policy, type, dates and status by queue |
+| `get_claim` | Masked description, documents as read, the latest evaluation, reviews, payment |
+| `claim_audit` | Event types, times and roles |
+| `claims_overview` | Claims per status |
+| `tramita://rules`, `tramita://conditions/{product}` | The rules in order; a product's conditions |
+
+It authenticates as ANALYST, so the core refuses any write; every tool is declared read-only.
+Results reach a model: the description is masked, and addresses, contacts, reviewer names,
+account numbers and the text of flagged instructions are left out.
 
 ## Events and workflows
 
