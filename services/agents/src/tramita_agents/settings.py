@@ -39,6 +39,26 @@ class Settings(BaseSettings):
     tramita_core_url: str = "http://localhost:8080"
     tramita_api_keys: SecretStr | None = None
 
+    # Policy search: OpenSearch for the lexical side, pgvector in PostgreSQL for the vectors.
+    opensearch_url: str = "http://localhost:9200"
+    postgres_host: str = "localhost"
+    postgres_port: int = 5432
+    postgres_user: str = "tramita"
+    postgres_password: SecretStr = SecretStr("change-me-local-only")
+    postgres_db: str = "tramita"
+    # Local models (fastembed, ONNX on CPU), downloaded once into the cache. Chosen by measurement
+    # (ADR 0012). An empty reranker turns the second stage off.
+    tramita_embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    tramita_reranker_model: str = "BAAI/bge-reranker-v2-m3-int8"
+    tramita_models_dir: Path = REPO_ROOT / "models-cache"
+
+    @property
+    def postgres_conninfo(self) -> str:
+        return (
+            f"host={self.postgres_host} port={self.postgres_port} dbname={self.postgres_db} "
+            f"user={self.postgres_user} password={self.postgres_password.get_secret_value()}"
+        )
+
     @property
     def model_provider(self) -> ModelProvider:
         """Without an API key the whole system runs on the deterministic fake model."""
