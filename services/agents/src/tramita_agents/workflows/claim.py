@@ -23,8 +23,7 @@ from datetime import timedelta
 from temporalio import workflow
 from temporalio.common import RetryPolicy
 
-with workflow.unsafe.imports_passed_through():
-    from tramita_agents.workflows.activities import ClaimState, analyse_claim, claim_state
+from tramita_agents.workflows.state import ClaimState
 
 TASK_QUEUE = "claims"
 ACTIVITY_RETRY = RetryPolicy(
@@ -64,6 +63,7 @@ class ClaimWorkflow:
         self._seen: set[str] = set()
         self._documents = 0
         self._reviews = 0
+        self._stage = "starting"
 
     @workflow.signal
     def documents_received(self, event_id: str) -> None:
@@ -80,6 +80,11 @@ class ClaimWorkflow:
     @workflow.query
     def signals_seen(self) -> int:
         return len(self._seen)
+
+    @workflow.query
+    def stage(self) -> str:
+        """What the workflow is doing: analysing, waiting_documents, waiting_review, done..."""
+        return self._stage
 
     async def _wait(self, counter: str, since: int, seconds: int) -> bool:
         """Waits for a signal counted after ``since``: one that arrived while the claim was
@@ -105,9 +110,11 @@ class ClaimWorkflow:
             nonlocal analyses
             analyses += 1
             mark()
+            self._stage = "analysing"
             state: ClaimState = await workflow.execute_activity(
-                analyse_claim,
+                "analyse_claim",
                 claim.claim_id,
+                result_type=ClaimState,
                 start_to_close_timeout=timedelta(minutes=10),
                 retry_policy=ACTIVITY_RETRY,
             )
@@ -115,6 +122,7 @@ class ClaimWorkflow:
             return state
 
         def result(outcome: str, state: ClaimState) -> ClaimResult:
+            self._stage = "done"
             return ClaimResult(claim.claim_id, outcome, state.status, analyses, history)
 
         state = await analyse()
@@ -124,18 +132,22 @@ class ClaimWorkflow:
             if state.status == "WAITING_DOCUMENTS":
                 if analyses >= claim.max_analyses:
                     return result("too_many_rounds", state)
+                self._stage = "waiting_documents"
                 if not await self._wait("_documents", marks["_documents"], claim.documents_wait_s):
                     return result("documents_overdue", state)
                 history.append("documents_received")
                 state = await analyse()
             elif state.status in AWAITING_REVIEW:
+                self._stage = "waiting_review"
                 if not await self._wait("_reviews", marks["_reviews"], claim.review_wait_s):
                     return result("review_overdue", state)
                 history.append("review_recorded")
                 mark()
+                self._stage = "reading_status"
                 state = await workflow.execute_activity(
-                    claim_state,
+                    "claim_state",
                     claim.claim_id,
+                    result_type=ClaimState,
                     start_to_close_timeout=timedelta(minutes=1),
                     retry_policy=ACTIVITY_RETRY,
                 )
@@ -143,9 +155,11 @@ class ClaimWorkflow:
             else:
                 # APPROVED without payment yet, or anything new: read again shortly.
                 await asyncio.sleep(timedelta(seconds=30).total_seconds())
+                self._stage = "reading_status"
                 state = await workflow.execute_activity(
-                    claim_state,
+                    "claim_state",
                     claim.claim_id,
+                    result_type=ClaimState,
                     start_to_close_timeout=timedelta(minutes=1),
                     retry_policy=ACTIVITY_RETRY,
                 )

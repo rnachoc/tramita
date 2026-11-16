@@ -7,7 +7,6 @@ the search and the clients are built once per worker process.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from functools import lru_cache
 
 from temporalio import activity
@@ -19,13 +18,7 @@ from tramita_agents.llm.factory import build_model_client
 from tramita_agents.responders import RESPONDERS, STEP_RESPONDERS
 from tramita_agents.search.factory import build_policy_search
 from tramita_agents.settings import Settings
-
-
-@dataclass
-class ClaimState:
-    status: str
-    decision: str | None = None
-    routing: str | None = None
+from tramita_agents.workflows.state import ClaimState
 
 
 @lru_cache

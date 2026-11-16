@@ -8,8 +8,8 @@ from temporalio.client import Client, WorkflowHandle
 from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Worker
 
-from tramita_agents.workflows.activities import ClaimState
 from tramita_agents.workflows.claim import ClaimInput, ClaimResult, ClaimWorkflow
+from tramita_agents.workflows.state import ClaimState
 
 DAY = 24 * 3600
 
@@ -74,6 +74,7 @@ async def test_a_review_signal_resumes_the_claim_and_reads_its_final_status(
 ) -> None:
     async def review(handle: WorkflowHandle[ClaimWorkflow, ClaimResult]) -> None:
         await env.sleep(5 * DAY)
+        assert await handle.query(ClaimWorkflow.stage) == "waiting_review"
         await handle.signal(ClaimWorkflow.review_recorded, "event-9")
         await handle.signal(ClaimWorkflow.review_recorded, "event-9")  # replayed by Kafka
 

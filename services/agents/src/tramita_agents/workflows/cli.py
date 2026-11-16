@@ -26,10 +26,8 @@ from temporalio.exceptions import WorkflowAlreadyStartedError
 from temporalio.service import RPCError, RPCStatusCode
 from temporalio.worker import Worker
 
-from tramita_agents.events.consumer import EventConsumer, connect
 from tramita_agents.events.contracts import ClaimEvent, EventType
 from tramita_agents.settings import REPO_ROOT, Settings
-from tramita_agents.workflows.activities import analyse_claim, claim_state
 from tramita_agents.workflows.claim import TASK_QUEUE, ClaimInput, ClaimWorkflow, workflow_id
 
 log = logging.getLogger(__name__)
@@ -45,6 +43,9 @@ def worker_main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--concurrency", type=int, default=4)
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+
+    # Only the worker loads the agents, the models and the search.
+    from tramita_agents.workflows.activities import analyse_claim, claim_state  # noqa: PLC0415
 
     async def run() -> None:
         client = await Client.connect(Settings().temporal_address)
@@ -115,6 +116,9 @@ def bridge_main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--idle-exit", type=float, help="stop after this many idle seconds")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    # Only the bridge loads the Kafka client.
+    from tramita_agents.events.consumer import EventConsumer, connect  # noqa: PLC0415
+
     settings = Settings()
     loop = asyncio.new_event_loop()
     client = loop.run_until_complete(Client.connect(settings.temporal_address))
