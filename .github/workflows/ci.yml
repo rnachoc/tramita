@@ -68,6 +68,8 @@ jobs:
       - run: .github/scripts/run-step.sh "python tests" make py-test
       - name: Evaluate document reading (fake provider) with its regression gate
         run: .github/scripts/run-step.sh "extraction eval" bash -c 'make data && make eval-extraction ARGS=--gate'
+      - name: Compare document reading with the baseline
+        run: .github/scripts/run-step.sh "scorecard extraction" make scorecard ARGS="--sections extraction --name scorecard-extraction"
 
   java:
     name: java build and tests
@@ -143,10 +145,14 @@ jobs:
             ARGS="--modes lexical,vector,hybrid --gate --name retrieval-fast"
           .github/scripts/run-step.sh "retrieval eval (reranked)" make eval-retrieval \
             ARGS="--modes reranked --sets claims,terms --gate --name retrieval-reranked"
+          .github/scripts/run-step.sh "scorecard retrieval" make scorecard \
+            ARGS="--sections retrieval-fast,retrieval-reranked --name scorecard-retrieval"
       - name: Analyse every claim with the agents and gate the outcome
         run: |
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "agents end to end" deploy/compose/check-agents.sh
+          .github/scripts/run-step.sh "scorecard agents" make scorecard \
+            ARGS="--sections agents --name scorecard-agents"
       - name: Publish claim events, run the workflows and signal a review through Kafka
         env:
           # A crash in native code (Kafka or Temporal clients) prints where it happened.
