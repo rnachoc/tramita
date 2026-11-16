@@ -114,6 +114,21 @@ jobs:
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "core against stack" bash -c \
             'make data && (cd services/core && mvn -B -q -DskipTests package) && deploy/compose/check-core.sh'
+      - name: Cache the policy search models
+        uses: actions/cache@v6
+        with:
+          path: models-cache
+          key: policy-search-models-${{ hashFiles('services/agents/src/tramita_agents/settings.py', '.env.example') }}
+      - name: Index the policy conditions and evaluate the search with its regression gate
+        run: |
+          set -a && . ./.env && set +a
+          .github/scripts/run-step.sh "policy search index" make index
+          # Every query set with the fast modes; the reranker (seconds per query on CPU) on the
+          # claims and the keyword searches only.
+          .github/scripts/run-step.sh "retrieval eval" make eval-retrieval \
+            ARGS="--modes lexical,vector,hybrid --gate --name retrieval-fast"
+          .github/scripts/run-step.sh "retrieval eval (reranked)" make eval-retrieval \
+            ARGS="--modes reranked --sets claims,terms --gate --name retrieval-reranked"
       - name: Show service status
         if: always()
         run: make ps
