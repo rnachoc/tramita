@@ -1,0 +1,9 @@
+<header class="top">
+  <a routerLink="/" class="brand">Tramita · Aseguradora Brisa</a>
+  <span class="muted">
+    Consola de tramitación{{ reviewer.name() ? ' · ' + reviewer.name() : '' }} · datos sintéticos
+  </span>
+</header>
+<main>
+  <router-outlet />
+</main>

@@ -1,0 +1,271 @@
+<section class="page">
+  <p><a routerLink="/">← Bandeja</a></p>
+
+  @if (error()) {
+    <p class="alert" role="alert">{{ error() }}</p>
+  }
+
+  @if (claim(); as c) {
+    <header class="bar">
+      <h1>Siniestro {{ c.claim_id }}</h1>
+      <span class="status" [attr.data-status]="c.status" data-testid="claim-status">{{
+        statusLabel(c.status)
+      }}</span>
+    </header>
+
+    <div class="grid">
+      <article class="card">
+        <h2>Hechos</h2>
+        <dl>
+          <dt>Póliza</dt>
+          <dd>
+            {{ c.policy.policy_number }} · {{ c.policy.product_name }} ({{ c.policy.start_date }} a
+            {{ c.policy.end_date }})
+          </dd>
+          <dt>Garantía</dt>
+          <dd>{{ coverageLabel(c.claim_type) }}</dd>
+          <dt>Fecha del siniestro</dt>
+          <dd>{{ c.incident_date }} · comunicado el {{ c.reported_date }}</dd>
+          <dt>Importe reclamado</dt>
+          <dd>{{ euros(c.claimed_amount) }}</dd>
+          <dt>Descripción</dt>
+          <dd class="quote">{{ c.description }}</dd>
+        </dl>
+      </article>
+
+      @if (proposal(); as p) {
+        <article class="card" data-testid="evaluation">
+          <h2>Evaluación de las reglas</h2>
+          <dl>
+            <dt>Decisión</dt>
+            <dd>
+              <strong>{{ decisionLabel(p.decision) }}</strong>
+              @if (p.decision !== p.proposed_decision) {
+                <span class="warn"
+                  >(los agentes proponían {{ decisionLabel(p.proposed_decision) }})</span
+                >
+              }
+            </dd>
+            <dt>Importe a pagar</dt>
+            <dd>
+              <strong>{{ euros(p.payable_amount) }}</strong> · elegible según los agentes
+              {{ euros(p.eligible_amount) }}
+            </dd>
+            <dt>Enrutado</dt>
+            <dd>{{ routingLabel(p.routing) }}</dd>
+            <dt>Motivos</dt>
+            <dd>
+              @for (r of p.reasons; track r) {
+                <span class="tag">{{ reasonLabel(r) }}</span>
+              }
+            </dd>
+            <dt>Riesgo de fraude</dt>
+            <dd>{{ (p.fraud_score * 100).toFixed(0) }} %</dd>
+          </dl>
+
+          @if (p.violations.length) {
+            <h3>Correcciones de las reglas</h3>
+            <ul class="alert">
+              @for (v of p.violations; track v.code) {
+                <li>
+                  <code>{{ v.code }}</code> {{ v.message }}
+                </li>
+              }
+            </ul>
+          }
+          @if (reviewRequests().length) {
+            <h3>Por qué piden revisión los agentes</h3>
+            <ul class="warn-list">
+              @for (r of reviewRequests(); track r) {
+                <li>{{ r }}</li>
+              }
+            </ul>
+          }
+          @if (p.fraud_signals.length) {
+            <h3>Señales de fraude</h3>
+            <ul>
+              @for (s of p.fraud_signals; track s.type + s.evidence) {
+                <li>
+                  <span class="tag">{{ s.type }}</span> {{ s.evidence }}
+                  <span class="muted"
+                    >({{ s.source === 'RULE' ? 'regla' : 'lectura' }},
+                    {{ (s.confidence * 100).toFixed(0) }} %)</span
+                  >
+                </li>
+              }
+            </ul>
+          }
+        </article>
+      }
+    </div>
+
+    @if (proposal(); as p) {
+      <article class="card">
+        <h2>Cláusulas citadas</h2>
+        @for (id of p.citations; track id) {
+          <details>
+            <summary>
+              <code>{{ id }}</code> {{ clause(id)?.title ?? '' }}
+              @if (p.required_citations.includes(id)) {
+                <span class="tag">fundamenta la decisión</span>
+              }
+            </summary>
+            <p class="quote">{{ clause(id)?.text ?? 'Texto no disponible.' }}</p>
+          </details>
+        }
+        <h3>Justificación de los agentes</h3>
+        <p class="quote pre">{{ p.rationale }}</p>
+      </article>
+    }
+
+    <article class="card">
+      <h2>Documentos</h2>
+      @for (d of c.documents; track d.document_id) {
+        <details>
+          <summary>
+            {{ d.document_id }} · {{ d.document_type }} · {{ d.filename }}
+            @if (d.extraction?.embedded_instructions?.length) {
+              <span class="tag danger">instrucciones incrustadas</span>
+            }
+            @if (d.extraction?.needs_review?.length) {
+              <span class="tag">campos dudosos</span>
+            }
+          </summary>
+          <dl class="compact">
+            @for (f of documentFields(d); track f.name) {
+              <dt>{{ f.name }}</dt>
+              <dd [class.warn]="f.low">{{ f.value }}</dd>
+            }
+          </dl>
+          @if (documentLines(d).length) {
+            <table class="list">
+              <thead>
+                <tr>
+                  <th>Línea</th>
+                  <th>Importe</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (l of documentLines(d); track $index) {
+                  <tr>
+                    <td>{{ l.description }}</td>
+                    <td>{{ l.amount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </details>
+      }
+    </article>
+
+    @if (reviewable()) {
+      <article class="card" data-testid="review">
+        <h2>Revisión</h2>
+        <form (submit)="$event.preventDefault(); submit()">
+          <label>
+            Tu nombre
+            <input
+              name="reviewer"
+              [value]="reviewer.name()"
+              (change)="reviewer.set($any($event.target).value)"
+              autocomplete="name"
+            />
+          </label>
+          <fieldset>
+            <legend>Acción</legend>
+            <label
+              ><input
+                type="radio"
+                name="action"
+                value="APPROVE"
+                [checked]="action() === 'APPROVE'"
+                (change)="action.set('APPROVE')"
+              />
+              Aprobar la evaluación</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="action"
+                value="CORRECT"
+                [checked]="action() === 'CORRECT'"
+                (change)="action.set('CORRECT')"
+              />
+              Corregir</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="action"
+                value="REJECT"
+                [checked]="action() === 'REJECT'"
+                (change)="action.set('REJECT')"
+              />
+              Rechazar</label
+            >
+          </fieldset>
+          @if (action() === 'CORRECT') {
+            <label>
+              Decisión
+              <select
+                name="decision"
+                [value]="decision()"
+                (change)="decision.set($any($event.target).value)"
+              >
+                <option value="">—</option>
+                <option value="APPROVE">Aprobar</option>
+                <option value="REJECT">Rechazar</option>
+              </select>
+            </label>
+            <label>
+              Importe (EUR)
+              <input
+                name="amount"
+                inputmode="decimal"
+                [value]="amount()"
+                (input)="amount.set($any($event.target).value)"
+              />
+            </label>
+          }
+          <label>
+            Comentario
+            <textarea
+              name="comment"
+              rows="3"
+              [value]="comment()"
+              (input)="comment.set($any($event.target).value)"
+            ></textarea>
+          </label>
+          @if (formErrors().length) {
+            <ul class="alert" role="alert">
+              @for (e of formErrors(); track e) {
+                <li>{{ e }}</li>
+              }
+            </ul>
+          }
+          <button type="submit" [disabled]="sending()">
+            {{ sending() ? 'Enviando…' : 'Registrar revisión' }}
+          </button>
+        </form>
+      </article>
+    }
+    @if (outcome()) {
+      <p class="ok" role="status" data-testid="outcome">{{ outcome() }}</p>
+    }
+
+    <article class="card">
+      <h2>Traza de auditoría</h2>
+      <ol class="audit">
+        @for (e of audit(); track e.event_id) {
+          <li>
+            <time>{{ e.occurred_at }}</time> {{ e.event_type }}
+            <span class="muted">({{ e.actor_role }})</span>
+          </li>
+        }
+      </ol>
+    </article>
+  } @else if (!error()) {
+    <p class="muted">Cargando…</p>
+  }
+</section>

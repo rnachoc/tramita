@@ -1,0 +1,54 @@
+<section class="page">
+  <header class="bar">
+    <h1>Bandeja de siniestros</h1>
+    <input
+      type="search"
+      placeholder="Buscar por siniestro o póliza"
+      aria-label="Buscar por siniestro o póliza"
+      [value]="filter()"
+      (input)="filter.set($any($event.target).value)"
+    />
+  </header>
+
+  <nav class="tabs" aria-label="Colas">
+    @for (q of queues; track q.label; let i = $index) {
+      <button type="button" [class.active]="queue() === i" (click)="load(i)">{{ q.label }}</button>
+    }
+  </nav>
+
+  @if (error()) {
+    <p class="alert" role="alert">{{ error() }}</p>
+  } @else if (claims() === null) {
+    <p class="muted">Cargando…</p>
+  } @else if (shown().length === 0) {
+    <p class="muted">No hay siniestros en esta cola.</p>
+  } @else {
+    <table class="list">
+      <thead>
+        <tr>
+          <th>Siniestro</th>
+          <th>Póliza</th>
+          <th>Garantía</th>
+          <th>Fecha del siniestro</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of shown(); track c.claim_id) {
+          <tr>
+            <td>
+              <a [routerLink]="['/claims', c.claim_id]">{{ c.claim_id }}</a>
+            </td>
+            <td>{{ c.policy_number }}</td>
+            <td>{{ coverageLabel(c.claim_type) }}</td>
+            <td>{{ c.incident_date }}</td>
+            <td>
+              <span class="status" [attr.data-status]="c.status">{{ statusLabel(c.status) }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <p class="muted">{{ shown().length }} siniestro(s)</p>
+  }
+</section>
