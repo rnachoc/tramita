@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 8: MCP server** (next). Phases 0 to 7 are complete.
+**Phase 9: full evaluation** (next). Phases 0 to 8 are complete.
 
 ## Phase status
 
@@ -19,7 +19,7 @@ resuming work, read this file first.
 | 5 | Agents | done | v0.6.0 |
 | 6 | Events and long-running processes | done | v0.7.0 |
 | 7 | Review console (Angular) | done | v0.8.0 |
-| 8 | MCP server | pending | |
+| 8 | MCP server | done | v0.9.0 |
 | 9 | Full evaluation | pending | |
 | 10 | Observability and cost | pending | |
 | 11 | Kubernetes | pending | |
@@ -161,7 +161,22 @@ resuming work, read this file first.
   file; a rejection without a comment is refused before sending).
 - The agents now keep their review requests in the proposal's metadata, shown to the handler.
 
+## Phase 8: done
+
+- `services/mcp` (`tramita-mcp`, official MCP SDK 2.x): read-only tools for analysts (policy
+  search, claim list, one claim, audit trail, overview by status) and resources (the rules, each
+  product's conditions). It reads with the ANALYST key; every tool is declared read-only (ADR 0016).
+- Results are masked for the model: description masked, no address, contacts, reviewer names,
+  account numbers or flagged instruction text.
+- CI over stdio: 150 claims read with 0 of 1,650 personal values in any result; the server's key
+  gets 403 when it tries to write.
+- Fixed in the core on the way: a known key without the role got 401 instead of 403 behind a real
+  servlet container (error dispatch); covered by a new test over HTTP.
+- Tests: 221 Python, 53 Java, 12 console unit and 3 end-to-end.
+
 ## Open issues and notes
+
+- **MCP users share one identity** (the server's ANALYST client); per-user tokens need OIDC.
 
 - **Reviewers are not individually authenticated** (ADR 0009, ADR 0015): whoever reaches the
   console reviews as the console. Production needs OIDC and per-user sessions.

@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 7 (review console)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 8 (MCP server)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -99,6 +99,7 @@ make worker               # Temporal worker for the claim workflows (another ter
 make bridge               # claim events on Kafka -> workflow signals (core with TRAMITA_EVENTS_ENABLED=true)
 make start-claims         # one durable workflow per ingested claim
 make console-up           # review console on http://localhost:4200 (core running on the host)
+uv run tramita-mcp        # MCP server over stdio for an assistant (read-only analyst tools)
 make test                 # Python and Java test suites (the Java integration tests need Docker)
 make help                 # every available target
 ```
@@ -195,6 +196,18 @@ agents are deterministic baselines that read nothing:
 
 No real-model numbers yet: with `ANTHROPIC_API_KEY` set the same commands use Claude and the
 report says so.
+
+## MCP server for analysts
+
+`tramita-mcp` gives an analyst's assistant read-only tools: search the policy conditions, list
+claims, read a claim with its evaluation and citations, its audit trail and a queue overview.
+It reads as ANALYST, so the core refuses any write, and every result is masked because a model
+reads it. CI reads all 150 claims through it and finds none of the 1,650 personal values of the
+ground truth. See [ADR 0016](docs/decisions/0016-read-only-mcp-for-analysts.md).
+
+```json
+{"mcpServers": {"tramita": {"command": "uv", "args": ["run", "--directory", "/path/to/tramita", "tramita-mcp"]}}}
+```
 
 ## Review console
 
