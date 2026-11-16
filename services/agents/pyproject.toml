@@ -19,6 +19,7 @@ dependencies = [
     "pypdfium2>=4.30",  # text layer of born-digital PDFs
     "pytesseract>=0.3.13",  # OCR wrapper; needs the tesseract binary with Spanish data
     # Offline public-suffix check for e-mail domains (imported directly in documents/pii.py).
+    "pyyaml>=6.0",
     "tldextract>=5.4",
     "uvicorn[standard]>=0.38",
 ]
@@ -28,6 +29,8 @@ tramita-ingest = "tramita_agents.ingest:main"
 tramita-eval-extraction = "tramita_agents.evals.extraction:main"
 tramita-index-policies = "tramita_agents.search.factory:main"
 tramita-eval-retrieval = "tramita_agents.evals.retrieval:main"
+tramita-process = "tramita_agents.process:main"
+tramita-eval-agents = "tramita_agents.evals.agents:main"
 
 [dependency-groups]
 dev = [
@@ -36,6 +39,7 @@ dev = [
     "moto[s3]>=5.1",
     # Tests render synthetic documents with the data generator.
     "tramita-datagen",
+    "types-pyyaml>=6.0",
 ]
 
 [tool.uv.sources]

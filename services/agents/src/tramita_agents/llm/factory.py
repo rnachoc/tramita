@@ -9,14 +9,21 @@ import anthropic
 from tramita_agents.llm.anthropic_client import AnthropicModelClient
 from tramita_agents.llm.fake import FakeModelClient, Responder
 from tramita_agents.llm.recording import RecordingModelClient
+from tramita_agents.llm.steps import StepResponder
 from tramita_agents.llm.types import ModelClient, Tier
 from tramita_agents.settings import ModelProvider, Settings
 
 
-def build_model_client(settings: Settings, responders: Mapping[str, Responder]) -> ModelClient:
+def build_model_client(
+    settings: Settings,
+    responders: Mapping[str, Responder],
+    step_responders: Mapping[str, StepResponder] | None = None,
+) -> ModelClient:
     """Anthropic when a key is configured (optionally recording), otherwise the fake."""
     if settings.model_provider is ModelProvider.FAKE:
-        return FakeModelClient(settings.tramita_recordings_dir, dict(responders))
+        return FakeModelClient(
+            settings.tramita_recordings_dir, dict(responders), dict(step_responders or {})
+        )
     key = settings.anthropic_api_key
     if key is None:  # unreachable: model_provider is FAKE without a key
         raise RuntimeError("Anthropic provider selected without an API key")

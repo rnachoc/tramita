@@ -94,6 +94,25 @@ class CoreClient:
         )
         return result
 
+    def submit_proposal(
+        self, claim_id: str, proposal: dict[str, Any], idempotency_key: str
+    ) -> dict[str, Any]:
+        response = self._http.post(
+            f"/api/claims/{_id(claim_id)}/proposals",
+            json=proposal,
+            headers={"Idempotency-Key": idempotency_key},
+        )
+        if response.is_error:
+            raise CoreError(response.status_code, response.text[:500])
+        result: dict[str, Any] = response.json()
+        return result
+
+    def policy_claims(self, policy_number: str) -> list[dict[str, Any]]:
+        result: list[dict[str, Any]] = self._call(
+            "GET", f"/api/policies/{_id(policy_number)}/claims"
+        )
+        return result
+
     def claim(self, claim_id: str) -> dict[str, Any]:
         result: dict[str, Any] = self._call("GET", f"/api/claims/{_id(claim_id)}")
         return result
