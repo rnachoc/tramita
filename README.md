@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 5 (agents)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 6 (events and long-running processes)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -64,8 +64,8 @@ in [docs/decisions](docs/decisions).
 |---|---|
 | Agents and orchestration | Python 3.12, FastAPI, official Anthropic SDK, Pydantic, uv |
 | Core system and rules | Java 17, Spring Boot 3, Spring Data JPA, Flyway, PostgreSQL |
-| Events | Apache Kafka (KRaft) |
-| Long-running processes | Temporal |
+| Events | Apache Kafka (KRaft), transactional outbox over the audit trail, confluent-kafka consumers |
+| Long-running processes | Temporal (Python SDK), one workflow per claim |
 | Documents | S3 API (RustFS locally, see [ADR 0006](docs/decisions/0006-object-store-rustfs-instead-of-minio.md)) |
 | Search | OpenSearch (BM25) + pgvector, reciprocal rank fusion, local embeddings and reranker (fastembed, ONNX) |
 | Personal data | Microsoft Presidio (Spanish) |
@@ -94,6 +94,9 @@ make index                # index the policy conditions (OpenSearch + pgvector; 
 make eval-retrieval       # policy search report: lexical, vector, hybrid and reranked (a few minutes on CPU)
 make process              # analyse every open claim with the agents and submit proposals to the core
 make eval-agents          # end-to-end report: what the core decided against the expected resolutions
+make worker               # Temporal worker for the claim workflows (another terminal)
+make bridge               # claim events on Kafka -> workflow signals (core with TRAMITA_EVENTS_ENABLED=true)
+make start-claims         # one durable workflow per ingested claim
 make test                 # Python and Java test suites (the Java integration tests need Docker)
 make help                 # every available target
 ```
@@ -190,6 +193,18 @@ agents are deterministic baselines that read nothing:
 
 No real-model numbers yet: with `ANTHROPIC_API_KEY` set the same commands use Claude and the
 report says so.
+
+## Events and workflows
+
+Every state change in the core is written to its append-only audit trail in the same
+transaction, and a relay publishes that trail, in order, to the Kafka topic
+`tramita.claim-events`, keyed by claim, without personal data. One Temporal workflow per claim
+analyses it, then waits for what it needs: missing documents (analysed again when they arrive) or
+a claims handler's review (the final status read back), each with a deadline. A bridge turns the
+events into workflow signals; consumers retry with backoff and park what still fails in a
+dead-letter topic. CI runs the whole loop: a review approved through the API reaches the
+workflow through Kafka and the claim ends paid. See
+[ADR 0014](docs/decisions/0014-audit-trail-as-outbox-one-ordered-topic.md).
 
 ## Core system
 

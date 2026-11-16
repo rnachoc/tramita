@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 6: events and long-running processes** (next). Phases 0 to 5 are complete.
+**Phase 7: review console (Angular)** (next). Phases 0 to 6 are complete.
 
 ## Phase status
 
@@ -17,7 +17,7 @@ resuming work, read this file first.
 | 3 | Document reading | done | v0.4.0 |
 | 4 | Policy search | done | v0.5.0 |
 | 5 | Agents | done | v0.6.0 |
-| 6 | Events and long-running processes | pending | |
+| 6 | Events and long-running processes | done | v0.7.0 |
 | 7 | Review console (Angular) | pending | |
 | 8 | MCP server | pending | |
 | 9 | Full evaluation | pending | |
@@ -130,7 +130,29 @@ resuming work, read this file first.
   violation, 0 automatic settlements that a person should have seen (10 before escalation).
 - Tests: 197 Python, 43 Java.
 
+## Phase 6: done
+
+- Transactional outbox over the audit trail (ADR 0014): a relay in the core publishes every
+  committed change, in order, to `tramita.claim-events` keyed by claim, moves its cursor only
+  after the broker acknowledges, waits on sequence gaps from in-flight transactions and skips
+  old ones. Only listed fields leave the core. Off unless `TRAMITA_EVENTS_ENABLED=true`.
+- Event contract in Pydantic, `docs/events/claim-event.schema.json` generated and checked for
+  drift in Python and against the relay in Java.
+- Consumers with manual commits, in-place retries with capped backoff and a dead-letter topic
+  per group; contract breaks go straight to it.
+- `ClaimWorkflow` per claim on Temporal: analyse, wait for documents or a review with deadlines,
+  end when paid or rejected; signals carry event ids (replays ignored, none lost during an
+  analysis). Bridge from Kafka to signals. `make worker`, `make bridge`, `make start-claims`.
+- Tests: 214 Python (workflows on Temporal's time-skipping server), 51 Java (relay against real
+  PostgreSQL and Kafka). CI runs the loop on the stack: twenty workflows, a review through the
+  API reaches the workflow through Kafka and the claim ends paid; events in order, no personal
+  data, empty dead-letter topic.
+
 ## Open issues and notes
+
+- **One relay per core**: several core instances would need a lock on the relay row.
+- **Overdue workflows end** (`documents_overdue`, `review_overdue`) for a person to chase; there
+  are no reminders or escalations yet.
 
 - **No real-model numbers for the agents.** The keyless baselines read nothing, so they escalate
   every payment; automation rates with Claude are unmeasured until a key is available.
