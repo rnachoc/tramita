@@ -65,6 +65,10 @@ eval-extraction: py-sync ## Evaluate document reading on the generated data (nee
 eval-retrieval: py-sync ## Evaluate the policy search (stack up, `make data` and `make index`; report in evals/reports)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-eval-retrieval $(ARGS)
 
+.PHONY: scorecard
+scorecard: ## Compare the evaluation reports with evals/baseline.json (ARGS="--sections agents" or "--update")
+	uv run tramita-eval-baseline $(ARGS)
+
 .PHONY: ingest
 ingest: ## Read the generated claims' documents and record them in a running core (stack up, policies seeded)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-ingest $(ARGS)

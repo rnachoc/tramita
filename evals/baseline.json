@@ -1,0 +1,179 @@
+{
+  "_about": "Headline numbers of each evaluation, per provider (ADR 0017). Values are written by `make scorecard ARGS=--update` and reviewed in the commit; `better` and `tolerance` are chosen by hand. Tolerances are zero for counts of harm (leaks, wrong facts, unsafe settlements) and small where ONNX scores drift across CPUs.",
+  "sections": {
+    "extraction": {
+      "report": "extraction.json",
+      "provider": "fake:responder (fake)",
+      "metrics": {
+        "summary.classification_accuracy": {
+          "value": 1.0,
+          "better": "higher",
+          "tolerance": 0
+        },
+        "summary.calibration.trusted_accuracy": {
+          "value": 0.9982,
+          "better": "higher",
+          "tolerance": 0.002
+        },
+        "summary.calibration.wrong_but_trusted": {
+          "value": 3.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.facts.wrong_facts_sent": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.privacy.personal_values_to_model": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.privacy.personal_values_in_redacted_scans": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.privacy.personal_values_to_core": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.privacy.rule_values_masked": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.injection.planted_pdf_instructions_missed": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.injection.false_instruction_alarms": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        }
+      }
+    },
+    "retrieval-fast": {
+      "report": "retrieval-fast.json",
+      "provider": "jinaai/jina-embeddings-v2-base-es + BAAI/bge-reranker-v2-m3-int8",
+      "metrics": {
+        "summary.lexical.terms.hit_at_5": {
+          "value": 1.0,
+          "better": "higher",
+          "tolerance": 0
+        },
+        "summary.vector.claims.hit_at_5": {
+          "value": 0.875,
+          "better": "higher",
+          "tolerance": 0.015
+        },
+        "summary.vector.questions.hit_at_5": {
+          "value": 0.9559,
+          "better": "higher",
+          "tolerance": 0.01
+        },
+        "summary.hybrid.all.hit_at_1": {
+          "value": 0.5648,
+          "better": "higher",
+          "tolerance": 0.01
+        },
+        "summary.hybrid.all.hit_at_5": {
+          "value": 0.8773,
+          "better": "higher",
+          "tolerance": 0.01
+        }
+      }
+    },
+    "retrieval-reranked": {
+      "report": "retrieval-reranked.json",
+      "provider": "jinaai/jina-embeddings-v2-base-es + BAAI/bge-reranker-v2-m3-int8",
+      "metrics": {
+        "summary.reranked.claims.hit_at_1": {
+          "value": 0.625,
+          "better": "higher",
+          "tolerance": 0.03
+        },
+        "summary.reranked.claims.hit_at_5": {
+          "value": 0.9167,
+          "better": "higher",
+          "tolerance": 0.03
+        },
+        "summary.reranked.terms.hit_at_5": {
+          "value": 1.0,
+          "better": "higher",
+          "tolerance": 0.02
+        }
+      }
+    },
+    "agents": {
+      "report": "agents.json",
+      "provider": "fake:responder",
+      "metrics": {
+        "summary.decision_accuracy": {
+          "value": 0.9621,
+          "better": "higher",
+          "tolerance": 0.01
+        },
+        "summary.routing_accuracy": {
+          "value": 0.58,
+          "better": "higher",
+          "tolerance": 0.01
+        },
+        "summary.payable_exact_on_approvals": {
+          "value": 0.8977,
+          "better": "higher",
+          "tolerance": 0.01
+        },
+        "summary.exclusions.found": {
+          "value": 10.0,
+          "better": "higher",
+          "tolerance": 1
+        },
+        "summary.exclusions.wrongly_proposed": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.agent_cites_grounding": {
+          "value": 0.7463,
+          "better": "higher",
+          "tolerance": 0.02
+        },
+        "summary.unsafe_automatic": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.unsafe_automatic_injected": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.fraud.automatic": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.fraud.to_investigation": {
+          "value": 12.0,
+          "better": "higher",
+          "tolerance": 0
+        },
+        "summary.fraud.decoys_to_investigation": {
+          "value": 0.0,
+          "better": "lower",
+          "tolerance": 0
+        },
+        "summary.fraud.score_matches_expected": {
+          "value": 0.96,
+          "better": "higher",
+          "tolerance": 0.01
+        }
+      }
+    }
+  }
+}
