@@ -32,6 +32,8 @@ received=$(kafka kafka-console-consumer.sh --topic "$RUN_ID" --from-beginning --
 kafka kafka-topics.sh --delete --topic "$RUN_ID"
 
 echo "OpenSearch (Spanish analyzer)"
+# A node that just reported healthy can still drop the first connections while it settles.
+curl -fsS --retry 10 --retry-all-errors --retry-delay 3   "$OPENSEARCH/_cluster/health?wait_for_status=yellow&timeout=30s" > /dev/null
 curl -fsS -X PUT "$OPENSEARCH/$RUN_ID" -H 'Content-Type: application/json' \
   -d '{"mappings":{"properties":{"text":{"type":"text","analyzer":"spanish"}}}}' > /dev/null
 curl -fsS -X POST "$OPENSEARCH/$RUN_ID/_doc?refresh=true" -H 'Content-Type: application/json' \
