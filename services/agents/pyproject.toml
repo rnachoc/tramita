@@ -34,6 +34,9 @@ tramita-eval-retrieval = "tramita_agents.evals.retrieval:main"
 tramita-process = "tramita_agents.process:main"
 tramita-eval-agents = "tramita_agents.evals.agents:main"
 tramita-event-schemas = "tramita_agents.events.contracts:main"
+tramita-worker = "tramita_agents.workflows.cli:worker_main"
+tramita-start-claims = "tramita_agents.workflows.cli:start_main"
+tramita-bridge = "tramita_agents.workflows.cli:bridge_main"
 
 [dependency-groups]
 dev = [

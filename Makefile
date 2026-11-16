@@ -77,6 +77,16 @@ index: py-sync ## Index the policy conditions for search in OpenSearch and pgvec
 event-schemas: py-sync ## Regenerate docs/events/claim-event.schema.json from the event contracts
 	uv run tramita-event-schemas
 
+.PHONY: worker bridge start-claims
+worker: ## Run the claim workflow worker (Temporal; stack up, index built, core running)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-worker $(ARGS)
+
+bridge: ## Signal claim workflows from the claim events on Kafka (core with TRAMITA_EVENTS_ENABLED=true)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-bridge $(ARGS)
+
+start-claims: ## Start one workflow per ingested claim (ARGS="--wait" to wait for them)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-start-claims $(ARGS)
+
 .PHONY: process
 process: ## Analyse the open claims with the agents and submit proposals to a running core (after ingest and index)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-process $(ARGS)

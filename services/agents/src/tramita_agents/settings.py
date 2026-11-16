@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     # Clauses each first-stage ranking hands over, and the most the reranker reads per query.
     tramita_search_candidates: int = 10
 
+    # Claim events and per-claim workflows (ADRs 0004 and 0014).
+    kafka_bootstrap_servers: str = "localhost:9092"
+    temporal_address: str = "localhost:7233"
+
     @property
     def postgres_conninfo(self) -> str:
         return (
