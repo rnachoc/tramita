@@ -57,3 +57,27 @@ def test_automatic_settlements_are_unsafe_when_a_person_was_needed_or_the_amount
         "not_processed 1 > 0",
     ]
     assert "**Settled automatically but should not be** | **2**" in markdown(summary, outcomes)
+
+
+def test_planted_fraud_must_reach_a_person_and_decoys_should_not_alarm() -> None:
+    outcomes = [
+        outcome(
+            _expected("F1", scenario="fraud", is_fraud=True, routing="FRAUD_INVESTIGATION"),
+            _view("FRAUD_INVESTIGATION", fraud_score=0.75),
+        ),
+        outcome(
+            _expected("F2", scenario="fraud", is_fraud=True, routing="FRAUD_INVESTIGATION"),
+            _view("HUMAN_REVIEW", fraud_score=0.5),
+        ),
+        outcome(
+            _expected("F3", scenario="fraud", is_fraud=True, routing="FRAUD_INVESTIGATION"),
+            _view("AUTO"),
+        ),
+        outcome(_expected("D1", scenario="decoy"), _view("AUTO", fraud_score=0.0)),
+    ]
+
+    fraud = summarise(outcomes)["fraud"]
+
+    assert (fraud["to_investigation"], fraud["to_review"], fraud["automatic"]) == (1, 1, 1)
+    assert (fraud["decoys"], fraud["decoys_to_investigation"]) == (1, 0)
+    assert "planted fraud settled automatically: 1" in gate_failures(summarise(outcomes))
