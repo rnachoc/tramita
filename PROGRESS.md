@@ -172,6 +172,9 @@ resuming work, read this file first.
   gets 403 when it tries to write.
 - Fixed in the core on the way: a known key without the role got 401 instead of 403 behind a real
   servlet container (error dispatch); covered by a new test over HTTP.
+- The intermittent crash on exit seen in phase 6 was caught with the fault handler: the Temporal
+  client's native threads raced interpreter shutdown (`PyGILState_Release`). Short-lived
+  commands that use Temporal now end without finalisation once their work is done and flushed.
 - Tests: 221 Python, 53 Java, 12 console unit and 3 end-to-end.
 
 ## Open issues and notes
