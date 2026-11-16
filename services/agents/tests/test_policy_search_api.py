@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from search_fixtures import CLAUSES, FakeEmbedder, FakeLexical, FakeReranker, FakeVectors
 
-from tramita_agents import app as app_module
+import tramita_agents.app as app_module
 from tramita_agents.search.lexical import SearchBackendError
 from tramita_agents.search.service import PolicySearch
 
