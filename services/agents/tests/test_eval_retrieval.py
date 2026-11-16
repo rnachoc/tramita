@@ -81,6 +81,14 @@ def test_questions_expand_over_products_and_fall_back_to_not_included() -> None:
     assert len({q.qid for q in queries}) == len(queries)
 
 
+def test_keyword_terms_are_a_set_of_their_own() -> None:
+    terms = [q for q in question_queries(QUESTIONS, CLAUSES) if q.source == "terms"]
+
+    hurto = next(q for q in terms if q.text == "hurto" and q.product_code == "HP")
+    assert hurto.relevant == {"HP-3.3": 2}
+    assert {q.product_code for q in terms if q.text == "circuitos cerrados"} == {"AF", "AR"}
+
+
 def test_every_question_points_to_a_clause_of_its_product() -> None:
     ids = {c.clause_id for c in CLAUSES}
 
@@ -117,7 +125,7 @@ def test_summary_gate_and_report(dataset: Path) -> None:
         "reranker_model": None,
         "corpus": "c",
         "clauses": 1,
-        "queries": {"claims": 3, "questions": 0},
+        "queries": {"claims": 3, "questions": 0, "terms": 0},
         "gate_mode": "reranked",
         "summary": summary,
         "misses": [],

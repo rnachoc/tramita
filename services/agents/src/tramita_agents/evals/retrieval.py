@@ -12,6 +12,9 @@ agents will search:
   clause. For an exclusion, the coverage clause counts as partly relevant.
 * **Questions**: templates in ``evals/retrieval/questions.json`` written in everyday words,
   expanded over every product and guarantee they apply to, each answered by one clause.
+* **Terms**: a few keyword searches copied from the conditions (a legal reference, a term of
+  art), as a claims handler would type them. Literal on purpose: they measure what lexical
+  search exists for, and are reported apart so they never inflate the other two sets.
 
 Every mode (lexical, vector, hybrid, reranked) runs on the same queries. Measured: hit rate of
 the answer at 1, 3 and 5, mean reciprocal rank (within 10), nDCG@5 with graded relevance, and
@@ -155,7 +158,7 @@ def question_queries(path: Path, clauses: Sequence[Clause]) -> list[Query]:
                     queries.append(
                         Query(
                             qid=f"Q{n:02d}-{product}-{guarantee or 'ALL'}-{m}",
-                            source="questions",
+                            source=template.get("set", "questions"),
                             category=kind,
                             text=template["text"].replace("{guarantee}", name),
                             product_code=product,
@@ -244,8 +247,9 @@ def markdown(report: dict[str, Any]) -> str:
         f"`{report['reranker_model'] or 'none'}`, corpus {report['corpus']} "
         f"({report['clauses']} clauses). Local models only; no language model is called.",
         "",
-        f"{report['queries']['claims']} claim descriptions and {report['queries']['questions']} "
-        "questions, each searched within its policy's product. Hit@k: the answer is among the "
+        f"{report['queries']['claims']} claim descriptions, {report['queries']['questions']} "
+        f"questions and {report['queries']['terms']} keyword searches, each within its policy's "
+        "product. Hit@k: the answer is among the "
         "first k clauses. Latency per query, end to end (masking included).",
         "",
     ]
@@ -328,6 +332,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "queries": {
             "claims": sum(q.source == "claims" for q in queries),
             "questions": sum(q.source == "questions" for q in queries),
+            "terms": sum(q.source == "terms" for q in queries),
         },
         "gate_mode": gate_mode.value,
         "seconds": round(time.perf_counter() - started, 1),

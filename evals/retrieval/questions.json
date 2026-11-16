@@ -1,5 +1,5 @@
 {
-  "_about": "Policyholder questions for the policy search evaluation (ADR 0012). Each template names the clause key that answers it; {guarantee} is replaced by every colloquial name of every guarantee the product mentions. A coverage question about a guarantee the product does not include is answered by its 'not included' clause. Written in everyday words on purpose, avoiding the wording of the conditions where possible.",
+  "_about": "Policyholder questions for the policy search evaluation (ADR 0012). Each template names the clause key that answers it; {guarantee} is replaced by every colloquial name of every guarantee the product mentions. A coverage question about a guarantee the product does not include is answered by its 'not included' clause. Questions are written in everyday words on purpose, avoiding the wording of the conditions where possible. Entries with \"set\": \"terms\" are the opposite: keyword searches copied from the conditions, reported apart.",
   "guarantees": {
     "HOME_WATER": ["una fuga de agua en casa", "una tubería que ha reventado"],
     "HOME_THEFT": ["que entren a robar en mi casa", "un robo en la vivienda"],
@@ -35,6 +35,21 @@
     {"key": "exclusion:AUTO_ALCOHOL", "text": "Tuve un accidente con el coche y di positivo en el control de alcohol"},
     {"key": "exclusion:AUTO_COMPETITION", "text": "Me di un golpe con el coche durante una carrera en un circuito"},
     {"key": "exclusion:AUTO_GLASS_MIRRORS", "text": "Se ha roto el cristal del retrovisor y un faro delantero"},
-    {"key": "exclusion:AUTO_THEFT_KEYS", "text": "Se llevaron cosas del coche porque me dejé las llaves dentro y sin cerrar"}
+    {"key": "exclusion:AUTO_THEFT_KEYS", "text": "Se llevaron cosas del coche porque me dejé las llaves dentro y sin cerrar"},
+    {"set": "terms", "key": "exclusion:GENERAL", "text": "Consorcio de Compensación de Seguros"},
+    {"set": "terms", "key": "mitigation", "text": "artículo 17 Ley de Contrato de Seguro"},
+    {"set": "terms", "key": "payment", "text": "artículo 18"},
+    {"set": "terms", "key": "fraud", "text": "mala fe artículo 19"},
+    {"set": "terms", "key": "exclusion:AUTO_ALCOHOL", "text": "tasas de alcohol drogas"},
+    {"set": "terms", "key": "exclusion:AUTO_COMPETITION", "text": "circuitos cerrados"},
+    {"set": "terms", "key": "exclusion:AUTO_THEFT_KEYS", "text": "llaves originales"},
+    {"set": "terms", "key": "exclusion:THEFT_WITHOUT_FORCE", "text": "hurto"},
+    {"set": "terms", "key": "exclusion:THEFT_UNOCCUPIED", "text": "deshabitada"},
+    {"set": "terms", "key": "exclusion:WATER_MAINTENANCE", "text": "condensación"},
+    {"set": "terms", "key": "exclusion:GLASS_SCRATCHES", "text": "arañazos y raspaduras"},
+    {"set": "terms", "key": "documents:AUTO_COLLISION", "text": "declaración amistosa"},
+    {"set": "terms", "key": "documents:HOME_THEFT", "text": "copia de la denuncia"},
+    {"set": "terms", "key": "definition:deductible", "text": "franquicia"},
+    {"set": "terms", "key": "definition:waiting", "text": "periodo de carencia"}
   ]
 }
