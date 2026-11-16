@@ -9,10 +9,10 @@ later phases implement; everything else describes the code as it is.
 |---|---|---|
 | Core service | `services/core` | System of record: policies, claims, rules engine, fraud scoring, payments, audit |
 | Data generator | `data/generator` | Reproducible synthetic policies, policyholders, claims, documents and expected resolutions |
-| Agent service | `services/agents` | Document reading and ingestion (*implemented*); policy search, agents, Kafka consumers, Temporal workflows (*planned*) |
+| Agent service | `services/agents` | Document reading, ingestion and policy search (*implemented*); agents, Kafka consumers, Temporal workflows (*planned*) |
 | MCP server | `services/mcp` | Analyst tools over the core API, guarded by the same rules (*planned*) |
 | Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject (*planned*) |
-| Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading evaluation with a CI gate (*implemented*); full eval set and baseline (*planned*) |
+| Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading and policy search evaluations with CI gates (*implemented*); full eval set and baseline (*planned*) |
 
 ## Trust boundary
 
@@ -88,6 +88,33 @@ flowchart TD
 - **Evaluation** (`make eval-extraction`): field accuracy by type and format, calibration, wrong
   facts sent to the rules, personal values reaching the model, the redacted scans or the core,
   over-masking, and planted instructions, against the generated ground truth.
+
+## Policy search
+
+`tramita_agents.search` finds the clauses of a product's conditions that bear on a question or a
+claim, for the coverage agent to cite ([ADR 0012](decisions/0012-hybrid-policy-search-measured.md)).
+The unit is one clause of `data/policies/clauses.json`, whose ids are the ones the rules engine
+accepts as citations. Every search is scoped to the policy's product.
+
+```mermaid
+flowchart LR
+    Q[Query] --> M[Mask personal data<br/>as for documents]
+    M --> L[BM25 in OpenSearch<br/>Spanish analyzer<br/>top 10 of the product]
+    M --> E[Embed locally<br/>jina-embeddings-v2-base-es] --> V[pgvector cosine<br/>schema policy_search<br/>top 10 of the product]
+    L --> F[Reciprocal rank fusion<br/>k = 60]
+    V --> F
+    F --> R[Cross-encoder rerank<br/>bge-reranker-v2-m3 int8]
+    R --> H[Clauses with their rank<br/>at every stage]
+```
+
+- **Index** (`make index`): rebuilds the OpenSearch index and the model's pgvector rows from the
+  clause file; both record the corpus version, and the search refuses to run on a stale index.
+- **Models** run on CPU through fastembed (ONNX), downloaded once into `models-cache/`; no API key.
+- **HTTP**: `POST /policy-search` on the agent service returns the masked query and the hits; 503
+  with the fix when the index is missing or stale.
+- **Evaluation** (`make eval-retrieval`): claim descriptions answered by the clause that grounds
+  the expected decision, everyday questions and keyword searches; hit@k, MRR, nDCG@5 and latency
+  per mode (lexical, vector, hybrid, reranked), with a hit@5 gate in CI.
 
 ## Claim lifecycle
 
@@ -167,9 +194,9 @@ and waits until every health check passes; `make smoke` then sends each service 
 
 | Service | Image | Purpose |
 |---|---|---|
-| postgres | `pgvector/pgvector:0.8.7-pg17-trixie` | Core data, pgvector embeddings, Temporal persistence |
+| postgres | `pgvector/pgvector:0.8.7-pg17-trixie` | Core data, clause embeddings (schema `policy_search`), Temporal persistence |
 | kafka | `apache/kafka:4.2.2` | Domain events, KRaft mode, no topic auto-creation |
-| opensearch | `opensearchproject/opensearch:3.9.0` | Full-text search over policy clauses |
+| opensearch | `opensearchproject/opensearch:3.9.0` | Lexical (BM25) side of the policy search |
 | object-store | `rustfs/rustfs:1.0.3` | S3-compatible storage for claim documents |
 | temporal | `temporalio/auto-setup:1.29.7` | Durable per-claim workflows |
 | temporal-ui | `temporalio/ui:2.56.0` | Workflow inspection |
@@ -180,5 +207,6 @@ Every push runs: a secret scan of the full history; Python lint, strict types an
 document reading evaluation with its regression gate (fake provider); the Java build with unit,
 integration (Testcontainers PostgreSQL) and cross-check tests; the compose stack with its smoke
 test, the core against it, seeding, and an end-to-end ingest of a sample of claims checked through
-the API and the object store; and a build of every pushed commit on its own. Test counts and eval
-headlines are published as annotations, and releases are created from `docs/releases/*.md`.
+the API and the object store; the policy search index and its evaluation with a hit@5 gate; and a
+build of every pushed commit on its own. Test counts and eval headlines are published as
+annotations, and releases are created from `docs/releases/*.md`.
