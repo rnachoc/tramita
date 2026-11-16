@@ -118,8 +118,11 @@ def test_summary_gate_and_report(dataset: Path) -> None:
     scores = summary["reranked"]["all"]
     assert (scores["hit_at_1"], scores["hit_at_5"], scores["mrr"]) == (0.3333, 0.6667, 0.4167)
     assert summary["reranked"]["claims:exclusion"]["queries"] == 1
-    assert gate_failures(summary, "reranked") == []
-    assert gate_failures(summary, "hybrid") == ["mode hybrid was not evaluated"]
+    # Two of the three answers are among the first five.
+    assert gate_failures(summary) == ["reranked on claims: hit@5 0.667 < 0.880"]
+    assert gate_failures({"hybrid": {"claims": scores}}) == [
+        "no gated mode and query set was evaluated"
+    ]
     report: dict[str, Any] = {
         "embedding_model": "e",
         "reranker_model": None,

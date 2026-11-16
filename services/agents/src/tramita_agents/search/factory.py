@@ -24,6 +24,7 @@ def build_policy_search(
     settings: Settings,
     embedding_model: str | None = None,
     reranker_model: str | None = None,
+    candidates: int | None = None,
 ) -> PolicySearch:
     """The search as configured; the model arguments override the settings (evaluation)."""
     embedding = embedding_model or settings.tramita_embedding_model
@@ -35,6 +36,7 @@ def build_policy_search(
         vectors=VectorIndex(settings.postgres_conninfo),
         embedder=FastEmbedEmbedder(embedding, cache),
         reranker=FastEmbedReranker(reranker, cache) if reranker.strip() else None,
+        candidates=candidates or settings.tramita_search_candidates,
     )
 
 

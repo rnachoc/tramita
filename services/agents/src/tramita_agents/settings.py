@@ -48,9 +48,11 @@ class Settings(BaseSettings):
     postgres_db: str = "tramita"
     # Local models (fastembed, ONNX on CPU), downloaded once into the cache. Chosen by measurement
     # (ADR 0012). An empty reranker turns the second stage off.
-    tramita_embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    tramita_embedding_model: str = "jinaai/jina-embeddings-v2-base-es"
     tramita_reranker_model: str = "BAAI/bge-reranker-v2-m3-int8"
     tramita_models_dir: Path = REPO_ROOT / "models-cache"
+    # Clauses each first-stage ranking hands over, and the most the reranker reads per query.
+    tramita_search_candidates: int = 10
 
     @property
     def postgres_conninfo(self) -> str:

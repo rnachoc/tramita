@@ -47,8 +47,18 @@ REPORTS = REPO_ROOT / "evals" / "reports"
 ANSWER = 2  # grade of the clause that answers a query; partly relevant ones get 1
 DEPTH = 10  # ranks looked at for MRR; hit@k and nDCG use their own k
 
-# Regression gate on the configured search (reranked mode); see ADR 0012 for the measurements.
-GATE = {"hit_at_3": 0.0, "mrr": 0.0}
+SETS = ("claims", "questions", "terms")
+# Regression gate: the least hit@5 (the answer among the clauses an agent reads) per mode and query
+# set, a few points under what ADR 0012 measured. Only the pairs a run evaluates are checked.
+GATE_METRIC = "hit_at_5"
+GATE: dict[tuple[str, str], float] = {
+    ("lexical", "terms"): 0.95,
+    ("vector", "claims"): 0.84,
+    ("vector", "questions"): 0.92,
+    ("hybrid", "all"): 0.79,
+    ("reranked", "claims"): 0.88,
+    ("reranked", "terms"): 0.95,
+}
 
 
 @dataclass(frozen=True)
@@ -227,15 +237,17 @@ def summarise(queries: Sequence[Query], outcomes: Sequence[Outcome]) -> dict[str
     }
 
 
-def gate_failures(summary: dict[str, Any], mode: str) -> list[str]:
-    scores = summary.get(mode, {}).get("all")
-    if scores is None:
-        return [f"mode {mode} was not evaluated"]
-    return [
-        f"{name} {scores[name]:.3f} < {minimum:.3f}"
-        for name, minimum in GATE.items()
-        if scores[name] < minimum
-    ]
+def gate_failures(summary: dict[str, Any]) -> list[str]:
+    failures = []
+    checked = 0
+    for (mode, group), minimum in GATE.items():
+        scores = summary.get(mode, {}).get(group)
+        if scores is None:
+            continue
+        checked += 1
+        if scores[GATE_METRIC] < minimum:
+            failures.append(f"{mode} on {group}: hit@5 {scores[GATE_METRIC]:.3f} < {minimum:.3f}")
+    return failures if checked else ["no gated mode and query set was evaluated"]
 
 
 def markdown(report: dict[str, Any]) -> str:
@@ -292,22 +304,31 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--out", type=Path, default=REPORTS)
     parser.add_argument("--embedding-model", help="instead of the configured one")
     parser.add_argument("--reranker-model", help="instead of the configured one; '' for none")
+    parser.add_argument("--candidates", type=int, help="instead of the configured number")
     parser.add_argument(
         "--modes", default=",".join(m.value for m in Mode), help="comma-separated modes to run"
     )
+    parser.add_argument("--sets", default=",".join(SETS), help="comma-separated query sets to run")
     parser.add_argument("--name", default="retrieval", help="report file name, without suffix")
     parser.add_argument("--gate", action="store_true", help="exit 1 if a gate threshold fails")
     args = parser.parse_args(argv)
 
     settings = Settings()
-    search = build_policy_search(settings, args.embedding_model, args.reranker_model)
+    search = build_policy_search(
+        settings, args.embedding_model, args.reranker_model, args.candidates
+    )
     search.check_ready()
     modes = [Mode(m) for m in args.modes.split(",")]
     if search.reranker is None and Mode.RERANKED in modes:
         modes.remove(Mode.RERANKED)
     gate_mode = Mode.RERANKED if Mode.RERANKED in modes else modes[-1]
     clauses = load_clauses()
-    queries = claim_queries(args.dataset, clauses) + question_queries(args.questions, clauses)
+    sets = args.sets.split(",")
+    queries = [
+        q
+        for q in claim_queries(args.dataset, clauses) + question_queries(args.questions, clauses)
+        if q.source in sets
+    ]
     search.search("calentamiento", None, mode=modes[0])  # load the models outside the timings
     started = time.perf_counter()
     outcomes = run(search, queries, modes)
@@ -329,11 +350,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "candidates": search.candidates,
         "corpus": corpus_version(clauses),
         "clauses": len(clauses),
-        "queries": {
-            "claims": sum(q.source == "claims" for q in queries),
-            "questions": sum(q.source == "questions" for q in queries),
-            "terms": sum(q.source == "terms" for q in queries),
-        },
+        "queries": {name: sum(q.source == name for q in queries) for name in SETS},
         "gate_mode": gate_mode.value,
         "seconds": round(time.perf_counter() - started, 1),
         "summary": summary,
@@ -356,12 +373,14 @@ def main(argv: Sequence[str] | None = None) -> None:
     text = markdown(report)
     (args.out / f"{args.name}.md").write_text(text, encoding="utf-8")
     print(text)
-    failures = gate_failures(summary, gate_mode.value)
+    failures = gate_failures(summary)
     if os.environ.get("GITHUB_ACTIONS"):
-        s = summary[gate_mode.value]["all"]
+        modes_line = "; ".join(
+            f"{mode} hit@1 {scores['all']['hit_at_1']:.1%} hit@5 {scores['all']['hit_at_5']:.1%}"
+            for mode, scores in summary.items()
+        )
         print(
-            f"::notice title=retrieval eval::{s['queries']} queries, {gate_mode.value}: "
-            f"hit@1 {s['hit_at_1']:.1%}, hit@3 {s['hit_at_3']:.1%}, MRR {s['mrr']:.3f}, "
+            f"::notice title=retrieval eval ({args.sets})::{len(queries)} queries: {modes_line}; "
             f"gate {'FAILED: ' + '; '.join(failures) if failures else 'passed'}"
         )
     if args.gate and failures:
