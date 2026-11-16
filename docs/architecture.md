@@ -9,10 +9,10 @@ later phases implement; everything else describes the code as it is.
 |---|---|---|
 | Core service | `services/core` | System of record: policies, claims, rules engine, fraud scoring, payments, audit |
 | Data generator | `data/generator` | Reproducible synthetic policies, policyholders, claims, documents and expected resolutions |
-| Agent service | `services/agents` | Document reading, ingestion and policy search (*implemented*); agents, Kafka consumers, Temporal workflows (*planned*) |
+| Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents and their coordinator (*implemented*); Kafka consumers, Temporal workflows (*planned*) |
 | MCP server | `services/mcp` | Analyst tools over the core API, guarded by the same rules (*planned*) |
 | Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject (*planned*) |
-| Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading and policy search evaluations with CI gates (*implemented*); full eval set and baseline (*planned*) |
+| Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading, policy search and end-to-end agent evaluations with CI gates (*implemented*); full eval set and baseline (*planned*) |
 
 ## Trust boundary
 
@@ -50,7 +50,7 @@ in order; the first three decide regardless of the proposal:
 | 7 | Notice within 7 days | Otherwise `LATE_NOTICE`: human review, cover unchanged |
 | 8 | Fraud score from rule and model signals | 0.4 review, 0.7 investigation |
 | 9 | Citations exist, belong to the product and include the grounding clause | Otherwise a violation |
-| 10 | Routing | `AUTO` only for consistent payments up to 3,000 EUR and requests for required documents |
+| 10 | Routing | `AUTO` only for consistent payments up to 3,000 EUR with no review request, and requests for required documents |
 
 ## Document reading
 
@@ -116,6 +116,41 @@ flowchart LR
   the expected decision, everyday questions and keyword searches; hit@k, MRR, nDCG@5 and latency
   per mode (lexical, vector, hybrid, reranked), with a hit@5 gate in CI.
 
+## Claim analysis
+
+`tramita_agents.agents` turns a claim into a proposal for the core
+([ADR 0013](decisions/0013-agents-judge-code-coordinates-escalation-only.md)). The coordinator is
+code; agents are asked only for what needs reading.
+
+```mermaid
+flowchart TD
+    V[Claim from the core<br/>description masked here,<br/>documents already masked] --> F{Guarantee included<br/>and outside the<br/>waiting period?}
+    F -- no --> RJ[Reject on the<br/>clause from the index]
+    F -- yes --> CA[Coverage agent<br/>tools: search_conditions,<br/>read_clause, own product only]
+    CA -- exclusion --> RX[Reject on the exclusion]
+    CA -- none --> D{Required<br/>documents?}
+    D -- missing --> RI[Request them]
+    D -- received --> DA[Damage agent<br/>which lines belong]
+    DA --> AM[Code: related lines + tax]
+    AM --> FA[Fraud agent<br/>signals with quoted evidence;<br/>code drops unquoted ones]
+    FA --> P[Proposal<br/>+ review requests]
+    RJ --> P
+    RX --> P
+    RI --> P
+    P --> CORE[Core rules decide,<br/>compute and route]
+```
+
+- **Loop** (`agents/loop.py`): typed read-only tools, the answer as a `submit` tool validated
+  against the output schema, errors returned to the model, a step budget and a timeout. Each
+  model turn must call a tool; recordings store every step.
+- **Escalation only**: any agent, and any document with embedded instructions, can add a review
+  request; the core then routes to a person (`REVIEW_REQUESTED`). Nothing lowers a routing.
+- **Keyless**: step responders search, take lines at face value and report no reading-based
+  signal, and always ask for review.
+- **Commands**: `make process` submits a proposal for every open claim; `make eval-agents`
+  compares the core's decisions with the expected resolutions and gates automatic settlements
+  that a person should have seen.
+
 ## Claim lifecycle
 
 Implemented in the core (`ClaimStatus`). Events and workflows around it are *planned*: Kafka will
@@ -180,7 +215,7 @@ that change state are idempotent: claims and documents by id, proposals and revi
 | `POST /api/claims` | AGENT | Register a claim |
 | `POST /api/claims/{id}/documents` | AGENT | Attach a document (file in the object store) |
 | `PUT /api/claims/{id}/documents/{doc}/extraction` | AGENT | Record extracted, masked facts |
-| `POST /api/claims/{id}/proposals` | AGENT | Submit a proposal; returns the rules evaluation, new status and any payment |
+| `POST /api/claims/{id}/proposals` | AGENT | Submit a proposal (optionally with review requests); returns the rules evaluation, new status and any payment |
 | `POST /api/claims/{id}/reviews` | REVIEWER | Approve, correct (within the guarantee limit) or reject |
 | `GET /api/claims?status=...` | any | Inbox, default pending review and under investigation |
 | `GET /api/claims/{id}` | any | Claim with documents, proposals, reviews and payment |
@@ -207,6 +242,7 @@ Every push runs: a secret scan of the full history; Python lint, strict types an
 document reading evaluation with its regression gate (fake provider); the Java build with unit,
 integration (Testcontainers PostgreSQL) and cross-check tests; the compose stack with its smoke
 test, the core against it, seeding, and an end-to-end ingest of a sample of claims checked through
-the API and the object store; the policy search index and its evaluation with a hit@5 gate; and a
-build of every pushed commit on its own. Test counts and eval headlines are published as
-annotations, and releases are created from `docs/releases/*.md`.
+the API and the object store; the policy search index and its evaluation with a hit@5 gate; every
+claim analysed by the agents with a gate on unsafe automatic settlements; and a build of every
+pushed commit on its own. Test counts and eval headlines are published as annotations, and releases
+are created from `docs/releases/*.md`.
