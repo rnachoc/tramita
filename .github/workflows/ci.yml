@@ -134,6 +134,9 @@ jobs:
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "agents end to end" deploy/compose/check-agents.sh
       - name: Publish claim events, run the workflows and signal a review through Kafka
+        env:
+          # A crash in native code (Kafka or Temporal clients) prints where it happened.
+          PYTHONFAULTHANDLER: "1"
         run: |
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "events and workflows" deploy/compose/check-workflows.sh

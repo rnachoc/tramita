@@ -113,6 +113,19 @@ def read_topic(bootstrap: str, topic: str, seconds: float) -> list[bytes]:
     return values
 
 
+async def waiting_for_review(settings: Settings, claim_id: str, seconds: float = 300) -> bool:
+    """True once the claim's workflow waits for a review; a review sent earlier would reach a
+    claim the workflow has not analysed yet, and the check would prove nothing."""
+    temporal = await Client.connect(settings.temporal_address)
+    handle = temporal.get_workflow_handle_for(ClaimWorkflow.run, workflow_id(claim_id))
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline:
+        if await handle.query(ClaimWorkflow.stage) == "waiting_review":
+            return True
+        await asyncio.sleep(2)
+    return False
+
+
 async def finished(settings: Settings, claim_id: str) -> ClaimResult:
     temporal = await Client.connect(settings.temporal_address)
     handle = temporal.get_workflow_handle_for(ClaimWorkflow.run, workflow_id(claim_id))
@@ -169,6 +182,8 @@ def main(claim_ids: list[str]) -> None:
         fail("no claim with a payment waiting for review in the sample")
     reviewed = pending[0]
     amount = core.payable(reviewed)
+    if not asyncio.run(waiting_for_review(settings, reviewed)):
+        fail(f"the workflow of {reviewed} never reached waiting_review")
     core.approve(reviewed)
     try:
         result = asyncio.run(finished(settings, reviewed))
