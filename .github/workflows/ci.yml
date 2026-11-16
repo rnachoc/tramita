@@ -129,6 +129,10 @@ jobs:
             ARGS="--modes lexical,vector,hybrid --gate --name retrieval-fast"
           .github/scripts/run-step.sh "retrieval eval (reranked)" make eval-retrieval \
             ARGS="--modes reranked --sets claims,terms --gate --name retrieval-reranked"
+      - name: Analyse every claim with the agents and gate the outcome
+        run: |
+          set -a && . ./.env && set +a
+          .github/scripts/run-step.sh "agents end to end" deploy/compose/check-agents.sh
       - name: Show service status
         if: always()
         run: make ps
