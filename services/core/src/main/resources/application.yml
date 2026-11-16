@@ -15,6 +15,13 @@ spring:
   flyway:
     schemas: core
     create-schemas: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      # Every replica acknowledges and retries cannot duplicate or reorder within a partition.
+      acks: all
+      properties:
+        enable.idempotence: true
   jackson:
     property-naming-strategy: SNAKE_CASE
     default-property-inclusion: non_null
@@ -28,6 +35,10 @@ tramita:
   catalog:
     location: classpath:catalog/catalog.yaml
     clauses: classpath:catalog/clauses.json
+  events:
+    # Publish the audit trail to Kafka (ADR 0014). Off by default so the core runs without a broker.
+    enabled: ${TRAMITA_EVENTS_ENABLED:false}
+    topic: tramita.claim-events
   security:
     # name:ROLE:key;name:ROLE:key - see .env.example. No default: an unset value rejects every call.
     api-keys: ${TRAMITA_API_KEYS:}
