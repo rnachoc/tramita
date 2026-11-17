@@ -1,29 +1,38 @@
 <section class="page">
-  <header class="bar">
+  <header class="hero">
+    <p class="eyebrow">Tramitación</p>
     <h1>Bandeja de siniestros</h1>
+    <p class="lede">
+      Los siniestros que necesitan a una persona, del incidente más antiguo al más reciente.
+    </p>
+  </header>
+
+  <div class="toolbar">
+    <nav class="tabs" aria-label="Colas">
+      @for (q of queues; track q.label; let i = $index) {
+        <button type="button" [class.active]="queue() === i" (click)="load(i)">
+          {{ q.label }}
+        </button>
+      }
+    </nav>
     <input
       type="search"
+      class="search"
       placeholder="Buscar por siniestro o póliza"
       aria-label="Buscar por siniestro o póliza"
       [value]="filter()"
       (input)="filter.set($any($event.target).value)"
     />
-  </header>
-
-  <nav class="tabs" aria-label="Colas">
-    @for (q of queues; track q.label; let i = $index) {
-      <button type="button" [class.active]="queue() === i" (click)="load(i)">{{ q.label }}</button>
-    }
-  </nav>
+  </div>
 
   @if (error()) {
     <p class="alert" role="alert">{{ error() }}</p>
   } @else if (claims() === null) {
-    <p class="muted">Cargando…</p>
+    <p class="empty">Cargando…</p>
   } @else if (shown().length === 0) {
-    <p class="muted">No hay siniestros en esta cola.</p>
+    <p class="empty">No hay siniestros en esta cola.</p>
   } @else {
-    <table class="list">
+    <table class="list rows">
       <thead>
         <tr>
           <th>Siniestro</th>
@@ -39,9 +48,9 @@
             <td>
               <a [routerLink]="['/claims', c.claim_id]">{{ c.claim_id }}</a>
             </td>
-            <td>{{ c.policy_number }}</td>
+            <td class="muted">{{ c.policy_number }}</td>
             <td>{{ coverageLabel(c.claim_type) }}</td>
-            <td>{{ c.incident_date }}</td>
+            <td class="muted">{{ c.incident_date }}</td>
             <td>
               <span class="status" [attr.data-status]="c.status">{{ statusLabel(c.status) }}</span>
             </td>
@@ -49,6 +58,6 @@
         }
       </tbody>
     </table>
-    <p class="muted">{{ shown().length }} siniestro(s)</p>
+    <p class="muted count">{{ shown().length }} siniestro(s)</p>
   }
 </section>

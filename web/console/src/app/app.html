@@ -1,8 +1,14 @@
 <header class="top">
-  <a routerLink="/" class="brand">Tramita · Aseguradora Brisa</a>
-  <span class="muted">
-    Consola de tramitación{{ reviewer.name() ? ' · ' + reviewer.name() : '' }} · datos sintéticos
-  </span>
+  <div class="top-inner">
+    <a routerLink="/" class="brand"><span class="brand-mark" aria-hidden="true">T</span>Tramita</a>
+    <span class="top-meta">
+      Aseguradora Brisa · Consola de tramitación{{ reviewer.name() ? ' · ' + reviewer.name() : '' }}
+    </span>
+    <span class="pill">Datos sintéticos</span>
+    <button type="button" class="ghost" (click)="toggleTheme()">
+      {{ theme() === 'dark' ? 'Tema claro' : 'Tema oscuro' }}
+    </button>
+  </div>
 </header>
 <main>
   <router-outlet />
