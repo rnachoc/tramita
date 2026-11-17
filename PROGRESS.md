@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 9: full evaluation** (next). Phases 0 to 8 are complete.
+**Phase 10: observability and cost** (next). Phases 0 to 9 are complete.
 
 ## Phase status
 
@@ -20,7 +20,7 @@ resuming work, read this file first.
 | 6 | Events and long-running processes | done | v0.7.0 |
 | 7 | Review console (Angular) | done | v0.8.0 |
 | 8 | MCP server | done | v0.9.0 |
-| 9 | Full evaluation | pending | |
+| 9 | Full evaluation | done | v0.10.0 |
 | 10 | Observability and cost | pending | |
 | 11 | Kubernetes | pending | |
 | 12 | Wrap-up | pending | |
@@ -177,7 +177,22 @@ resuming work, read this file first.
   commands that use Temporal now end without finalisation once their work is done and flushed.
 - Tests: 221 Python, 53 Java, 12 console unit and 3 end-to-end.
 
+## Phase 9: done
+
+- End-to-end evaluation extended with fraud (where planted fraud ends: 12 of 18 investigated,
+  6 reviewed, 0 automatic; 0 of 6 decoys investigated; fraud score equal to the expected in 96%)
+  and planted instructions (decision 90%, no unsafe settlement). The gate fails on any planted
+  fraud settled automatically.
+- `evals/baseline.json` and `make scorecard`: every headline number of document reading, policy
+  search and the agents, per provider, with direction and tolerance (zero for counts of harm).
+  Runs of another provider are reported, never failed. CI writes a scorecard after each
+  evaluation (ADR 0017).
+- Tests: 229 Python, 53 Java, 12 console unit and 3 end-to-end.
+
 ## Open issues and notes
+
+- **The baseline is keyless**: it measures the deterministic parts and the rule-based baselines;
+  a real-model run will need its own baseline, recorded with `make scorecard ARGS=--update`.
 
 - **MCP users share one identity** (the server's ANALYST client); per-user tokens need OIDC.
 

@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 8 (MCP server)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 9 (full evaluation)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -95,6 +95,7 @@ make index                # index the policy conditions (OpenSearch + pgvector; 
 make eval-retrieval       # policy search report: lexical, vector, hybrid and reranked (a few minutes on CPU)
 make process              # analyse every open claim with the agents and submit proposals to the core
 make eval-agents          # end-to-end report: what the core decided against the expected resolutions
+make scorecard            # every evaluation against the committed baseline (evals/baseline.json)
 make worker               # Temporal worker for the claim workflows (another terminal)
 make bridge               # claim events on Kafka -> workflow signals (core with TRAMITA_EVENTS_ENABLED=true)
 make start-claims         # one durable workflow per ingested claim
@@ -172,6 +173,26 @@ Hit@5 (the answer among the five clauses an agent reads) on 432 queries (`make e
 Each first stage has a blind spot; the reranked hybrid is the only option without one, at about
 1.5 s per query on CPU. The queries are synthetic and written by the project's author, so these
 numbers compare options rather than predict production accuracy.
+
+## Evaluation
+
+Every quality claim in this README comes from an evaluation against ground truth derived from
+the generated facts, and CI compares each headline number with a committed baseline: counts of
+harm (personal data leaked, wrong facts sent to the rules, claims settled without the person
+they needed, planted fraud settled automatically) must stay at zero, and scores may only drift
+within a small tolerance. Today's baseline is keyless, so it measures the deterministic parts and
+the baselines, not a model. End to end, without a key:
+
+| Measure | Result |
+|---|---|
+| Decision correct, scored on the merits | 96.2% |
+| Claims settled automatically that a person should have seen | 0 |
+| Planted fraud to investigation / review / automatic | 12 / 6 / 0 of 18 |
+| Decoys sent to investigation | 0 of 6 |
+| Fraud score equal to the expected one | 96.0% |
+| Personal values reaching a model, a redacted scan or the core | 0 of 1,044 |
+
+See [ADR 0017](docs/decisions/0017-evaluation-baseline-and-scorecard.md).
 
 ## Agents
 
