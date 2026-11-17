@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 10 (observability and cost)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 11 (Kubernetes)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -72,7 +72,7 @@ in [docs/decisions](docs/decisions).
 | Review console | Angular 22, TypeScript, Vitest, Playwright, nginx |
 | Tool access for analysts | MCP server (official Python SDK) |
 | Observability | OpenTelemetry (GenAI semantic conventions), Micrometer, OTel Collector, Jaeger, Prometheus, Grafana |
-| Infrastructure | Docker Compose, Helm + kind, GitHub Actions |
+| Infrastructure | Docker Compose, Helm + kind (network policies, hardened pods), GitHub Actions |
 
 ## Quick start
 
@@ -175,6 +175,20 @@ Hit@5 (the answer among the five clauses an agent reads) on 432 queries (`make e
 Each first stage has a blind spot; the reranked hybrid is the only option without one, at about
 1.5 s per query on CPU. The queries are synthetic and written by the project's author, so these
 numbers compare options rather than predict production accuracy.
+
+## Kubernetes
+
+A Helm chart (`deploy/helm/tramita`) runs the core, the agents, the review console and,
+optionally, single-replica infrastructure with the same images as Compose. Pods run as non-root
+with a read-only root file system and no capabilities, secrets are generated at install time,
+and network policies deny ingress by default. `helm test` analyses a sample of claims inside the
+cluster and checks that a pod with no role reaches only the console; CI runs it on kind. See
+[ADR 0019](docs/decisions/0019-kubernetes-helm-chart-tested-in-kind.md).
+
+```bash
+kind create cluster --name tramita
+deploy/helm/check-kind.sh        # build and load the images, install the chart, run helm test
+```
 
 ## Observability and cost
 

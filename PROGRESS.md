@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 11: Kubernetes** (next). Phases 0 to 10 are complete.
+**Phase 12: wrap-up** (next). Phases 0 to 11 are complete.
 
 ## Phase status
 
@@ -22,7 +22,7 @@ resuming work, read this file first.
 | 8 | MCP server | done | v0.9.0 |
 | 9 | Full evaluation | done | v0.10.0 |
 | 10 | Observability and cost | done | v0.11.0 |
-| 11 | Kubernetes | pending | |
+| 11 | Kubernetes | done | v0.12.0 |
 | 12 | Wrap-up | pending | |
 
 ## Phase 0: done
@@ -204,7 +204,21 @@ resuming work, read this file first.
   CI processes the claims with telemetry on and checks Jaeger and Prometheus.
 - Tests: 235 Python, 54 Java.
 
+## Phase 11: done
+
+- Container images for the core and the agents: multi-stage, non-root, read-only root.
+- Helm chart `deploy/helm/tramita`: core, agents' API, worker and bridge, console, index job and
+  optional single-replica infrastructure (PostgreSQL + pgvector, Kafka, OpenSearch, RustFS,
+  Temporal). Hardened pods, install-time secrets kept on upgrade, deny-by-default ingress with
+  per-component rules (ADR 0019).
+- `helm test`: claims analysed end to end inside the cluster; an outsider pod reaches only the
+  console. Verified on kind locally (Kubernetes 1.37); CI lints, validates with kubeconform and
+  runs the tests on kind.
+
 ## Open issues and notes
+
+- **The chart's infrastructure is development-grade**: single replica, no backups, OpenSearch
+  security plugin off; production would use managed services. No ingress, TLS or OIDC.
 
 - **No real cost numbers**: keyless runs use no tokens, and model prices are configuration.
 
