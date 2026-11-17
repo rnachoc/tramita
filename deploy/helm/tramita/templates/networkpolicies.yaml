@@ -1,0 +1,63 @@
+{{- if .Values.networkPolicies.enabled }}
+{{- $root := . -}}
+{{- /*
+Ingress is denied to every Tramita pod, then allowed per component from the components that
+need it (ADR 0019); "e2e" is the `helm test` pod. Pods outside the release reach the core only if labelled
+tramita.io/core-client=true, which is how operators run one-off commands. Egress stays open: the
+index job downloads the search models, and the agents may call the model provider.
+*/}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "tramita.fullname" . }}-default-deny
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  policyTypes: ["Ingress"]
+{{- $rules := dict
+  "core" (list "agents-api" "worker" "console" "e2e")
+  "postgres" (list "core" "agents-api" "worker" "index" "temporal" "e2e")
+  "opensearch" (list "agents-api" "worker" "index" "e2e")
+  "object-store" (list "agents-api" "worker" "e2e")
+  "kafka" (list "core" "bridge")
+  "temporal" (list "agents-api" "worker" "bridge")
+}}
+{{- range $target, $sources := $rules }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "tramita.fullname" $root }}-allow-{{ $target }}
+  labels: {{- include "tramita.labels" $root | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels: {{- include "tramita.selector" (dict "root" $root "component" $target) | nindent 6 }}
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        {{- range $sources }}
+        - podSelector:
+            matchLabels: {{- include "tramita.selector" (dict "root" $root "component" .) | nindent 14 }}
+        {{- end }}
+        {{- if eq $target "core" }}
+        - podSelector:
+            matchLabels:
+              tramita.io/core-client: "true"
+        {{- end }}
+{{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "tramita.fullname" . }}-allow-console
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels: {{- include "tramita.selector" (dict "root" . "component" "console") | nindent 6 }}
+  policyTypes: ["Ingress"]
+  ingress:
+    - ports:
+        - {port: 8080}
+{{- end }}

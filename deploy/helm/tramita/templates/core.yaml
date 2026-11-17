@@ -1,0 +1,64 @@
+{{- $c := dict "root" . "component" "core" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tramita.name" $c }}
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+    app.kubernetes.io/component: core
+spec:
+  replicas: {{ .Values.core.replicas }}
+  selector:
+    matchLabels: {{- include "tramita.selector" $c | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "tramita.selector" $c | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      {{- include "tramita.podSecurity" dict | nindent 6 }}
+      containers:
+        - name: core
+          image: {{ .Values.images.core }}
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          {{- include "tramita.containerSecurity" . | nindent 10 }}
+          ports:
+            - {name: http, containerPort: 8080}
+          env:
+            - name: POSTGRES_HOST
+              value: {{ include "tramita.name" (dict "root" . "component" "postgres") }}
+            - name: POSTGRES_PASSWORD
+              valueFrom: {secretKeyRef: {name: {{ include "tramita.fullname" . }}-secrets, key: postgres-password}}
+            - name: TRAMITA_API_KEYS
+              valueFrom: {secretKeyRef: {name: {{ include "tramita.fullname" . }}-secrets, key: api-keys}}
+            - name: TRAMITA_EVENTS_ENABLED
+              value: {{ .Values.core.events | quote }}
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ include "tramita.name" (dict "root" . "component" "kafka") }}:9092
+            {{- if .Values.otlpEndpoint }}
+            - name: MANAGEMENT_OTLP_TRACING_ENDPOINT
+              value: {{ printf "%s/v1/traces" .Values.otlpEndpoint | quote }}
+            {{- end }}
+          startupProbe:
+            httpGet: {path: /actuator/health/liveness, port: http}
+            periodSeconds: 5
+            failureThreshold: 60
+          livenessProbe:
+            httpGet: {path: /actuator/health/liveness, port: http}
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: {path: /actuator/health/readiness, port: http}
+            periodSeconds: 5
+          resources: {{- toYaml .Values.core.resources | nindent 12 }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tramita.name" $c }}
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+spec:
+  selector: {{- include "tramita.selector" $c | nindent 4 }}
+  ports:
+    - {name: http, port: 8080, targetPort: http}

@@ -1,0 +1,105 @@
+{{- $root := . -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "tramita.fullname" . }}-models
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  {{- with .Values.infrastructure.storageClass }}
+  storageClassName: {{ . }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.agents.modelsStorage }}
+---
+{{- /* Indexes the policy conditions once (downloading the search models into the shared volume). */}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "tramita.fullname" . }}-index
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+    app.kubernetes.io/component: index
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: index
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      {{- include "tramita.podSecurity" dict | nindent 6 }}
+      containers:
+        - name: index
+          image: {{ .Values.images.agents }}
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          {{- include "tramita.containerSecurity" . | nindent 10 }}
+          command: ["tramita-index-policies"]
+          env: {{- include "tramita.agentsEnv" . | nindent 12 }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: models, mountPath: /models}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+        - {name: models, persistentVolumeClaim: {claimName: {{ include "tramita.fullname" . }}-models}}
+{{- range $name, $spec := dict "agents-api" (dict "command" (list "uvicorn" "tramita_agents.app:app" "--host" "0.0.0.0" "--port" "8000") "values" .Values.agents.api "enabled" true "port" true) "worker" (dict "command" (list "tramita-worker") "values" .Values.agents.worker "enabled" .Values.agents.worker.enabled "port" false) "bridge" (dict "command" (list "tramita-bridge") "values" .Values.agents.bridge "enabled" .Values.agents.bridge.enabled "port" false) }}
+{{- if $spec.enabled }}
+{{- $c := dict "root" $root "component" $name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tramita.name" $c }}
+  labels: {{- include "tramita.labels" $root | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  replicas: {{ $spec.values.replicas | default 1 }}
+  selector:
+    matchLabels: {{- include "tramita.selector" $c | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "tramita.selector" $c | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      {{- include "tramita.podSecurity" dict | nindent 6 }}
+      containers:
+        - name: {{ $name }}
+          image: {{ $root.Values.images.agents }}
+          imagePullPolicy: {{ $root.Values.images.pullPolicy }}
+          {{- include "tramita.containerSecurity" $root | nindent 10 }}
+          command: {{ toJson $spec.command }}
+          env: {{- include "tramita.agentsEnv" $root | nindent 12 }}
+          {{- if $spec.port }}
+          ports:
+            - {name: http, containerPort: 8000}
+          readinessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+            failureThreshold: 6
+          {{- end }}
+          resources: {{- toYaml $spec.values.resources | nindent 12 }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: models, mountPath: /models}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+        - {name: models, persistentVolumeClaim: {claimName: {{ include "tramita.fullname" $root }}-models}}
+{{- if $spec.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tramita.name" $c }}
+  labels: {{- include "tramita.labels" $root | nindent 4 }}
+spec:
+  selector: {{- include "tramita.selector" $c | nindent 4 }}
+  ports:
+    - {name: http, port: 8000, targetPort: http}
+{{- end }}
+{{- end }}
+{{- end }}

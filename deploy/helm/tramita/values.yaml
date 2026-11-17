@@ -1,0 +1,72 @@
+# Tramita Helm chart (ADR 0019). Secrets are generated at install time and kept on upgrade;
+# none is in this file or in the repository.
+
+images:
+  core: tramita-core:dev
+  agents: tramita-agents:dev
+  console: tramita-console:dev
+  pullPolicy: IfNotPresent
+
+# Development-grade single-replica infrastructure, the same images as Docker Compose. Turn it off
+# and point the services at managed equivalents in production.
+infrastructure:
+  enabled: true
+  storageClass: ""   # the cluster default
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg17-trixie
+    storage: 2Gi
+  kafka:
+    image: apache/kafka:4.2.2
+  opensearch:
+    image: opensearchproject/opensearch:3.9.0
+    storage: 2Gi
+    heap: 512m
+  objectStore:
+    image: rustfs/rustfs:1.0.3
+    storage: 2Gi
+  temporal:
+    image: temporalio/auto-setup:1.29.7
+
+core:
+  replicas: 1
+  # Publish the audit trail to Kafka (ADR 0014).
+  events: true
+  resources:
+    requests: {cpu: 250m, memory: 512Mi}
+    limits: {memory: 1Gi}
+
+agents:
+  api:
+    replicas: 1
+    resources:
+      requests: {cpu: 250m, memory: 1Gi}
+      limits: {memory: 3Gi}
+  worker:
+    enabled: true
+    resources:
+      requests: {cpu: 250m, memory: 1Gi}
+      limits: {memory: 3Gi}
+  bridge:
+    enabled: true
+    resources:
+      requests: {cpu: 50m, memory: 256Mi}
+      limits: {memory: 512Mi}
+  # Downloaded once by the index job and shared by the pods on the node (ReadWriteOnce).
+  modelsStorage: 3Gi
+  embeddingModel: jinaai/jina-embeddings-v2-base-es
+  rerankerModel: BAAI/bge-reranker-v2-m3-int8
+  # Empty: the deterministic fake model (ADR 0005). Set the name of a Secret with key
+  # ANTHROPIC_API_KEY to use Claude.
+  anthropicSecret: ""
+
+console:
+  enabled: true
+  service:
+    type: ClusterIP
+    port: 8080
+
+networkPolicies:
+  enabled: true
+
+# Export traces and metrics to an OTLP endpoint (ADR 0018); empty turns it off.
+otlpEndpoint: ""

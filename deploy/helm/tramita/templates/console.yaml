@@ -1,0 +1,56 @@
+{{- if .Values.console.enabled }}
+{{- $c := dict "root" . "component" "console" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tramita.name" $c }}
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{- include "tramita.selector" $c | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "tramita.selector" $c | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      {{- include "tramita.podSecurity" (dict "uid" 101) | nindent 6 }}
+      containers:
+        - name: console
+          image: {{ .Values.images.console }}
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          {{- include "tramita.containerSecurity" . | nindent 10 }}
+          ports:
+            - {name: http, containerPort: 8080}
+          env:
+            # nginx adds the REVIEWER key on its way to the core; the browser never holds it.
+            - name: TRAMITA_CONSOLE_CORE_URL
+              value: http://{{ include "tramita.name" (dict "root" . "component" "core") }}:8080
+            - name: TRAMITA_CONSOLE_API_KEY
+              valueFrom: {secretKeyRef: {name: {{ include "tramita.fullname" . }}-secrets, key: console-key}}
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 5
+          resources:
+            requests: {cpu: 20m, memory: 32Mi}
+            limits: {memory: 128Mi}
+          volumeMounts:
+            # The image renders its config at start-up: the only writable paths.
+            - {name: tmp, mountPath: /tmp}
+            - {name: conf, mountPath: /etc/nginx/conf.d}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+        - {name: conf, emptyDir: {}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tramita.name" $c }}
+  labels: {{- include "tramita.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.console.service.type }}
+  selector: {{- include "tramita.selector" $c | nindent 4 }}
+  ports:
+    - {name: http, port: {{ .Values.console.service.port }}, targetPort: http}
+{{- end }}

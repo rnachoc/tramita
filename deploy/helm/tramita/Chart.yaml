@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tramita
+description: Tramita on Kubernetes - core, agents, review console and (optionally) their infrastructure.
+type: application
+version: 0.12.0
+appVersion: "0.12.0"

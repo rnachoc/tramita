@@ -62,7 +62,8 @@ services:
       bootstrap.memory_lock: "false"
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
       # Local development only: the security plugin is disabled so the stack
-      # starts without TLS certificates. The Helm chart keeps it enabled.
+      # starts without TLS certificates. The Helm chart disables it as well and lets only the
+      # agent pods reach OpenSearch through network policies (ADR 0019).
       DISABLE_SECURITY_PLUGIN: "true"
       DISABLE_INSTALL_DEMO_CONFIG: "true"
     ports:

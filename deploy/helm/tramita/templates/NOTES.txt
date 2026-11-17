@@ -1,0 +1,10 @@
+Tramita is installed as release {{ .Release.Name }}.
+
+Wait for the policy search index:
+  kubectl wait --for=condition=complete job/{{ include "tramita.fullname" . }}-index --timeout=20m
+
+Open the review console:
+  kubectl port-forward svc/{{ include "tramita.name" (dict "root" . "component" "console") }} 8080:{{ .Values.console.service.port }}
+
+API keys were generated at install time; read one with:
+  kubectl get secret {{ include "tramita.fullname" . }}-secrets -o jsonpath='{.data.analyst-key}' | base64 -d
