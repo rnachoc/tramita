@@ -65,6 +65,20 @@
       <artifactId>jackson-dataformat-yaml</artifactId>
     </dependency>
 
+    <!-- Traces over OTLP (joined with the agents' spans by traceparent) and Prometheus metrics. -->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-tracing-bridge-otel</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-otlp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Publishes the audit trail to Kafka as the public record of claim events (ADR 0014). -->
     <dependency>
       <groupId>org.springframework.kafka</groupId>

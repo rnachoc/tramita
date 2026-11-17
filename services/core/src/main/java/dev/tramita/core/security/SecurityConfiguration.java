@@ -46,7 +46,8 @@ public class SecurityConfiguration {
                 // dispatch that carries no API key; without this it would turn every 403 into 401.
                 auth.dispatcherTypeMatchers(DispatcherType.ERROR)
                     .permitAll()
-                    .requestMatchers("/actuator/health/**", "/actuator/info")
+                    .requestMatchers(
+                        "/actuator/health/**", "/actuator/info", "/actuator/prometheus")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/import/**")
                     .hasRole(ADMIN)

@@ -13,6 +13,7 @@ import dev.tramita.core.rules.Evaluation;
 import dev.tramita.core.rules.RulesEngine;
 import dev.tramita.core.rules.Violation;
 import dev.tramita.core.web.ConflictException;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ public class ProposalService {
   private final PaymentService payments;
   private final AuditService audit;
   private final Clock clock;
+  private final MeterRegistry metrics;
 
   public ProposalService(
       ProposalRepository proposals,
@@ -45,7 +47,8 @@ public class ProposalService {
       RulesEngine rules,
       PaymentService payments,
       AuditService audit,
-      Clock clock) {
+      Clock clock,
+      MeterRegistry metrics) {
     this.proposals = proposals;
     this.claims = claims;
     this.facts = facts;
@@ -53,6 +56,7 @@ public class ProposalService {
     this.payments = payments;
     this.audit = audit;
     this.clock = clock;
+    this.metrics = metrics;
   }
 
   /** The outcome of a submission: the checked proposal, the new claim status and any payment. */
@@ -103,6 +107,16 @@ public class ProposalService {
                 evaluation));
     claim.moveTo(nextStatus(evaluation), now);
     audit.record(claimId, "PROPOSAL_EVALUATED", details(record, evaluation));
+    metrics
+        .counter(
+            "tramita.proposals",
+            "decision",
+            evaluation.decision().name(),
+            "routing",
+            evaluation.routing().name(),
+            "corrected",
+            String.valueOf(!evaluation.violations().isEmpty()))
+        .increment();
 
     Optional<Payment> payment = Optional.empty();
     if (evaluation.canExecuteAutomatically()

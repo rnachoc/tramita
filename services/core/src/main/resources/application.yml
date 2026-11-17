@@ -47,7 +47,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
+  tracing:
+    sampling:
+      probability: 1.0
+  # Spans are exported only when MANAGEMENT_OTLP_TRACING_ENDPOINT is set (ADR 0018).
   endpoint:
     health:
       probes:
