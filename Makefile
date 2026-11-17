@@ -106,6 +106,15 @@ process: ## Analyse the open claims with the agents and submit proposals to a ru
 eval-agents: ## Evaluate the agents end to end against the expected resolutions (after `make process`)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-eval-agents $(ARGS)
 
+.PHONY: demo eval
+demo: ## The whole pipeline without credentials: stack, data, index, core, ingest, agents, scores
+	deploy/compose/demo.sh
+
+eval: eval-extraction eval-agents ## Every evaluation, then the comparison with evals/baseline.json (after `make demo`)
+	$(MAKE) eval-retrieval ARGS="--modes lexical,vector,hybrid --name retrieval-fast"
+	$(MAKE) eval-retrieval ARGS="--modes reranked --sets claims,terms --name retrieval-reranked"
+	uv run tramita-eval-baseline
+
 # --- Review console (Angular) ---------------------------------------------------------
 .PHONY: console-install console-test console-build console-up console-e2e
 console-install: ## Install the console's dependencies (npm ci)

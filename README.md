@@ -83,6 +83,13 @@ Node.js 22 for the console,
 [gitleaks](https://github.com/gitleaks/gitleaks#installing) for the pre-commit hook.
 
 ```bash
+make demo                 # everything below up to the agents' report, in one go and without credentials
+make eval                 # every evaluation and the comparison with the baseline (after `make demo`)
+```
+
+Or step by step:
+
+```bash
 cp .env.example .env      # local-only placeholder values, including the core API keys
 make up                   # start Postgres+pgvector, Kafka, OpenSearch, RustFS and Temporal
 make smoke                # send every service a real request
