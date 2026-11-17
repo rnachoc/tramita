@@ -147,12 +147,20 @@ jobs:
             ARGS="--modes reranked --sets claims,terms --gate --name retrieval-reranked"
           .github/scripts/run-step.sh "scorecard retrieval" make scorecard \
             ARGS="--sections retrieval-fast,retrieval-reranked --name scorecard-retrieval"
+      - name: Start the observability stack
+        run: .github/scripts/run-step.sh "observability up" make obs-up
       - name: Analyse every claim with the agents and gate the outcome
+        env:
+          # Traces and metrics from the agents and the core go to the collector.
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4318
+          MANAGEMENT_OTLP_TRACING_ENDPOINT: http://localhost:4318/v1/traces
         run: |
           set -a && . ./.env && set +a
           .github/scripts/run-step.sh "agents end to end" deploy/compose/check-agents.sh
           .github/scripts/run-step.sh "scorecard agents" make scorecard \
             ARGS="--sections agents --name scorecard-agents"
+      - name: Check the traces and metrics of the claims just analysed
+        run: .github/scripts/run-step.sh "observability" uv run python deploy/compose/check-observability.py
       - name: Publish claim events, run the workflows and signal a review through Kafka
         env:
           # A crash in native code (Kafka or Temporal clients) prints where it happened.

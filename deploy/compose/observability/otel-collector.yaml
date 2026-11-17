@@ -27,6 +27,8 @@ exporters:
       insecure: true
   prometheus:
     endpoint: 0.0.0.0:8889
+    # Batch commands (ingest, process) stop sending when they end; keep their series an hour.
+    metric_expiration: 1h
     resource_to_telemetry_conversion:
       enabled: true
 
