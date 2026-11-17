@@ -9,7 +9,7 @@ later phases implement; everything else describes the code as it is.
 |---|---|---|
 | Core service | `services/core` | System of record: policies, claims, rules engine, fraud scoring, payments, audit |
 | Data generator | `data/generator` | Reproducible synthetic policies, policyholders, claims, documents and expected resolutions |
-| Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents, claim event consumers and the per-claim Temporal workflows |
+| Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents, claim event consumers, the per-claim Temporal workflows and their telemetry |
 | MCP server | `services/mcp` | Read-only analyst tools over the core, results masked for the model |
 | Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject, behind a key-holding proxy |
 | Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading, policy search and end-to-end evaluations, compared with a committed baseline |
@@ -247,6 +247,32 @@ scorecard that compares their headline numbers with `evals/baseline.json`
 Counts of harm have zero tolerance; scores that drift across CPUs have a small one. Runs of
 another provider are reported next to the baseline, never failed against it.
 
+## Observability and cost
+
+OpenTelemetry end to end, with no content in any span or metric
+([ADR 0018](decisions/0018-observability-genai-traces-without-content.md)).
+
+```mermaid
+flowchart LR
+    A[Agents<br/>GenAI spans + metrics] -- OTLP --> C[OTel collector<br/>drops content attributes]
+    K[Core<br/>Micrometer + OTel bridge] -- OTLP --> C
+    A -- traceparent --> K
+    C --> J[Jaeger<br/>traces]
+    C --> P[Prometheus<br/>metrics]
+    K -- /actuator/prometheus --> P
+    J --> G[Grafana<br/>Tramita overview]
+    P --> G
+```
+
+- **One trace per claim**: `process_claim` > `analyse_claim` > `invoke_agent` > `chat` /
+  `execute_tool` > `policy_search`, joined by the core's request spans.
+- **Metrics**: model call duration and tokens by task and model (GenAI conventions), stage
+  durations, claims by routing, the rules' outcomes, core request latency by URI template.
+- **Cost**: `make cost-report` sums model calls, tokens and time per agent and claim, and dollars
+  for models with a configured price.
+- **Commands**: `make obs-up` (Jaeger :16686, Prometheus :9090, Grafana :3000); set
+  `OTEL_EXPORTER_OTLP_ENDPOINT` and `MANAGEMENT_OTLP_TRACING_ENDPOINT` to export.
+
 ## Claim lifecycle
 
 Implemented in the core (`ClaimStatus`) and followed by the claim workflow above.
@@ -329,6 +355,7 @@ and waits until every health check passes; `make smoke` then sends each service 
 | object-store | `rustfs/rustfs:1.0.3` | S3-compatible storage for claim documents |
 | temporal | `temporalio/auto-setup:1.29.7` | Durable per-claim workflows (task queue `claims`) |
 | temporal-ui | `temporalio/ui:2.56.0` | Workflow inspection |
+| otel-collector, jaeger, prometheus, grafana (profile) | `otel/opentelemetry-collector-contrib:0.165.0`, `jaegertracing/jaeger:2.23.0`, `prom/prometheus:v3.16.0`, `grafana/grafana:13.3.1` | Traces and metrics (`make obs-up`) |
 | console (profile) | built from `web/console/Dockerfile` | Review console behind nginx, proxying `/api` to the core |
 
 ## Continuous integration
