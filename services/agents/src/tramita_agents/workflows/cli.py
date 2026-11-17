@@ -28,6 +28,7 @@ from temporalio.exceptions import WorkflowAlreadyStartedError
 from temporalio.service import RPCError, RPCStatusCode
 from temporalio.worker import Worker
 
+from tramita_agents import telemetry
 from tramita_agents.events.contracts import ClaimEvent, EventType
 from tramita_agents.settings import REPO_ROOT, Settings
 from tramita_agents.workflows.claim import TASK_QUEUE, ClaimInput, ClaimWorkflow, workflow_id
@@ -60,6 +61,8 @@ def worker_main(argv: Sequence[str] | None = None) -> None:
 
     # Only the worker loads the agents, the models and the search.
     from tramita_agents.workflows.activities import analyse_claim, claim_state  # noqa: PLC0415
+
+    telemetry.configure("tramita-worker")
 
     async def run() -> None:
         client = await Client.connect(Settings().temporal_address)
@@ -134,6 +137,7 @@ def bridge_main(argv: Sequence[str] | None = None) -> None:
     # Only the bridge loads the Kafka client.
     from tramita_agents.events.consumer import EventConsumer, connect  # noqa: PLC0415
 
+    telemetry.configure("tramita-bridge")
     settings = Settings()
     loop = asyncio.new_event_loop()
     client = loop.run_until_complete(Client.connect(settings.temporal_address))

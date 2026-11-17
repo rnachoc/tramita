@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from tramita_agents import telemetry
 from tramita_agents.core_client import CoreClient, role_key
 from tramita_agents.documents.payload import extraction_payload
 from tramita_agents.documents.pii import Pseudonymizer
@@ -140,6 +141,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--claims", help="comma-separated claim ids (default: all)")
     parser.add_argument("--limit", type=int, help="ingest only the first N claims")
     args = parser.parse_args(argv)
+    telemetry.configure("tramita-agents")
 
     settings = Settings()
     if settings.tramita_api_keys is None:
@@ -161,6 +163,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             for outcome in ingestor.claim(form, args.dataset):
                 print(outcome.line())
                 failures += outcome.error is not None
+    telemetry.shutdown()
     if failures:
         print(f"{failures} documents could not be read", file=sys.stderr)
         raise SystemExit(1)

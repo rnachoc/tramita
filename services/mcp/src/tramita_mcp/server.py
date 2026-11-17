@@ -17,6 +17,7 @@ from typing import Any, Literal, Protocol
 from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
 
+from tramita_agents import telemetry
 from tramita_agents.agents.catalog import catalog
 from tramita_agents.search.corpus import Clause
 from tramita_agents.settings import REPO_ROOT, Settings
@@ -179,6 +180,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     args = parser.parse_args(argv)
     # Request lines on stderr are noise for a desktop client; warnings still show.
     logging.getLogger("httpx").setLevel(logging.WARNING)
+    telemetry.configure("tramita-mcp")
     settings = Settings()
     if settings.tramita_api_keys is None:
         raise SystemExit("TRAMITA_API_KEYS is not set (see .env.example).")

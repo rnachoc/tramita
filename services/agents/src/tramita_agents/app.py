@@ -7,11 +7,13 @@ from typing import Annotated, Literal
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from tramita_agents import telemetry
 from tramita_agents.search.factory import build_policy_search
 from tramita_agents.search.lexical import SearchBackendError
 from tramita_agents.search.service import MAX_QUERY_CHARS, Mode, PolicySearch
 from tramita_agents.settings import ModelProvider, Settings, get_settings
 
+telemetry.configure("tramita-agents-api")
 app = FastAPI(title="Tramita agents", version="0.1.0")
 
 
