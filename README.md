@@ -10,7 +10,7 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 9 (full evaluation)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
+> Status: **Phase 10 (observability and cost)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
 > done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
@@ -71,7 +71,7 @@ in [docs/decisions](docs/decisions).
 | Personal data | Microsoft Presidio (Spanish) |
 | Review console | Angular 22, TypeScript, Vitest, Playwright, nginx |
 | Tool access for analysts | MCP server (official Python SDK) |
-| Observability | OpenTelemetry (GenAI semantic conventions), Tempo/Jaeger, Prometheus, Grafana |
+| Observability | OpenTelemetry (GenAI semantic conventions), Micrometer, OTel Collector, Jaeger, Prometheus, Grafana |
 | Infrastructure | Docker Compose, Helm + kind, GitHub Actions |
 
 ## Quick start
@@ -96,6 +96,8 @@ make eval-retrieval       # policy search report: lexical, vector, hybrid and re
 make process              # analyse every open claim with the agents and submit proposals to the core
 make eval-agents          # end-to-end report: what the core decided against the expected resolutions
 make scorecard            # every evaluation against the committed baseline (evals/baseline.json)
+make obs-up               # Jaeger :16686, Prometheus :9090, Grafana :3000 (set the OTLP endpoints in .env)
+make cost-report          # model calls, tokens, time and (when priced) dollars per claim and agent
 make worker               # Temporal worker for the claim workflows (another terminal)
 make bridge               # claim events on Kafka -> workflow signals (core with TRAMITA_EVENTS_ENABLED=true)
 make start-claims         # one durable workflow per ingested claim
@@ -173,6 +175,17 @@ Hit@5 (the answer among the five clauses an agent reads) on 432 queries (`make e
 Each first stage has a blind spot; the reranked hybrid is the only option without one, at about
 1.5 s per query on CPU. The queries are synthetic and written by the project's author, so these
 numbers compare options rather than predict production accuracy.
+
+## Observability and cost
+
+Every claim is one OpenTelemetry trace across the agents and the core: the claim, each agent,
+each model call with its model and tokens (GenAI semantic conventions), each tool call, each
+search stage and the core's requests. Metrics cover model latency and tokens, stage durations,
+routing and the rules' outcomes, and a provisioned Grafana dashboard shows them. Telemetry
+carries identifiers, counts and timings, never text: CI processes the claims with telemetry on
+and finds none of the ground truth's personal values in any span. `make cost-report` turns
+tokens into dollars only for models whose price you configure. See
+[ADR 0018](docs/decisions/0018-observability-genai-traces-without-content.md).
 
 ## Evaluation
 

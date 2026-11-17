@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 10: observability and cost** (next). Phases 0 to 9 are complete.
+**Phase 11: Kubernetes** (next). Phases 0 to 10 are complete.
 
 ## Phase status
 
@@ -21,7 +21,7 @@ resuming work, read this file first.
 | 7 | Review console (Angular) | done | v0.8.0 |
 | 8 | MCP server | done | v0.9.0 |
 | 9 | Full evaluation | done | v0.10.0 |
-| 10 | Observability and cost | pending | |
+| 10 | Observability and cost | done | v0.11.0 |
 | 11 | Kubernetes | pending | |
 | 12 | Wrap-up | pending | |
 
@@ -189,7 +189,24 @@ resuming work, read this file first.
   evaluation (ADR 0017).
 - Tests: 229 Python, 53 Java, 12 console unit and 3 end-to-end.
 
+## Phase 10: done
+
+- OpenTelemetry in the agents with the GenAI conventions: spans per claim, agent, model call
+  (provider, model, tokens), tool call, search stage and document; metrics for model duration and
+  tokens (conventions' buckets), stage durations and claims by routing. No text in any span.
+- Core: Micrometer tracing with the OpenTelemetry bridge, joined to the agents' traces by
+  `traceparent`; Prometheus metrics including `tramita.proposals` by decision and routing.
+- Compose profile `observability`: OTel collector (drops content attributes), Jaeger, Prometheus
+  and a provisioned Grafana dashboard (`make obs-up`).
+- `make cost-report`: calls, tokens, time and, for priced models, dollars per agent and claim.
+- Verified: every processed claim is one trace with agents and core; 0 of 1,800 personal values
+  in the traces; histogram buckets fixed after Grafana showed keyless calls at ~4.75 s (ADR 0018).
+  CI processes the claims with telemetry on and checks Jaeger and Prometheus.
+- Tests: 235 Python, 54 Java.
+
 ## Open issues and notes
+
+- **No real cost numbers**: keyless runs use no tokens, and model prices are configuration.
 
 - **The baseline is keyless**: it measures the deterministic parts and the rule-based baselines;
   a real-model run will need its own baseline, recorded with `make scorecard ARGS=--update`.
