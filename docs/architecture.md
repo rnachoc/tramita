@@ -12,7 +12,7 @@ later phases implement; everything else describes the code as it is.
 | Agent service | `services/agents` | Document reading, ingestion, policy search, claim analysis agents, claim event consumers and the per-claim Temporal workflows |
 | MCP server | `services/mcp` | Read-only analyst tools over the core, results masked for the model |
 | Review console | `web/console` | Claims handler inbox, claim detail, approve / correct / reject, behind a key-holding proxy |
-| Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading, policy search and end-to-end agent evaluations with CI gates (*implemented*); full eval set and baseline (*planned*) |
+| Evals | `services/agents/src/tramita_agents/evals`, `evals/` | Document reading, policy search and end-to-end evaluations, compared with a committed baseline |
 
 ## Trust boundary
 
@@ -230,6 +230,22 @@ sequenceDiagram
 - **ClaimWorkflow**: analyse; wait for documents (then analyse again) or for a review (then read
   the final status), each with a deadline; end when paid or rejected. Signals carry the event id.
 - **Commands**: `make worker`, `make bridge`, `make start-claims`.
+
+## Evaluation
+
+Three evaluations, each against ground truth derived from the generated facts (ADR 0007), and a
+scorecard that compares their headline numbers with `evals/baseline.json`
+([ADR 0017](decisions/0017-evaluation-baseline-and-scorecard.md)).
+
+| Evaluation | Command | What it measures |
+|---|---|---|
+| Document reading | `make eval-extraction` | Classification, fields, calibration, wrong facts sent, personal values leaked, instructions found |
+| Policy search | `make eval-retrieval` | Hit@k, MRR, nDCG and latency per mode and query set |
+| Agents end to end | `make process && make eval-agents` | Decision, routing, amount, exclusions, citations, unsafe automatic settlements, fraud routing, planted instructions |
+| Scorecard | `make scorecard` | Every headline number against the baseline of the same provider |
+
+Counts of harm have zero tolerance; scores that drift across CPUs have a small one. Runs of
+another provider are reported next to the baseline, never failed against it.
 
 ## Claim lifecycle
 
