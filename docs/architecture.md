@@ -273,6 +273,41 @@ flowchart LR
 - **Commands**: `make obs-up` (Jaeger :16686, Prometheus :9090, Grafana :3000); set
   `OTEL_EXPORTER_OTLP_ENDPOINT` and `MANAGEMENT_OTLP_TRACING_ENDPOINT` to export.
 
+## Kubernetes
+
+`deploy/helm/tramita` runs the system on Kubernetes
+([ADR 0019](decisions/0019-kubernetes-helm-chart-tested-in-kind.md)).
+
+```mermaid
+flowchart LR
+    subgraph app["Application (uid 10001, read-only root, no capabilities)"]
+        CO[console<br/>nginx] --> CORE[core]
+        API[agents-api] --> CORE
+        W[worker] --> CORE
+        IDX[index job]
+        B[bridge]
+    end
+    subgraph infra["Infrastructure (optional, single replica)"]
+        PG[(postgres<br/>+ pgvector)]
+        OS[(opensearch)]
+        S3[(rustfs)]
+        K[[kafka]]
+        T[[temporal]]
+    end
+    CORE --> PG
+    CORE --> K
+    API --> OS & PG & S3
+    W --> OS & PG & T
+    IDX --> OS & PG
+    B --> K & T
+    T --> PG
+```
+
+- Every arrow is an allowed ingress; everything else is denied by network policies.
+- Secrets are generated at install and kept on upgrade; none is in values or the repository.
+- `helm test` analyses a sample of claims inside the cluster and checks that an outsider pod
+  reaches only the console. CI runs it on kind after linting and validating the manifests.
+
 ## Claim lifecycle
 
 Implemented in the core (`ClaimStatus`) and followed by the claim workflow above.
