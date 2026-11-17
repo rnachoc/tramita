@@ -1,0 +1,6 @@
+# Build context is the repository root: send only what the image needs.
+*
+!data/policies/catalog.yaml
+!data/policies/clauses.json
+!services/core/pom.xml
+!services/core/src

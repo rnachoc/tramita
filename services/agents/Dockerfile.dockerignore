@@ -1,0 +1,16 @@
+# Build context is the repository root: send only what the image needs.
+*
+!pyproject.toml
+!uv.lock
+!.python-version
+!services/agents/pyproject.toml
+!services/agents/src
+!services/mcp/pyproject.toml
+!services/mcp/src
+!data/generator/pyproject.toml
+!data/generator/src
+!data/policies
+!docs/architecture.md
+!evals/retrieval
+!evals/baseline.json
+**/__pycache__
