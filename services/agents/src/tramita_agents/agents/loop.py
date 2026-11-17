@@ -53,6 +53,7 @@ class AgentRun[O: BaseModel]:
     calls: list[str] = field(default_factory=list)  # tool names in order, for traces
     errors: int = 0  # tool results returned as errors
     providers: set[str] = field(default_factory=set)
+    models: set[str] = field(default_factory=set)
     input_tokens: int = 0
     output_tokens: int = 0
     seconds: float = 0.0
@@ -110,6 +111,7 @@ def _run[O: BaseModel](  # noqa: PLR0917 - the arguments of run_agent, passed on
     run_calls: list[str] = []
     errors = 0
     providers: set[str] = set()
+    models: set[str] = set()
     tokens_in = tokens_out = 0
     for step in range(1, max_steps + 1):
         if time.monotonic() - started > timeout_s:
@@ -118,6 +120,7 @@ def _run[O: BaseModel](  # noqa: PLR0917 - the arguments of run_agent, passed on
             StepRequest(task, tier, system, prompt, specs, history=tuple(history))
         )
         providers.add(response.provider)
+        models.add(response.model)
         tokens_in += response.usage.input_tokens
         tokens_out += response.usage.output_tokens
         results: list[ToolResult] = []
@@ -135,6 +138,7 @@ def _run[O: BaseModel](  # noqa: PLR0917 - the arguments of run_agent, passed on
                     calls=run_calls,
                     errors=errors,
                     providers=providers,
+                    models=models,
                     input_tokens=tokens_in,
                     output_tokens=tokens_out,
                     seconds=round(time.monotonic() - started, 3),

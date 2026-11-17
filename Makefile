@@ -68,6 +68,10 @@ eval-extraction: py-sync ## Evaluate document reading on the generated data (nee
 eval-retrieval: py-sync ## Evaluate the policy search (stack up, `make data` and `make index`; report in evals/reports)
 	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-eval-retrieval $(ARGS)
 
+.PHONY: cost-report
+cost-report: ## Model calls, tokens, time and (when priced) money per claim and agent (after `make process`)
+	$(if $(ENV_FILE),set -a && . ./$(ENV_FILE) && set +a &&) uv run tramita-cost-report $(ARGS)
+
 .PHONY: scorecard
 scorecard: ## Compare the evaluation reports with evals/baseline.json (ARGS="--sections agents" or "--update")
 	uv run tramita-eval-baseline $(ARGS)

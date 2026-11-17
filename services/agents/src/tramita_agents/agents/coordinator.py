@@ -59,6 +59,7 @@ def _trace(run: AgentRun[Any]) -> dict[str, Any]:
         "calls": run.calls,
         "tool_errors": run.errors,
         "providers": sorted(run.providers),
+        "models": sorted(run.models),
         "input_tokens": run.input_tokens,
         "output_tokens": run.output_tokens,
         "seconds": run.seconds,
