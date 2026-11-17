@@ -156,9 +156,9 @@ quality; `make eval-extraction`):
 | Classification | 100% |
 | Key fields (number, date, CIF, total, rate; report dates) | 100% on PDFs and scans |
 | Line items read exactly | all 131 PDFs; 37 of 39 scans (the other 2 go to review) |
-| Wrong typed facts sent to the rules | 0 of 1,071 |
+| Wrong typed facts sent to the rules | 0 of 1,068 |
 | Personal values reaching the model, the redacted scans or the core | 0 of 1,044 |
-| Rule values lost to masking | 0 of 1,321 |
+| Rule values lost to masking | 0 of 1,319 |
 | Planted instructions found | 3 of 3 in PDFs, 0 of 3 in scans (too small for OCR), no false alarms |
 
 ## Policy search
