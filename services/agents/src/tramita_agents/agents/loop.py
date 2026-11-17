@@ -20,6 +20,7 @@ from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
+from tramita_agents import telemetry
 from tramita_agents.llm.steps import Exchange, StepRequest, ToolResult, ToolSpec
 from tramita_agents.llm.types import ModelClient, Tier
 
@@ -68,6 +69,30 @@ def run_agent[O: BaseModel](
     output: type[O],
     max_steps: int = 8,
     timeout_s: float = 120.0,
+) -> AgentRun[O]:
+    """Runs the agent inside an ``invoke_agent`` span (GenAI conventions)."""
+    with telemetry.span(
+        f"invoke_agent {task}",
+        **{telemetry.OPERATION: "invoke_agent", telemetry.AGENT_NAME: task},
+    ) as current:
+        run = _run(client, task, tier, system, prompt, tools, output, max_steps, timeout_s)
+        current.set_attribute("tramita.steps", run.steps)
+        current.set_attribute("tramita.tool_errors", run.errors)
+        current.set_attribute(telemetry.INPUT_TOKENS, run.input_tokens)
+        current.set_attribute(telemetry.OUTPUT_TOKENS, run.output_tokens)
+        return run
+
+
+def _run[O: BaseModel](  # noqa: PLR0917 - the arguments of run_agent, passed on
+    client: ModelClient,
+    task: str,
+    tier: Tier,
+    system: str,
+    prompt: str,
+    tools: Sequence[Tool],
+    output: type[O],
+    max_steps: int,
+    timeout_s: float,
 ) -> AgentRun[O]:
     by_name = {t.name: t for t in tools}
     if SUBMIT in by_name:
@@ -121,6 +146,20 @@ def run_agent[O: BaseModel](
 
 
 def _run_tool(tool: Tool | None, call_id: str, name: str, raw: dict[str, Any]) -> ToolResult:
+    with telemetry.span(
+        f"execute_tool {name}",
+        **{
+            telemetry.OPERATION: "execute_tool",
+            telemetry.TOOL_NAME: name,
+            telemetry.TOOL_CALL_ID: call_id,
+        },
+    ) as current:
+        result = _tool_result(tool, call_id, name, raw)
+        current.set_attribute("tramita.tool_error", result.is_error)
+        return result
+
+
+def _tool_result(tool: Tool | None, call_id: str, name: str, raw: dict[str, Any]) -> ToolResult:
     if tool is None:
         return ToolResult(call_id, f"Unknown tool '{name}'.", True)
     try:

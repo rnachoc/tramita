@@ -6,14 +6,21 @@ from tramita_agents.llm.anthropic_client import AnthropicModelClient
 from tramita_agents.llm.factory import build_model_client
 from tramita_agents.llm.fake import FakeModelClient
 from tramita_agents.llm.recording import RecordingModelClient
+from tramita_agents.llm.tracing import TracingModelClient
 from tramita_agents.llm.types import Tier
 from tramita_agents.settings import Settings
+
+
+def _inner(client: object) -> object:
+    """Every client is wrapped for tracing; the tests look at what it wraps."""
+    assert isinstance(client, TracingModelClient)
+    return client.inner
 
 
 def test_without_a_key_the_fake_is_used_with_the_recordings_and_responders(tmp_path: Path) -> None:
     settings = Settings(anthropic_api_key=None, tramita_recordings_dir=tmp_path)
 
-    client = build_model_client(settings, {"demo": lambda r: "{}"})
+    client = _inner(build_model_client(settings, {"demo": lambda r: "{}"}))
 
     assert isinstance(client, FakeModelClient)
     assert client.recordings == tmp_path
@@ -23,7 +30,7 @@ def test_without_a_key_the_fake_is_used_with_the_recordings_and_responders(tmp_p
 def test_with_a_key_the_configured_models_are_used() -> None:
     settings = Settings(anthropic_api_key=SecretStr("sk-ant-test"), tramita_model_fast="m-fast")
 
-    client = build_model_client(settings, {})
+    client = _inner(build_model_client(settings, {}))
 
     assert isinstance(client, AnthropicModelClient)
     assert client.models[Tier.FAST] == "m-fast"
@@ -36,7 +43,7 @@ def test_recording_can_be_switched_on(tmp_path: Path) -> None:
         tramita_recordings_dir=tmp_path,
     )
 
-    client = build_model_client(settings, {})
+    client = _inner(build_model_client(settings, {}))
 
     assert isinstance(client, RecordingModelClient)
     assert client.directory == tmp_path

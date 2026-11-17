@@ -18,6 +18,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
+from tramita_agents import telemetry
 from tramita_agents.agents.catalog import catalog
 from tramita_agents.agents.context import build_context
 from tramita_agents.agents.coordinator import Coordinator
@@ -35,6 +36,22 @@ OPEN = {"RECEIVED", "WAITING_DOCUMENTS"}
 def process_claim(
     core: CoreClient, coordinator: Coordinator, claim_id: str
 ) -> dict[str, Any] | None:
+    """Analyses one claim and proposes, inside a ``process_claim`` span that the core's spans
+    join (the HTTP calls carry ``traceparent``)."""
+    with telemetry.span("process_claim", **{"tramita.claim_id": claim_id}) as current:
+        outcome = _process(core, coordinator, claim_id)
+        if outcome is None:
+            current.set_attribute("tramita.skipped", True)
+            return None
+        for key in ("decision", "routing", "status"):
+            current.set_attribute(f"tramita.{key}", outcome[key])
+        telemetry.instruments().claims.add(
+            1, {"tramita.decision": outcome["decision"], "tramita.routing": outcome["routing"]}
+        )
+        return outcome
+
+
+def _process(core: CoreClient, coordinator: Coordinator, claim_id: str) -> dict[str, Any] | None:
     view = core.claim(claim_id)
     if view["status"] not in OPEN:
         return None
@@ -63,6 +80,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     settings = Settings()
     if settings.tramita_api_keys is None:
         sys.exit("TRAMITA_API_KEYS is not set (see .env.example).")
+    telemetry.configure("tramita-agents")
     ids = (
         args.claims.split(",")
         if args.claims
@@ -99,6 +117,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     print(f"\n{len(ids)} claims in {time.perf_counter() - started:.0f} s")
     for name, count in sorted(counts.items()):
         print(f"  {name}: {count}")
+    telemetry.shutdown()
     if counts["failed"]:
         raise SystemExit(1)
 

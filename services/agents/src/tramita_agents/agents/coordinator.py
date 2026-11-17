@@ -28,6 +28,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
+from tramita_agents import telemetry
 from tramita_agents.agents import coverage, damage, fraud
 from tramita_agents.agents.catalog import Catalog
 from tramita_agents.agents.context import ClaimContext
@@ -115,6 +116,22 @@ class Coordinator:
         self.catalog = catalog
 
     def plan(self, context: ClaimContext, history: Callable[[], list[dict[str, Any]]]) -> Plan:
+        """Composes the proposal inside an ``analyse_claim`` span (ids and outcomes only)."""
+        with telemetry.span(
+            "analyse_claim",
+            **{
+                "tramita.claim_id": context.claim_id,
+                "tramita.product": context.product_code,
+                "tramita.coverage": context.coverage,
+            },
+        ) as current:
+            plan = self._plan(context, history)
+            current.set_attribute("tramita.proposed_decision", plan.body["decision"])
+            current.set_attribute("tramita.review_requests", len(plan.body["review_requests"]))
+            current.set_attribute("tramita.agents_run", len(plan.agents))
+            return plan
+
+    def _plan(self, context: ClaimContext, history: Callable[[], list[dict[str, Any]]]) -> Plan:
         draft = _Draft(context, self.catalog, Plan(context.claim_id, {}))
         cov = context.coverage
         if self.catalog.guarantee(context.product_code, cov) is None:

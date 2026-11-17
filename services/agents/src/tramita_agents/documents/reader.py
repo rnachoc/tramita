@@ -19,6 +19,7 @@ from enum import StrEnum
 import pypdfium2 as pdfium
 from PIL import Image
 
+from tramita_agents import telemetry
 from tramita_agents.documents.extraction import ExtractedDocument, Source, score
 from tramita_agents.documents.injection import SuspectedInstruction, find_instructions
 from tramita_agents.documents.ocr import load_image, read_page, redact
@@ -161,6 +162,18 @@ class DocumentReader:
         self.scan_tier = scan_tier
 
     def read(self, data: bytes, pseudonyms: Pseudonymizer) -> ReadResult:
+        """Reads inside a ``read_document`` span: what was read and how much was masked."""
+        with telemetry.span("read_document", **{"tramita.bytes": len(data)}) as current:
+            result = self._read(data, pseudonyms)
+            current.set_attribute("tramita.document_type", result.extracted.document_type.value)
+            current.set_attribute("tramita.source", str(result.source.value))
+            current.set_attribute("tramita.masked_values", sum(result.pii_counts.values()))
+            current.set_attribute(
+                "tramita.instructions_flagged", len(result.suspected_instructions)
+            )
+            return result
+
+    def _read(self, data: bytes, pseudonyms: Pseudonymizer) -> ReadResult:
         if sniff(data) is FileKind.PDF:
             text = pdf_text(data)
             if len("".join(text.split())) >= MIN_TEXT_CHARACTERS:

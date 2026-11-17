@@ -21,6 +21,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+from tramita_agents import telemetry
 from tramita_agents.documents.pii import Pseudonymizer, mask
 from tramita_agents.search.corpus import Clause, corpus_version
 from tramita_agents.search.embeddings import Embedder
@@ -102,6 +103,22 @@ class PolicySearch:
         product_code: str | None = None,
         k: int = 5,
         mode: Mode | str = Mode.RERANKED,
+    ) -> SearchResult:
+        """Searches inside a ``policy_search`` span: mode, product, hits and stage timings."""
+        with telemetry.span(
+            "policy_search",
+            **{"tramita.search.mode": str(mode), "tramita.product": product_code, "tramita.k": k},
+        ) as current:
+            result = self._search(query, product_code, k, mode)
+            current.set_attribute("tramita.search.hits", len(result.hits))
+            stage = telemetry.instruments().stage_duration
+            for name, ms in result.timings_ms.items():
+                current.set_attribute(f"tramita.search.{name}_ms", ms)
+                stage.record(ms / 1000, {"tramita.stage": f"search.{name}"})
+            return result
+
+    def _search(
+        self, query: str, product_code: str | None, k: int, mode: Mode | str
     ) -> SearchResult:
         mode = Mode(mode)
         if not query.strip():

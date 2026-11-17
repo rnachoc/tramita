@@ -10,6 +10,7 @@ from tramita_agents.llm.anthropic_client import AnthropicModelClient
 from tramita_agents.llm.fake import FakeModelClient, Responder
 from tramita_agents.llm.recording import RecordingModelClient
 from tramita_agents.llm.steps import StepResponder
+from tramita_agents.llm.tracing import TracingModelClient
 from tramita_agents.llm.types import ModelClient, Tier
 from tramita_agents.settings import ModelProvider, Settings
 
@@ -19,7 +20,16 @@ def build_model_client(
     responders: Mapping[str, Responder],
     step_responders: Mapping[str, StepResponder] | None = None,
 ) -> ModelClient:
-    """Anthropic when a key is configured (optionally recording), otherwise the fake."""
+    """Anthropic when a key is configured (optionally recording), otherwise the fake; every call
+    traced (spans and metrics are no-ops unless telemetry is configured)."""
+    return TracingModelClient(_client(settings, responders, step_responders))
+
+
+def _client(
+    settings: Settings,
+    responders: Mapping[str, Responder],
+    step_responders: Mapping[str, StepResponder] | None,
+) -> ModelClient:
     if settings.model_provider is ModelProvider.FAKE:
         return FakeModelClient(
             settings.tramita_recordings_dir, dict(responders), dict(step_responders or {})
