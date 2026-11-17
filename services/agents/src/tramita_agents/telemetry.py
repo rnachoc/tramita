@@ -97,22 +97,37 @@ def _clean(attributes: dict[str, Any]) -> dict[str, Any]:
     return {k.replace("__", "."): v for k, v in attributes.items() if v is not None}
 
 
+# Bucket boundaries from the GenAI conventions. The SDK's defaults (0, 5, 10, 25, ...) suit
+# milliseconds: in seconds every call would fall into the first bucket and p95 would read ~4.75 s.
+SECONDS = [0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24, 20.48, 40.96, 81.92]
+TOKENS = [1, 4, 16, 64, 256, 1024, 4096, 16384, 65536, 262144, 1048576, 4194304]
+
+
 class Instruments:
     """Metric instruments, created against whichever meter provider is active."""
 
-    def __init__(self) -> None:
-        meter = metrics.get_meter(TRACER)
+    def __init__(self, meter: metrics.Meter | None = None) -> None:
+        meter = meter or metrics.get_meter(TRACER)
         self.operation_duration = meter.create_histogram(
-            "gen_ai.client.operation.duration", unit="s", description="Model call duration"
+            "gen_ai.client.operation.duration",
+            unit="s",
+            description="Model call duration",
+            explicit_bucket_boundaries_advisory=SECONDS,
         )
         self.token_usage = meter.create_histogram(
-            "gen_ai.client.token.usage", unit="{token}", description="Tokens per model call"
+            "gen_ai.client.token.usage",
+            unit="{token}",
+            description="Tokens per model call",
+            explicit_bucket_boundaries_advisory=TOKENS,
         )
         self.claims = meter.create_counter(
             "tramita.claims.analysed", unit="{claim}", description="Claims analysed by outcome"
         )
         self.stage_duration = meter.create_histogram(
-            "tramita.stage.duration", unit="s", description="Duration of a pipeline stage"
+            "tramita.stage.duration",
+            unit="s",
+            description="Duration of a pipeline stage",
+            explicit_bucket_boundaries_advisory=SECONDS,
         )
 
 

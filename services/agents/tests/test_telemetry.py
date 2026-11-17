@@ -3,6 +3,8 @@ from typing import Any
 
 import pytest
 from opentelemetry import trace
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import InMemoryMetricReader
 from opentelemetry.sdk.trace import ReadableSpan, TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
@@ -16,6 +18,7 @@ from tramita_agents.llm.fake import FakeModelClient
 from tramita_agents.llm.tracing import TracingModelClient
 from tramita_agents.responders import STEP_RESPONDERS
 from tramita_agents.search.service import PolicySearch
+from tramita_agents.telemetry import SECONDS, TOKENS, Instruments
 
 EXPORTER = InMemorySpanExporter()
 _provider = TracerProvider()
@@ -91,3 +94,24 @@ def test_no_span_carries_personal_data_or_claim_text(spans: list[ReadableSpan]) 
         for value in values:
             for personal in PERSONAL:
                 assert personal not in value, f"{span.name} carries {personal!r}"
+
+
+def test_durations_are_bucketed_in_seconds_and_tokens_in_tokens() -> None:
+
+    reader = InMemoryMetricReader()
+    instruments = Instruments(MeterProvider(metric_readers=[reader]).get_meter("test"))
+    instruments.operation_duration.record(0.03)
+    instruments.token_usage.record(900)
+
+    data = reader.get_metrics_data()
+    assert data is not None
+    points = {
+        m.name: m.data.data_points[0]
+        for rm in data.resource_metrics
+        for sm in rm.scope_metrics
+        for m in sm.metrics
+    }
+    duration = points["gen_ai.client.operation.duration"]
+    assert list(duration.explicit_bounds) == SECONDS  # type: ignore[union-attr]
+    assert list(duration.bucket_counts)[2] == 1  # type: ignore[union-attr]  # 0.02 < 0.03 <= 0.04
+    assert list(points["gen_ai.client.token.usage"].explicit_bounds) == TOKENS  # type: ignore[union-attr]
