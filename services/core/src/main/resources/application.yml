@@ -51,6 +51,10 @@ management:
   tracing:
     sampling:
       probability: 1.0
+  observations:
+    enable:
+      # Spring Security adds several spans per request; the HTTP span says what matters.
+      spring.security: false
   # Spans are exported only when MANAGEMENT_OTLP_TRACING_ENDPOINT is set (ADR 0018).
   endpoint:
     health:
