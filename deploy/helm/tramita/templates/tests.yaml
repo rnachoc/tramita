@@ -1,0 +1,106 @@
+{{- /*
+`helm test` checks the release from inside the cluster (ADR 0019):
+  - end-to-end: generate the synthetic dataset, seed the core, ingest and analyse a sample of
+    claims through the services, and check what the core decided;
+  - network policies: a pod with no allowed role cannot reach the database or the core, and can
+    reach the console.
+*/}}
+{{- $root := . -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "tramita.fullname" . }}-test-end-to-end
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: e2e
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  {{- include "tramita.podSecurity" dict | nindent 2 }}
+  initContainers:
+    # The generator rewrites data/; give it a writable copy over the read-only image.
+    - name: copy-data
+      image: {{ .Values.images.agents }}
+      {{- include "tramita.containerSecurity" . | nindent 6 }}
+      command: ["cp", "-r", "/app/data/.", "/work/"]
+      volumeMounts:
+        - {name: data, mountPath: /work}
+  containers:
+    - name: end-to-end
+      image: {{ .Values.images.agents }}
+      {{- include "tramita.containerSecurity" . | nindent 6 }}
+      env: {{- include "tramita.agentsEnv" . | nindent 8 }}
+        - {name: SAMPLE, value: "12"}
+      command: ["bash", "-ec"]
+      args:
+        - |
+          tramita-datagen > /dev/null
+          tramita-seed
+          tramita-ingest --limit "$SAMPLE" > /dev/null
+          tramita-process --limit "$SAMPLE"
+          python - <<'PY'
+          import json, os, httpx
+          from tramita_agents.core_client import role_key
+          key = role_key(os.environ["TRAMITA_API_KEYS"], "ANALYST")
+          ids = [c["claim_id"] for c in json.load(open("/app/data/generated/claims.json"))][: int(os.environ["SAMPLE"])]
+          core = httpx.Client(base_url=os.environ["TRAMITA_CORE_URL"], headers={"X-Api-Key": key})
+          statuses = {i: core.get(f"/api/claims/{i}").json()["status"] for i in ids}
+          undecided = [i for i, s in statuses.items() if s == "RECEIVED"]
+          assert not undecided, f"claims never analysed: {undecided}"
+          print(f"ok: {len(ids)} claims analysed in the cluster; {sorted(set(statuses.values()))}")
+          PY
+      volumeMounts:
+        - {name: tmp, mountPath: /tmp}
+        - {name: models, mountPath: /models}
+        - {name: data, mountPath: /app/data}
+  volumes:
+    - {name: tmp, emptyDir: {}}
+    - {name: data, emptyDir: {}}
+    - {name: models, persistentVolumeClaim: {claimName: {{ include "tramita.fullname" . }}-models}}
+{{- if .Values.networkPolicies.enabled }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "tramita.fullname" . }}-test-network-policies
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: outsider
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  {{- include "tramita.podSecurity" dict | nindent 2 }}
+  containers:
+    - name: probe
+      image: {{ .Values.images.agents }}
+      {{- include "tramita.containerSecurity" . | nindent 6 }}
+      command: ["python", "-c"]
+      args:
+        - |
+          import socket
+          def reachable(host, port):
+              try:
+                  socket.create_connection((host, port), timeout=5).close()
+                  return True
+              except OSError:
+                  return False
+          checks = {
+              "postgres": ("{{ include "tramita.name" (dict "root" $root "component" "postgres") }}", 5432, False),
+              "core": ("{{ include "tramita.name" (dict "root" $root "component" "core") }}", 8080, False),
+              "opensearch": ("{{ include "tramita.name" (dict "root" $root "component" "opensearch") }}", 9200, False),
+              "console": ("{{ include "tramita.name" (dict "root" $root "component" "console") }}", {{ .Values.console.service.port }}, True),
+          }
+          wrong = [name for name, (host, port, allowed) in checks.items() if reachable(host, port) != allowed]
+          assert not wrong, f"network policies not enforced for: {wrong}"
+          print("ok: an outsider reaches the console only")
+      volumeMounts:
+        - {name: tmp, mountPath: /tmp}
+  volumes:
+    - {name: tmp, emptyDir: {}}
+{{- end }}
