@@ -10,8 +10,8 @@ Deterministic rules in code decide whether that proposal can be executed automat
 to a human claims handler, who approves, corrects or rejects it from a review console. Approved
 payments are executed idempotently by the insurer's core system and every step is audited.
 
-> Status: **Phase 11 (Kubernetes)** of 12 complete. See [PROGRESS.md](PROGRESS.md) for what is
-> done and what is next. All data is synthetic; the insurer, its policies and its customers do not exist.
+> Status: **all 12 phases complete** (v1.0.0). See [PROGRESS.md](PROGRESS.md) for what was built
+> and its known limitations. All data is synthetic; the insurer, its policies and its customers do not exist.
 
 ## Principles
 
@@ -30,12 +30,12 @@ payments are executed idempotently by the insurer's core system and every step i
 8. **Prompt-injection resistant**: document text is data, never instructions. The eval set includes
    documents with hidden instructions.
 
-## Architecture (target)
+## Architecture
 
 ```mermaid
 flowchart LR
     subgraph agents["services/agents (Python, FastAPI)"]
-        X[Document reader<br/>vision + structured output] --> C[Coordinator agent]
+        X[Document reader<br/>vision + structured output] --> C[Coordinator<br/>in code]
         C --> CA[Coverage agent]
         C --> DA[Damage agent]
         C --> FA[Fraud agent]
@@ -54,7 +54,7 @@ flowchart LR
     C -- proposals only --> API
 ```
 
-The full design, with event flow and sequence diagrams, will live in
+The full design, with event flow and sequence diagrams, lives in
 [docs/architecture.md](docs/architecture.md). Decisions and their trade-offs are recorded as ADRs
 in [docs/decisions](docs/decisions).
 
@@ -310,10 +310,13 @@ pre-commit install        # secret scan and hygiene checks on every commit
 ```
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org/), one per change. CI
-scans the full history for secrets, lints, type-checks and tests every service, gates on the
-document reading evaluation, starts the compose stack and sends each service a real request, runs
-the core against it and ingests a sample of claims end to end, and builds every pushed commit on
-its own so the history stays bisectable. Test counts are published as annotations.
+scans the full history for secrets, lints, type-checks and tests every service, and builds every
+pushed commit on its own so the history stays bisectable. Against the compose stack it sends each
+service a real request, runs the core, ingests and analyses every claim with the agents, gates
+document reading, policy search and the agents against the baseline, checks traces and metrics,
+runs the workflows through Kafka and Temporal, reads every claim through the MCP server and
+reviews one in the console with a real browser. It also installs the Helm chart on kind and runs
+`helm test`. Test counts and scorecards are published as annotations.
 
 ## License
 

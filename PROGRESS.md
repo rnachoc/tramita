@@ -5,7 +5,7 @@ resuming work, read this file first.
 
 ## Current phase
 
-**Phase 12: wrap-up** (next). Phases 0 to 11 are complete.
+**All phases complete** (v1.0.0). What remains is listed under open issues.
 
 ## Phase status
 
@@ -23,7 +23,7 @@ resuming work, read this file first.
 | 9 | Full evaluation | done | v0.10.0 |
 | 10 | Observability and cost | done | v0.11.0 |
 | 11 | Kubernetes | done | v0.12.0 |
-| 12 | Wrap-up | pending | |
+| 12 | Wrap-up | done | v1.0.0 |
 
 ## Phase 0: done
 
@@ -215,6 +215,15 @@ resuming work, read this file first.
   console. Verified on kind locally (Kubernetes 1.37); CI lints, validates with kubeconform and
   runs the tests on kind.
 
+## Phase 12: done
+
+- `make demo` runs the whole pipeline on a fresh clone without credentials, and `make eval` every
+  evaluation with the comparison against the baseline, as ADR 0005 promised.
+- README and PROGRESS checked against fresh evaluation runs: two document reading figures were
+  stale (1,068 facts sent and 1,319 rule values today) and are corrected.
+- `make demo` repeats the steps CI runs on every push; it was not run end to end on the
+  maintainer's machine, which has no Java or Maven outside Docker.
+
 ## Open issues and notes
 
 - **The chart's infrastructure is development-grade**: single replica, no backups, OpenSearch
@@ -254,8 +263,6 @@ resuming work, read this file first.
 
 - **MinIO replaced by RustFS** (ADR 0006): MinIO community images are no longer published.
 - **Spotless runs google-java-format 1.28.0**, the newest version Spotless supports on Java 17.
-- **Reviewers are not individually authenticated** (ADR 0009): the console has a REVIEWER key and
-  the reviewer's name travels in the request. Production would use OIDC.
 - **Fraud weights are expert-set** in the catalog, not learned (ADR 0008).
 - **Build environment note**: parts of this project were developed in a sandbox without access to
   Maven Central, Docker Hub or Hugging Face. Java builds, the compose stack and anything that
