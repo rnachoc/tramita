@@ -11,7 +11,7 @@ help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 # --- Infrastructure -----------------------------------------------------------
-.PHONY: up down reset ps logs smoke
+.PHONY: up down reset ps logs smoke obs-up
 up: ## Start the local infrastructure and wait until every service is healthy
 	$(COMPOSE) up -d --wait
 
@@ -23,6 +23,9 @@ down: ## Stop the local infrastructure (keeps data volumes)
 
 reset: ## Stop the local infrastructure and delete its data volumes
 	$(COMPOSE) down -v
+
+obs-up: ## Start the observability stack: OTLP collector, Jaeger (:16686), Prometheus (:9090), Grafana (:3000)
+	$(COMPOSE) --profile observability up -d otel-collector jaeger prometheus grafana
 
 ps: ## Show infrastructure status
 	$(COMPOSE) ps

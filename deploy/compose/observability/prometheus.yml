@@ -1,0 +1,12 @@
+# Scrapes the agents' metrics (through the collector) and the core's (on the host).
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: agents
+    static_configs:
+      - targets: ["otel-collector:8889"]
+  - job_name: core
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:CORE_PORT_PLACEHOLDER"]

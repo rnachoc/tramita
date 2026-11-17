@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: tramita
+    folder: Tramita
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
